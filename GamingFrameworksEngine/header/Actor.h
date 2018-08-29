@@ -1,9 +1,18 @@
 #pragma once
 #include "Sprite.h"
 
-class Drawable
+class Actor
 {
 private:
+    // physics
+    float xAcceleration;
+    float yAcceleration;
+    float xSpeed;
+    float ySpeed;
+    float xPosition;
+    float yPosition;
+
+    // drawing
     Sprite sprite;
     float imageSpeed;
     int imageFrame;
@@ -13,8 +22,11 @@ private:
     float imageAngle;
 
 public:
-    Drawable();
-    ~Drawable();
+    Actor();
+    ~Actor();
+
+    void move();
+
     void draw();
 };
 
