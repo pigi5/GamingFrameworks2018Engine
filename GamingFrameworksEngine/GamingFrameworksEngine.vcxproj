@@ -19,11 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Drawable.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Moveable.cpp" />
+    <ClCompile Include="src\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="header\Drawable.h" />
     <ClInclude Include="header\Engine.h" />
+    <ClInclude Include="header\Moveable.h" />
+    <ClInclude Include="header\Sprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
