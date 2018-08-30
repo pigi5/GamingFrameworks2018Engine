@@ -32,6 +32,14 @@ bool Rectangle::willCollideY(const Rectangle* other, float ySpeed) const
             y + ySpeed < other->y + other->height;
 }
 
+bool Rectangle::willCollide(const Rectangle* other, float xSpeed, float ySpeed) const
+{
+    return x + width + xSpeed > other->x && 
+            x + xSpeed < other->x + other->width && 
+            y + height + ySpeed > other->y && 
+            y + ySpeed < other->y + other->height;
+}
+
 float Rectangle::getDistanceX(const Rectangle* other) const
 {
     if (x + width < other->x)

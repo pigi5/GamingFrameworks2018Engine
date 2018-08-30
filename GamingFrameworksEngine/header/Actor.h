@@ -36,8 +36,10 @@ public:
     bool isCollidable() const;
     bool willCollideX(const Actor* actor) const;
     bool willCollideY(const Actor* actor) const;
+    bool willCollide(const Actor* actor) const;
     float getHitboxDistanceX(const Actor* other) const;
     float getHitboxDistanceY(const Actor* other) const;
+    virtual void onCollision(const Actor* other) = 0;
 
     Sprite* getSprite() const;
 };
