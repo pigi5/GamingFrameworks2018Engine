@@ -25,8 +25,8 @@ public:
     Actor();
     ~Actor();
 
-    void move();
+    void move(double delta_time);
 
-    void draw();
+    void draw(double delta_time);
 };
 
