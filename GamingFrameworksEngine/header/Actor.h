@@ -1,4 +1,6 @@
 #pragma once
+
+#include <list>
 #include "Sprite.h"
 
 class Actor
@@ -13,7 +15,7 @@ private:
     float yPosition;
 
     // drawing
-    Sprite sprite;
+    Sprite* sprite;
     float imageSpeed;
     int imageFrame;
     int imageNum;
@@ -24,9 +26,18 @@ private:
 public:
     Actor();
     ~Actor();
+    
+    virtual void step(double) = 0;
 
-    void move(double delta_time);
+    void move(double, std::list<Actor*>&);
 
-    void draw(double delta_time);
+    void draw(double);
+    
+    bool isCollidable() const;
+    bool willCollideX(const Actor* actor) const;
+    bool willCollideY(const Actor* actor) const;
+    float getHitboxDistanceX(const Actor* other) const;
+    float getHitboxDistanceY(const Actor* other) const;
+
+    Sprite* getSprite() const;
 };
-

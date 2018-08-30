@@ -1,10 +1,16 @@
 #pragma once
 
+#include <vector>
+#include "Rectangle.h"
+
 class Sprite
 {
 private:
-    // some type of array or list of images
+    //std::vector<Image*> frames;
+    Rectangle* hitbox;
 public:
     Sprite();
     ~Sprite();
+
+    Rectangle* getHitbox() const;
 };
