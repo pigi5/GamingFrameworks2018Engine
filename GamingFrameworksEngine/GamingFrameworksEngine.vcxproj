@@ -22,11 +22,13 @@
     <ClCompile Include="src\Actor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Room.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\Actor.h" />
     <ClInclude Include="header\Engine.h" />
+    <ClInclude Include="header\Room.h" />
     <ClInclude Include="header\Sprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
