@@ -25,11 +25,18 @@ bool Button::isPressed(){
 	return state;
 }
 
+int Button::getholdTime()
+{
+	return holdTime;
+}
+
 void Button::updateState(){
 	if (sf::Keyboard::isKeyPressed(this->key)) {
 		setState(true);
+		holdTime++;
 	}
 	else {
 		setState(false);
+		holdTime = 0;
 	}
 }

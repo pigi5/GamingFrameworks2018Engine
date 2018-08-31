@@ -11,6 +11,7 @@ private:
 	GameCommand command;
 	sf::Keyboard::Key key;
 	bool state = false;
+	int holdTime = 0; // FIX
 
 public:
 	Button(GameCommand command, sf::Keyboard::Key key);
@@ -21,6 +22,7 @@ public:
 
 	void setState(bool state);
 	bool isPressed();
+	int getholdTime();
 
 	void updateState();
 
