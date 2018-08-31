@@ -3,6 +3,7 @@
 #include <vector>
 #include "Rectangle.h"
 
+// Holds an animation and a hitbox for objects to use.
 class Sprite
 {
 private:

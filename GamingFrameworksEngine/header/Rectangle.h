@@ -1,5 +1,6 @@
 #pragma once
 
+// Simple 
 class Rectangle
 {
 public:
@@ -10,6 +11,7 @@ public:
 
     Rectangle(float, float, float, float);
     
+    // Collision functions
     bool collides(const Rectangle*) const;
     bool willCollideX(const Rectangle*, float) const;
     bool willCollideY(const Rectangle*, float) const;

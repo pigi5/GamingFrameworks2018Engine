@@ -1,3 +1,6 @@
 #pragma once
 
-const float GRAVITY = 1.0f;
+namespace engine_constant
+{
+    const float GRAVITY = 1.0f;
+}

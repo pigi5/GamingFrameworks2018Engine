@@ -3,6 +3,7 @@
 
 Engine::Engine()
 {
+
 }
 
 
@@ -16,7 +17,7 @@ void Engine::run()
     bool go = true;
     std::chrono::steady_clock::time_point loopStartTime;
     std::chrono::steady_clock::duration loopElapsedTime;
-    // Microsecond duration between runs of the game loop
+    // Second duration between runs of the game loop
     double deltaTime;
 
     loopStartTime = std::chrono::high_resolution_clock::now();
