@@ -23,6 +23,7 @@
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Overlay.cpp" />
     <ClCompile Include="src\Rectangle.cpp" />
     <ClCompile Include="src\Room.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="header\Constants.h" />
     <ClInclude Include="header\Engine.h" />
     <ClInclude Include="header\Material.h" />
+    <ClInclude Include="header\Overlay.h" />
     <ClInclude Include="header\Rectangle.h" />
     <ClInclude Include="header\Room.h" />
     <ClInclude Include="header\Sprite.h" />

@@ -4,7 +4,8 @@
 #include "Sprite.h"
 #include "Material.h"
 
-// A "world object" that can move and be drawn to the screen.
+// A "world object" that can move and be drawn to the screen. Its
+// position is in world or "room" coordinates.
 class Actor
 {
 private:

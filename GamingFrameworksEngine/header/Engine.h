@@ -1,6 +1,13 @@
 #pragma once
+
+#include <vector>
+#include "Room.h"
+
 class Engine
 {
+private:
+    std::vector<Room*> rooms;
+    int currentRoomIndex;
 public:
     Engine();
     ~Engine();

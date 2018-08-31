@@ -33,9 +33,12 @@ void Engine::run()
         // DETECT INPUT
 
         // GAME LOGIC
+        rooms[currentRoomIndex]->step(deltaTime);
 
         // DRAW WORLD
+        rooms[currentRoomIndex]->draw(deltaTime);
 
         // DRAW GUI
+        rooms[currentRoomIndex]->drawHUD(deltaTime);
     }
 }
