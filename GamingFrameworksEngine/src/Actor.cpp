@@ -17,7 +17,7 @@ Actor::~Actor()
 // params:
 //   deltaTime - the time in seconds between this frame and the previous frame
 //   actors - other actors in the room
-void Actor::move(double deltaTime, std::list<Actor*>& actors)
+void Actor::move(std::list<Actor*>& actors)
 {
     // Increment speeds
     xSpeed += xAcceleration;
@@ -85,14 +85,28 @@ void Actor::move(double deltaTime, std::list<Actor*>& actors)
     }
     
     // Increment positions
-    setXPosition(xPosition + xSpeed);
-    setYPosition(yPosition + ySpeed);
+	xPositionPrevious = xPosition;
+	yPositionPrevious = yPosition;
+    xPosition += xSpeed;
+    yPosition += ySpeed;
+}
+
+// Does a linear interpolation of the actors current state and its previous
+// state based on the given progress value
+// params:
+//   progress - the amount to interpolate; must be between 0 and 1, where
+//              0 indicates to use the previous state and 1 indicates to
+//              use the current state
+void Actor::interpolateState(float progress)
+{
+	setXPosition(xPositionPrevious + (xPositionPrevious - xPosition) * progress);
+	setXPosition(yPositionPrevious + (yPositionPrevious - yPosition) * progress);
 }
 
 // Draws the object to the screen.
 // params:
 //   deltaTime - the time in seconds between this frame and the previous frame
-void Actor::draw(double deltaTime)
+void Actor::draw()
 {
 
 }

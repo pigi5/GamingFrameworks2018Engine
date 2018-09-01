@@ -1,5 +1,6 @@
 #include <chrono>
 #include "../header/Engine.h"
+#include "../header/Constants.h"
 
 Engine::Engine()
 {
@@ -15,30 +16,47 @@ Engine::~Engine()
 void Engine::run()
 {
     bool go = true;
-    std::chrono::steady_clock::time_point loopStartTime;
-    std::chrono::steady_clock::duration loopElapsedTime;
-    // Second duration between runs of the game loop
-    double deltaTime;
+	std::chrono::steady_clock::time_point currentTime;
+	std::chrono::steady_clock::time_point previousTime;
+    double loopDeltaTime;
+	double accumulator = 0.0;
 
-    loopStartTime = std::chrono::high_resolution_clock::now();
+	previousTime = std::chrono::high_resolution_clock::now();
     while (go) {
+		// Reset the timer
+		currentTime = std::chrono::high_resolution_clock::now();
         // Calculate the time elapsed between the beginning of the last loop and now
-        loopElapsedTime = std::chrono::high_resolution_clock::now() - loopStartTime;
-        // Reset the timer
-        loopStartTime = std::chrono::high_resolution_clock::now();
-        // Cast elapsed time to seconds
-        // This variable should be passed in to every calculation of game physics and animation
-        deltaTime = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(loopElapsedTime).count();
+		loopDeltaTime = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(currentTime - previousTime).count();
+		previousTime = currentTime;
 
-        // DETECT INPUT
+		// Cap the maximum calculated time between frames
+		if (loopDeltaTime < engine_constant::MAX_DELTA_TIME)
+		{
+			loopDeltaTime = engine_constant::MAX_DELTA_TIME;
+		}
 
-        // GAME LOGIC
-        rooms[currentRoomIndex]->step(deltaTime);
+		// Add calculated time since frame to accumulator
+		accumulator += loopDeltaTime;
+
+		// Iterate steps at fixed rate until we can't do another
+		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
+		{
+			// Perform iterative game logic
+			rooms[currentRoomIndex]->step();
+			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
+		}
+
+		// Interpolate state for a smooth simulation
+		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
+		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
+		//       twice the frame rate
+		rooms[currentRoomIndex]->interpolateState(-accumulator / engine_constant::PHYSICS_DELTA_TIME);
+
 
         // DRAW WORLD
-        rooms[currentRoomIndex]->draw(deltaTime);
+        rooms[currentRoomIndex]->draw();
 
         // DRAW GUI
-        rooms[currentRoomIndex]->drawHUD(deltaTime);
+        rooms[currentRoomIndex]->drawHUD();
     }
 }

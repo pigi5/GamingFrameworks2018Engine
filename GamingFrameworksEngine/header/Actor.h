@@ -16,6 +16,8 @@ private:
     float ySpeed;
     float xPosition;
     float yPosition;
+	float xPositionPrevious;
+	float yPositionPrevious;
 
     Material* material;
 
@@ -33,13 +35,14 @@ public:
     ~Actor();
     
     // Override to perform custom object code every game loop
-    virtual void step(double) = 0;
+    virtual void step() = 0;
 
     // Implements collision and motion of the object
-    void move(double, std::list<Actor*>&);
+    void move(std::list<Actor*>&);
+	void interpolateState(float);
 
     // Draws the object to the screen
-    void draw(double);
+    void draw();
     
     // Collision functions
     bool isCollidable() const;

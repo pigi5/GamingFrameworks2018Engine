@@ -8,31 +8,39 @@ Room::~Room()
 {
 }
 
-void Room::step(double deltaTime)
+void Room::step()
 {
     for (Actor* actor : actors)
     {
-        actor->step(deltaTime);
+        actor->step();
     }
 
     for (Actor* actor : actors)
     {
-        actor->move(deltaTime, actors);
+        actor->move(actors);
     }
 }
 
-void Room::draw(double deltaTime)
+void Room::interpolateState(float progress)
+{
+	for (Actor* actor : actors)
+	{
+		actor->interpolateState(progress);
+	}
+}
+
+void Room::draw()
 {
     for (Actor* actor : actors)
     {
-        actor->draw(deltaTime);
+        actor->draw();
     }
 }
 
-void Room::drawHUD(double deltaTime)
+void Room::drawHUD()
 {
     for (Overlay* overlay : overlays)
     {
-        overlay->draw(deltaTime);
+        overlay->draw();
     }
 }

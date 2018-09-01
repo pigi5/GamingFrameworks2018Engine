@@ -1,6 +1,6 @@
 #include "../header/Overlay.h"
     
-void Overlay::draw(double deltaTime)
+void Overlay::draw()
 {
     
 }

@@ -14,7 +14,8 @@ public:
     Room();
     ~Room();
 
-    void step(double);
-    void draw(double);
-    void drawHUD(double);
+    void step();
+	void interpolateState(float);
+    void draw();
+    void drawHUD();
 };
