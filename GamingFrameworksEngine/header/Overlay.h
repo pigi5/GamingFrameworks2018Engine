@@ -8,5 +8,5 @@ class Overlay : Actor
 {
 public:
     // Draws the object to the screen
-    void draw();
+    void draw(sf::RenderWindow* window);
 };

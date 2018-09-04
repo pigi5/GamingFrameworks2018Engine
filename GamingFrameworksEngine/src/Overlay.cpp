@@ -1,6 +1,6 @@
 #include "../header/Overlay.h"
     
-void Overlay::draw()
+void Overlay::draw(sf::RenderWindow* window)
 {
     
 }

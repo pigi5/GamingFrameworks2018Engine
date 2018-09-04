@@ -13,7 +13,7 @@ Engine::~Engine()
 }
 
 // Runs the game loop until complete.
-void Engine::run()
+void Engine::run(sf::RenderWindow* window)
 {
     bool go = true;
 	std::chrono::steady_clock::time_point currentTime;
@@ -54,9 +54,9 @@ void Engine::run()
 
 
         // DRAW WORLD
-        rooms[currentRoomIndex]->draw();
+        rooms[currentRoomIndex]->draw(window);
 
         // DRAW GUI
-        rooms[currentRoomIndex]->drawHUD();
+        rooms[currentRoomIndex]->drawHUD(window);
     }
 }

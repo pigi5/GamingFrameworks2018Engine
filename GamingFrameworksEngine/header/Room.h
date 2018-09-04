@@ -16,6 +16,6 @@ public:
 
     void step();
 	void interpolateState(float);
-    void draw();
-    void drawHUD();
+    void draw(sf::RenderWindow* window);
+    void drawHUD(sf::RenderWindow* window);
 };

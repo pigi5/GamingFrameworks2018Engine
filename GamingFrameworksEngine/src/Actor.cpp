@@ -106,7 +106,7 @@ void Actor::interpolateState(float progress)
 // Draws the object to the screen.
 // params:
 //   deltaTime - the time in seconds between this frame and the previous frame
-void Actor::draw()
+void Actor::draw(sf::RenderWindow* window)
 {
 
 }

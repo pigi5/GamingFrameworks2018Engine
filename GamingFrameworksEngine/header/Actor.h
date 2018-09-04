@@ -42,7 +42,7 @@ public:
 	void interpolateState(float);
 
     // Draws the object to the screen
-    void draw();
+    void draw(sf::RenderWindow* window);
     
     // Collision functions
     bool isCollidable() const;

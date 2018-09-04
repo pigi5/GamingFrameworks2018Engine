@@ -13,6 +13,6 @@ public:
     ~Engine();
 
     // Runs the main game loop
-    void run();
+    void run(sf::RenderWindow* window);
 };
 
