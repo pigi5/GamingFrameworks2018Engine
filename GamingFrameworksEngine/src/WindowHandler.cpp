@@ -42,7 +42,7 @@ void WindowHandler::setWinName(string name) {
 void WindowHandler::toggleFullScreen() {
 	this->fullScreen *= -1;
 }
-void WindowHandler::openWindow(void* function) {
+void WindowHandler::openWindow(vector<sf::Drawable> toDraw) {
 	if (fullScreen) {
 		window.create(fullValid[0], windowName, sf::Style::Fullscreen);
 	}
@@ -51,6 +51,19 @@ void WindowHandler::openWindow(void* function) {
 	}
 
 	while (window.isOpen()) {
-		function;
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear(sf::Color::Black);
+
+		for (int i = 0; i < toDraw.size(); i++) {
+			window.draw(toDraw[i]);
+		}
+
+		window.display();
 	}
 }

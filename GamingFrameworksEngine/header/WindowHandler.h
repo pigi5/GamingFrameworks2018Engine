@@ -1,5 +1,6 @@
 #pragma once
-#include <SFML/Window.hpp>
+#include <SFML\Graphics\RenderWindow.hpp>
+#include <SFML\Graphics.hpp>
 #include <vector>
 #include <string>
 using namespace std;
@@ -11,7 +12,7 @@ private:
 	string windowName;
 	sf::VideoMode currentMode = sf::VideoMode(800,600);
 	vector<sf::VideoMode> fullValid = currentMode.getFullscreenModes();
-	sf::Window window;
+	sf::RenderWindow window;
 public:
 	WindowHandler();
 	WindowHandler(string name, int width, int height);
@@ -24,5 +25,5 @@ public:
 	void setWinHeight(int height);
 	void setWinName(string name);
 	void toggleFullScreen();
-	void openWindow(void* function);
+	void openWindow(vector<sf::Drawable> toDraw);
 };
