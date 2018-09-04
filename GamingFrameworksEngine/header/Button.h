@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Window.hpp>
-#include "Command.h"
+#include "../header/Command.h"
 
 using namespace std;
 
