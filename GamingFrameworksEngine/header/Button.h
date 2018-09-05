@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Window.hpp>
-#include "../header/Command.h"
 
 using namespace std;
 
@@ -8,21 +7,22 @@ using namespace std;
 // as well as its state and the key that activates the command
 class Button {
 private:
-	GameCommand command;
+	vector<double> params;
 	sf::Keyboard::Key key;
 	bool state = false;
-	int holdTime = 0; // FIX
 
 public:
-	Button(GameCommand command, sf::Keyboard::Key key);
+	Button();
+	Button(sf::Keyboard::Key key, vector<double> params);
 	~Button();
 
-	void setCommand(GameCommand command);
 	void setKey(sf::Keyboard::Key key);
+	void setParams(vector<double> params);
+	vector<double> getParams();
+	sf::Keyboard::Key getKey();
 
 	void setState(bool state);
 	bool isPressed();
-	int getholdTime();
 
 	void updateState();
 

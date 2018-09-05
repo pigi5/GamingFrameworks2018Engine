@@ -1,4 +1,6 @@
 #include "Player.h"
+#include <iostream>
+
 
 Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 {
@@ -6,10 +8,14 @@ Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 	this->objName = "Player";
 	this->xPosition = 200;
 	this->yPosition = 200;
-	this->xSpeed = 0.0005;
+	this->xSpeed = 0;
+	this->ySpeed = 0;
 	this->hitbox = new Rectangle(xPosition, yPosition, xSize, ySize);
 	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
-	this->shape->setColorFill(sf::Color::Blue);
+	this->shape->setColorFill(sf::Color::White);
+	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-.0005)));
+	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, .0005)));
+	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005)));
 }
 
 Player::~Player()
@@ -22,8 +28,56 @@ Player::~Player()
 void Player::step()
 {
 	//INPUTS HERE
-	this->shape->setPosition(xPosition, yPosition);
+	for (Button b : buttons) {
+		b.updateState();
+		if (b.isPressed()) {
+			switch (b.getKey())
+			{
+			case sf::Keyboard::Left:
+				this->setXSpeed(b.getParams()[0]);
+				break;
+			case sf::Keyboard::Right:
+				this->setXSpeed(b.getParams()[0]);
+				break;
+			default:
+				break;
+			}
+		}
+
+	}
+
+	// Does joystick really need a class? Maybe player needs to know what joystick it is?
+	// Or just joystick button bindings
+	// joysticks could just "press" buttons..I dont know if thats wise though.
+	if (sf::Joystick::isConnected(0)) {
+		if (sf::Joystick::hasAxis(0, sf::Joystick::X)) {
+			if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) > 50) {
+				this->setXSpeed(.0005);
+			}
+			else if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -50) {
+				this->setXSpeed(-.0005);
+			}
+		}
+		if (sf::Joystick::isButtonPressed(0, 0)) {
+			this->shape->setColorFill(sf::Color::Green);
+		}
+		if (sf::Joystick::isButtonPressed(0, 1)) {
+			this->shape->setColorFill(sf::Color::Red);
+		}
+		if (sf::Joystick::isButtonPressed(0, 2)) {
+			this->shape->setColorFill(sf::Color::Blue);
+		}
+		if (sf::Joystick::isButtonPressed(0, 3)) {
+			this->shape->setColorFill(sf::Color::Yellow);
+		}
+
+			
+	}
+
 	this->move(this->actorList);
+	this->shape->setPosition(xPosition, yPosition);
+
+
 }
 
 void Player::draw(sf::RenderWindow * window)

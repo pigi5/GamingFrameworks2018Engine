@@ -1,20 +1,34 @@
 #include"../header/Button.h"
 using namespace std;
 
-Button::Button(GameCommand command, sf::Keyboard::Key key) {
-	this->command = command;
-	this->key = key;
+Button::Button() {
+	this->key = sf::Keyboard::A;
 }
+
+Button::Button(sf::Keyboard::Key key, vector<double> params) {
+	this->key = key;
+	this->params = params;
+}
+
 
 Button::~Button(){
 }
 
-void Button::setCommand(GameCommand command){
-	this->command = command;
-}
 
 void Button::setKey(sf::Keyboard::Key key){
 	this->key = key;
+}
+
+sf::Keyboard::Key Button::getKey(){
+	return key;
+}
+
+void Button::setParams(vector<double> params){
+	this->params = params;
+}
+
+vector<double> Button::getParams(){
+	return params;
 }
 
 void Button::setState(bool state){
@@ -25,18 +39,12 @@ bool Button::isPressed(){
 	return state;
 }
 
-int Button::getholdTime()
-{
-	return holdTime;
-}
-
 void Button::updateState(){
 	if (sf::Keyboard::isKeyPressed(this->key)) {
 		setState(true);
-		holdTime++;
 	}
 	else {
 		setState(false);
-		holdTime = 0;
 	}
 }
+
