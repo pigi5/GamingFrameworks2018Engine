@@ -7,7 +7,7 @@ class Engine
 {
 private:
     std::vector<Room*> rooms;
-    int currentRoomIndex;
+	int currentRoomIndex;
 public:
     Engine();
     ~Engine();

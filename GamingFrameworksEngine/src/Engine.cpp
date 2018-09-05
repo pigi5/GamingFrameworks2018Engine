@@ -1,10 +1,11 @@
 #include <chrono>
+#include <iostream>
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 
 Engine::Engine()
 {
-
+	currentRoomIndex = 0;
 }
 
 
@@ -42,8 +43,15 @@ void Engine::run(sf::RenderWindow* window)
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
 		{
 			// Perform iterative game logic
-			rooms[currentRoomIndex]->step();
-			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
+			if (!rooms.empty()) {
+				rooms[currentRoomIndex]->step();
+				accumulator -= engine_constant::PHYSICS_DELTA_TIME;
+			}
+			else
+			{
+				cout << "No rooms exist" << endl;
+				exit(1);
+			}
 		}
 
 		// Interpolate state for a smooth simulation
