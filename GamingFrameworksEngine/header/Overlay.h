@@ -8,5 +8,7 @@ class Overlay : Actor
 {
 public:
     // Draws the object to the screen
-    void draw(sf::RenderWindow* window);
+    virtual void draw(sf::RenderWindow* window) = 0;
+	void step();
+	void onCollision(const Actor* other);
 };

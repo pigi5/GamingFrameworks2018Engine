@@ -9,7 +9,7 @@ private:
     std::vector<Room*> rooms;
 	int currentRoomIndex;
 public:
-    Engine();
+    Engine(std::vector<Room*> rooms);
     ~Engine();
 
     // Runs the main game loop

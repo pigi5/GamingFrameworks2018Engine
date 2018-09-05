@@ -1,7 +1,9 @@
 #include "../header/Room.h"
 
-Room::Room()
+Room::Room(std::list<Actor*> actors, std::list<Overlay*> overlays)
 {
+	this->actors = actors;
+	this->overlays = overlays;
 }
 
 Room::~Room()

@@ -2,13 +2,18 @@
 
 #include <list>
 #include "Sprite.h"
+#include "Shape.h"
 #include "Material.h"
 
 // A "world object" that can move and be drawn to the screen. Its
 // position is in world or "room" coordinates.
 class Actor
 {
-private:
+protected:
+	// identifiers
+	int id;
+	std::string objName;
+
     // physics
     float xAcceleration;
     float yAcceleration;
@@ -23,6 +28,7 @@ private:
 
     // drawing
     Sprite* sprite;
+	Shape* shape;
     float imageSpeed;
     int imageFrame;
     int imageNum;
@@ -34,6 +40,13 @@ public:
     Actor();
     ~Actor();
     
+	// Getters/Setters
+	std::string getName() const;
+	int getId() const;
+
+	void setXSpeed(float speed);
+	void setYSpeed(float speed);
+
     // Override to perform custom object code every game loop
     virtual void step() = 0;
 
@@ -42,7 +55,7 @@ public:
 	void interpolateState(float);
 
     // Draws the object to the screen
-    void draw(sf::RenderWindow* window);
+	virtual void draw(sf::RenderWindow* window) = 0;
     
     // Collision functions
     bool isCollidable() const;

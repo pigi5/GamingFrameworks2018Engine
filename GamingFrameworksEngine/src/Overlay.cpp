@@ -1,6 +1,8 @@
 #include "../header/Overlay.h"
-    
-void Overlay::draw(sf::RenderWindow* window)
-{
-    
+
+void Overlay::step() {
+
+}
+void Overlay::onCollision(const Actor* other) {
+
 }

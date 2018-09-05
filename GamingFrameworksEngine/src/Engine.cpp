@@ -3,11 +3,11 @@
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 
-Engine::Engine()
+Engine::Engine(std::vector<Room*> rooms)
 {
+	this->rooms = rooms;
 	currentRoomIndex = 0;
 }
-
 
 Engine::~Engine()
 {
@@ -24,6 +24,16 @@ void Engine::run(sf::RenderWindow* window)
 
 	previousTime = std::chrono::high_resolution_clock::now();
     while (go) {
+
+		sf::Event event;
+		while (window->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed) {
+				window->close();
+				exit(0);
+			}
+		}
+
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
         // Calculate the time elapsed between the beginning of the last loop and now
@@ -66,5 +76,7 @@ void Engine::run(sf::RenderWindow* window)
 
         // DRAW GUI
         rooms[currentRoomIndex]->drawHUD(window);
+
+		window->display();
     }
 }

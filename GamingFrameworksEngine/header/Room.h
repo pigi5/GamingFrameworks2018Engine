@@ -11,7 +11,7 @@ private:
     std::list<Actor*> actors;
     std::list<Overlay*> overlays;
 public:
-    Room();
+    Room(std::list<Actor*> actors, std::list<Overlay*> overlays);
     ~Room();
 
     void step();

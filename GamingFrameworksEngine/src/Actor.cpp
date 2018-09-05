@@ -13,6 +13,21 @@ Actor::~Actor()
 {
 }
 
+// Getters/Setters
+std::string Actor::getName() const{
+	return this->objName;
+}
+int Actor::getId() const{
+	return this->id;
+}
+
+void Actor::setXSpeed(float speed) {
+	this->xSpeed = speed;
+}
+void Actor::setYSpeed(float speed) {
+	this->ySpeed = speed;
+}
+
 // Moves the object based on its physics attributes and performs collision detection
 // params:
 //   deltaTime - the time in seconds between this frame and the previous frame
@@ -101,14 +116,6 @@ void Actor::interpolateState(float progress)
 {
 	setXPosition(xPositionPrevious + (xPositionPrevious - xPosition) * progress);
 	setXPosition(yPositionPrevious + (yPositionPrevious - yPosition) * progress);
-}
-
-// Draws the object to the screen.
-// params:
-//   deltaTime - the time in seconds between this frame and the previous frame
-void Actor::draw(sf::RenderWindow* window)
-{
-
 }
 
 // Tests if the actor has a hitbox.
