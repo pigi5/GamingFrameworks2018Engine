@@ -8,7 +8,7 @@ Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 	this->yPosition = 200;
 	this->yAcceleration = 4;
 	this->sprite = NULL;
-	this->shape = new Shape(4, xPosition, yPosition);
+	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Blue);
 }
 

@@ -12,7 +12,8 @@ int main()
 	window->create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
 
 	std::list<Overlay*> overlays;
-	overlays.push_back(new HUD());
+	HUD h = HUD();
+	overlays.push_back(&h);
 	std::list<Actor*> actors;
 	actors.push_back(new Wall(actors));
 	actors.push_back(new Player(actors));

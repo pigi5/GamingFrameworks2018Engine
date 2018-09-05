@@ -70,6 +70,7 @@ void Engine::run(sf::RenderWindow* window)
 		//       twice the frame rate
 		rooms[currentRoomIndex]->interpolateState(-accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
+		window->clear(sf::Color::Black);
 
         // DRAW WORLD
         rooms[currentRoomIndex]->draw(window);

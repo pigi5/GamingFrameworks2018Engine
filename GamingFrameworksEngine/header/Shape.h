@@ -15,7 +15,7 @@ private:
 	sf::Color outlineColor;
 
 public:
-	Shape(int numPoints, int xPos, int yPos);
+	Shape(int numPoints, int xPos, int yPos, int xSize, int ySize);
 	void setPosition(int xPos, int yPos);
 	void move(int dx, int dy);
 	void rotate(int angle);

@@ -8,7 +8,7 @@ Wall::Wall(std::list<Actor*>& actorList) : actorList(actorList){
 	this->xSpeed = 0;
 	this->ySpeed = 0;
 	this->sprite = NULL;
-	this->shape = new Shape(4, xPosition, yPosition);
+	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Green);
 }
 void Wall::step() {

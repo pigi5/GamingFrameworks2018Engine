@@ -1,19 +1,22 @@
 #include "../header/Shape.h"
 
-Shape::Shape(int numPoints, int xPos, int yPos) {
+Shape::Shape(int numPoints, int xPos, int yPos, int xSize, int ySize) {
 	this->xPos = xPos;
 	this->yPos = yPos;
-	this->xSize = 1;
-	this->ySize = 1;
+	this->numPoints = numPoints;
+	this->xSize = xSize;
+	this->ySize = ySize;
 	this->fillColor = sf::Color();
 	this->outlineColor = sf::Color();
 	if (numPoints == 4) {
-		sf::RectangleShape s = sf::RectangleShape(sf::Vector2f(1, 1));
+		sf::RectangleShape s = sf::RectangleShape(sf::Vector2f(xSize, ySize));
 		s.setPosition(xPos, yPos);
+		s2 = s;
 	}
 	else {
-		sf::CircleShape s = sf::CircleShape(0.5, numPoints);
+		sf::CircleShape s = sf::CircleShape(xSize, numPoints);
 		s.setPosition(xPos, yPos);
+		s1 = s;
 	}
 }
 void Shape::setPosition(int xPos, int yPos) {
