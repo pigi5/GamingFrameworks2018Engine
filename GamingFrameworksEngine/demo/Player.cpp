@@ -95,8 +95,11 @@ void Player::step()
 
 }
 
-void Player::draw(sf::RenderWindow * window)
+void Player::draw(sf::RenderWindow * window, sf::View* view)
 {
+	float dx = xPosition - xPositionPrevious;
+	float dy = yPosition - yPositionPrevious;
+	view->move(dx*60, dy*80);
 	this->shape->draw(window);
 }
 

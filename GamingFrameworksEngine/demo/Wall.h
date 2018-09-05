@@ -9,6 +9,6 @@ public:
 	Wall(std::list<Actor*>& actorList);
 	~Wall();
 	void step();
-	void draw(sf::RenderWindow* window);
+	void draw(sf::RenderWindow* window, sf::View* view);
 	void onCollision(const Actor* other);
 };

@@ -13,6 +13,6 @@ public:
 	Player(std::list<Actor*>& actorList);
 	~Player();
 	void step();
-	void draw(sf::RenderWindow* window);
+	void draw(sf::RenderWindow* window, sf::View* view);
 	void onCollision(const Actor* other);
 };

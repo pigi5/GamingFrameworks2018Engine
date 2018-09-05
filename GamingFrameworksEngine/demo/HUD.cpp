@@ -13,6 +13,6 @@ HUD::~HUD() {
     delete shape;
 }
 
-void HUD::draw(sf::RenderWindow* window) {
+void HUD::draw(sf::RenderWindow* window, sf::View* view) {
 	this->shape->draw(window);
 }

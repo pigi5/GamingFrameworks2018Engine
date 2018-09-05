@@ -9,5 +9,5 @@ private:
 public:
 	HUD();
 	~HUD();
-	void draw(sf::RenderWindow* window);
+	void draw(sf::RenderWindow* window, sf::View* view);
 };

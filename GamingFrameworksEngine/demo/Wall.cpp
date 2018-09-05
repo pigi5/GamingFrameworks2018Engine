@@ -25,7 +25,7 @@ void Wall::step()
 {
 	this->move(actorList);
 }
-void Wall::draw(sf::RenderWindow* window)
+void Wall::draw(sf::RenderWindow* window, sf::View* view)
 {
 	this->shape->draw(window);
 }

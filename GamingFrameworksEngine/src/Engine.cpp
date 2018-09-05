@@ -19,6 +19,10 @@ void Engine::run(sf::RenderWindow* window)
     bool go = true;
 	std::chrono::steady_clock::time_point currentTime;
 	std::chrono::steady_clock::time_point previousTime;
+	sf::View camera = window->getView();
+	camera.setCenter(0, 0);
+	camera.move(200, 200);
+	sf::View fixed = window->getView();
     double loopDeltaTime;
 	double accumulator = 0.0;
 
@@ -73,10 +77,12 @@ void Engine::run(sf::RenderWindow* window)
 		window->clear(sf::Color::Black);
 
         // DRAW WORLD
-        rooms[currentRoomIndex]->draw(window);
+		window->setView(camera);
+		rooms[currentRoomIndex]->draw(window, &camera);
 
         // DRAW GUI
-        rooms[currentRoomIndex]->drawHUD(window);
+		window->setView(fixed);
+        rooms[currentRoomIndex]->drawHUD(window, &fixed);
 
 		window->display();
     }

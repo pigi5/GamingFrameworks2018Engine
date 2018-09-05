@@ -31,18 +31,18 @@ void Room::interpolateState(float progress)
 	}
 }
 
-void Room::draw(sf::RenderWindow* window)
+void Room::draw(sf::RenderWindow* window, sf::View* view)
 {
     for (Actor* actor : actors)
     {
-        actor->draw(window);
+        actor->draw(window, view);
     }
 }
 
-void Room::drawHUD(sf::RenderWindow* window)
+void Room::drawHUD(sf::RenderWindow* window, sf::View* view)
 {
     for (Overlay* overlay : overlays)
     {
-        overlay->draw(window);
+        overlay->draw(window, view);
     }
 }

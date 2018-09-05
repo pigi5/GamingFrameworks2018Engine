@@ -56,7 +56,7 @@ public:
 	void interpolateState(float);
 
     // Draws the object to the screen
-	virtual void draw(sf::RenderWindow* window) = 0;
+	virtual void draw(sf::RenderWindow* window, sf::View* view) = 0;
     
     // Collision functions
     bool isCollidable() const;
