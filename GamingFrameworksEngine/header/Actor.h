@@ -69,7 +69,7 @@ public:
     virtual void onCollision(const Actor* other) = 0;
     
     // Getters
-    Sprite* getSprite() const;
+    Rectangle* getHitbox() const;
     Material* getMaterial() const;
 
     // Setters

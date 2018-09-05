@@ -68,7 +68,6 @@ void Actor::move(std::list<Actor*>& actors)
         // Perform collision actions
         if (collidesX || collidesY)
         {
-            std::cout << "collisioncollisioncollisioncollisioncollisioncollisioncollisioncollisioncollision " << endl;
             // The "else" is an optimization based on the fact that we cannot collide in both directions
             // with a single object with a rectangular hitbox 
             if (collidesX)
@@ -86,13 +85,14 @@ void Actor::move(std::list<Actor*>& actors)
             else if (collidesY)
             {
                 // Set speed such that this object will go up to the colliding object but not past
-                ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(other);
+                ySpeed = 0;
+                //ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(other);
                 // Friction that goes against direction of motion in opposite axis
                 Material* otherMaterial = other->getMaterial();
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    xSpeed = engine_util::sign(xSpeed) * std::min(0.0f, abs(xSpeed) - other->getMaterial()->getFriction());
+                    xSpeed = engine_util::sign(xSpeed) * std::max(0.0f, abs(xSpeed) - other->getMaterial()->getFriction());
                 }
             }
             // Fire collision event
@@ -104,10 +104,8 @@ void Actor::move(std::list<Actor*>& actors)
     // Increment positions
 	xPositionPrevious = xPosition;
 	yPositionPrevious = yPosition;
-    xPosition += xSpeed;
-    yPosition += ySpeed;
-
-    std::cout << "(" << xPosition << ", " << yPosition << ")" << endl;
+    setXPosition(xPosition + xSpeed);
+    setYPosition(yPosition + ySpeed);
 }
 
 // Does a linear interpolation of the actors current state and its previous
@@ -119,7 +117,7 @@ void Actor::move(std::list<Actor*>& actors)
 void Actor::interpolateState(float progress)
 {
 	setXPosition(xPositionPrevious + (xPositionPrevious - xPosition) * progress);
-	setXPosition(yPositionPrevious + (yPositionPrevious - yPosition) * progress);
+	setYPosition(yPositionPrevious + (yPositionPrevious - yPosition) * progress);
 }
 
 // Tests if the actor has a hitbox.
@@ -141,7 +139,7 @@ bool Actor::willCollide(const Actor* other) const
         return false;
     }
     
-    return hitbox->willCollide(other->getSprite()->getHitbox(), xSpeed, ySpeed);
+    return hitbox->willCollide(other->getHitbox(), xSpeed, ySpeed);
 }
 
 // Tests if this actor will collide with the given actor in the x-axis after its new 
@@ -156,7 +154,7 @@ bool Actor::willCollideX(const Actor* other) const
         return false;
     }
     
-    return hitbox->willCollideX(other->getSprite()->getHitbox(), xSpeed);
+    return hitbox->willCollideX(other->getHitbox(), xSpeed);
 }
 
 // Tests if this actor will collide with the given actor in the y-axis after its new 
@@ -171,7 +169,7 @@ bool Actor::willCollideY(const Actor* other) const
         return false;
     }
     
-    return hitbox->willCollideY(other->getSprite()->getHitbox(), ySpeed);
+    return hitbox->willCollideY(other->getHitbox(), ySpeed);
 }
 
 // Calculate the distance along the x-axis to the given object.
@@ -185,7 +183,7 @@ float Actor::getHitboxDistanceX(const Actor* other) const
         return -1.0f;
     }
     
-    return hitbox->getDistanceX(other->getSprite()->getHitbox());
+    return hitbox->getDistanceX(other->getHitbox());
 }
 
 // Calculate the distance along the y-axis to the given object.
@@ -199,9 +197,13 @@ float Actor::getHitboxDistanceY(const Actor* other) const
         return -1.0f;
     }
     
-    return hitbox->getDistanceY(other->getSprite()->getHitbox());
+    return hitbox->getDistanceY(other->getHitbox());
 }
 
+Rectangle* Actor::getHitbox() const
+{
+    return hitbox;
+}
 
 Material* Actor::getMaterial() const
 {

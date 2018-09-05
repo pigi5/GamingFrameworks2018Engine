@@ -7,6 +7,7 @@ private:
 	int xSize = 30, ySize = 30;
 public:
 	Player(std::list<Actor*>& actorList);
+	~Player();
 	void step();
 	void draw(sf::RenderWindow* window);
 	void onCollision(const Actor* other);
