@@ -7,7 +7,7 @@ using namespace std;
 // as well as its state and the key that activates the command
 class Button {
 private:
-	vector<double> params;
+	vector<double> params; // will probably scrap this
 	sf::Keyboard::Key key;
 	bool state = false;
 

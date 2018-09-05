@@ -16,6 +16,8 @@ Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-.0005)));
 	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, .0005)));
 	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005)));
+	vector<double> x = { 200, 200 };
+	this->buttons.push_back(Button(sf::Keyboard::R, x));
 }
 
 Player::~Player()
@@ -39,6 +41,12 @@ void Player::step()
 			case sf::Keyboard::Right:
 				this->setXSpeed(b.getParams()[0]);
 				break;
+			case sf::Keyboard::R:
+				this->setXPosition(b.getParams()[0]);
+				this->setYPosition(b.getParams()[1]);
+				this->setXSpeed(0);
+				this->setYSpeed(0);
+				this->shape->setColorFill(sf::Color::White);
 			default:
 				break;
 			}
@@ -69,6 +77,13 @@ void Player::step()
 		}
 		if (sf::Joystick::isButtonPressed(0, 3)) {
 			this->shape->setColorFill(sf::Color::Yellow);
+		}
+		if (sf::Joystick::isButtonPressed(0, 7)) {
+			this->setXPosition(200);
+			this->setYPosition(200);
+			this->setXSpeed(0);
+			this->setYSpeed(0);
+			this->shape->setColorFill(sf::Color::White);
 		}
 
 			
