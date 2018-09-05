@@ -8,5 +8,6 @@ private:
 
 public:
 	HUD();
+	~HUD();
 	void draw(sf::RenderWindow* window);
 };

@@ -7,7 +7,7 @@ Wall::Wall(std::list<Actor*>& actorList) : actorList(actorList){
 	this->yPosition = 400;
 	this->xSpeed = 0;
 	this->ySpeed = 0;
-	this->sprite = NULL;
+	this->hitbox = new Rectangle(xPosition, yPosition, xSize, ySize);
 	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Green);
 }

@@ -6,8 +6,7 @@ Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 	this->objName = "Player";
 	this->xPosition = 200;
 	this->yPosition = 200;
-	this->yAcceleration = 4;
-	this->sprite = NULL;
+	this->hitbox = new Rectangle(xPosition, yPosition, xSize, ySize);
 	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Blue);
 }

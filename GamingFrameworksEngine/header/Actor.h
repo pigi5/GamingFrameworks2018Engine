@@ -27,7 +27,8 @@ protected:
     Material* material;
 
     // drawing
-    Sprite* sprite;
+    //Sprite* sprite;
+    Rectangle* hitbox;
 	Shape* shape;
     float imageSpeed;
     int imageFrame;
