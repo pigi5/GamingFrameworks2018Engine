@@ -41,36 +41,35 @@ public:
     Actor();
     ~Actor();
     
-	// Getters/Setters
-	std::string getName() const;
-	int getId() const;
-
-	void setXSpeed(float speed);
-	void setYSpeed(float speed);
-
     // Override to perform custom object code every game loop
-    virtual void step() = 0;
+    virtual void step() {};
 
     // Implements collision and motion of the object
-    void move(std::list<Actor*>&);
+    void move(const std::list<Actor*>&);
 	void interpolateState(float);
 
     // Draws the object to the screen
-	virtual void draw(sf::RenderWindow* window, sf::View* view) = 0;
+	virtual void draw(sf::RenderWindow*, sf::View*);
     
     // Collision functions
     bool isCollidable() const;
-    bool willCollideX(const Actor* actor) const;
-    bool willCollideY(const Actor* actor) const;
-    bool willCollide(const Actor* actor) const;
-    float getHitboxDistanceX(const Actor* other) const;
-    float getHitboxDistanceY(const Actor* other) const;
+    bool willCollideX(const Actor&) const;
+    bool willCollideY(const Actor&) const;
+    bool willCollide(const Actor&) const;
+    float getHitboxDistanceX(const Actor&) const;
+    float getHitboxDistanceY(const Actor&) const;
     // Override to perform custom object code on collision with another actor
-    virtual void onCollision(const Actor* other) = 0;
+    virtual void onCollision(Actor*) {};
     
     // Getters
+	std::string getName() const;
+	int getId() const;
     Rectangle* getHitbox() const;
     Material* getMaterial() const;
+    
+	// Setters
+	void setXSpeed(float);
+	void setYSpeed(float);
 
     // Setters
     void setXPosition(float);

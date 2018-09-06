@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
+Player::Player()
 {
 	this->id = 0;
 	this->objName = "Player";
@@ -19,13 +19,6 @@ Player::Player(std::list<Actor*>& actorList) : actorList(actorList)
 	vector<double> x = { 200, 200 };
 	this->buttons.push_back(Button(sf::Keyboard::R, x));
 }
-
-Player::~Player()
-{
-    delete shape;
-    delete hitbox;
-}
-
 
 void Player::step()
 {
@@ -85,32 +78,11 @@ void Player::step()
 			this->setYSpeed(0);
 			this->shape->setColorFill(sf::Color::White);
 		}
-
-			
 	}
-
-	this->move(this->actorList);
-	this->shape->setPosition(xPosition, yPosition);
-
-
 }
 
-void Player::draw(sf::RenderWindow * window, sf::View* view)
+void Player::draw(sf::RenderWindow* window, sf::View* view)
 {
-	float dx = xPosition - xPositionPrevious;
-	float dy = yPosition - yPositionPrevious;
-	view->move(dx*60, dy*80);
-	this->shape->draw(window);
-}
-
-void Player::onCollision(const Actor* other)
-{
-	if (other->getName() == "wall") {
-		if (willCollideX(other)) {
-			this->setXSpeed(0);
-		}
-		if (willCollideY(other)) {
-			this->setYSpeed(0);
-		}
-	}
+	view->setCenter(xPosition, yPosition);
+	Actor::draw(window, view);
 }

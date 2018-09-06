@@ -1,5 +1,7 @@
 #include <chrono>
 #include <iostream>
+#include <deque>
+#include <numeric>
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 
@@ -17,32 +19,50 @@ Engine::~Engine()
 void Engine::run(sf::RenderWindow* window)
 {
     bool go = true;
-	std::chrono::steady_clock::time_point currentTime;
-	std::chrono::steady_clock::time_point previousTime;
+    
+    // Defines the current room index locally so that the room cannot be changed during loops
+    int localCurrentRoomIndex;
+
+    // Setup camera
 	sf::View camera = window->getView();
 	camera.setCenter(0, 0);
 	camera.move(200, 200);
 	sf::View fixed = window->getView();
+
+    // Variables for game loop timing
+	std::chrono::steady_clock::time_point currentTime;
+	std::chrono::steady_clock::time_point previousTime = std::chrono::high_resolution_clock::now();
     double loopDeltaTime;
 	double accumulator = 0.0;
+    std::deque<double> loopDeltaTimes;
+    double averageLoopDeltaTime;
+    double averageFrameRate;
 
-	previousTime = std::chrono::high_resolution_clock::now();
-    while (go) {
-
-		sf::Event event;
-		while (window->pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed) {
-				window->close();
-				exit(0);
-			}
-		}
+    // Run the game loop
+    while (go) 
+    {
+        localCurrentRoomIndex = currentRoomIndex;
+        // Error if room index out of bounds
+		if (localCurrentRoomIndex < 0 || localCurrentRoomIndex >= rooms.size())
+        {
+			cout << "Room index out of bounds." << endl;
+			exit(1);
+        }
 
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
-        // Calculate the time elapsed between the beginning of the last loop and now
+        // Calculate the time elapsed (in seconds) between the beginning of the last loop and now
 		loopDeltaTime = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(currentTime - previousTime).count();
 		previousTime = currentTime;
+        
+        // Calculate average framerate
+        if (loopDeltaTimes.size() >= 10)
+        {
+            loopDeltaTimes.pop_front();
+        }
+        loopDeltaTimes.push_back(loopDeltaTime);
+        averageLoopDeltaTime = std::accumulate(loopDeltaTimes.begin(), loopDeltaTimes.end(), 0.0) / loopDeltaTimes.size();
+        averageFrameRate = 1.0 / averageLoopDeltaTime;
 
 		// Cap the maximum calculated time between frames
 		if (loopDeltaTime < engine_constant::MAX_DELTA_TIME)
@@ -57,33 +77,39 @@ void Engine::run(sf::RenderWindow* window)
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
 		{
 			// Perform iterative game logic
-			if (!rooms.empty()) {
-				rooms[currentRoomIndex]->step();
-				accumulator -= engine_constant::PHYSICS_DELTA_TIME;
-			}
-			else
-			{
-				cout << "No rooms exist" << endl;
-				exit(1);
-			}
+			rooms[localCurrentRoomIndex]->step();
+			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
 
 		// Interpolate state for a smooth simulation
 		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
-		rooms[currentRoomIndex]->interpolateState(-accumulator / engine_constant::PHYSICS_DELTA_TIME);
+		rooms[localCurrentRoomIndex]->interpolateState(-accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
+        // Clear window
 		window->clear(sf::Color::Black);
 
-        // DRAW WORLD
+        // Draw world
 		window->setView(camera);
-		rooms[currentRoomIndex]->draw(window, &camera);
+		rooms[localCurrentRoomIndex]->draw(window, &camera);
 
-        // DRAW GUI
+        // Draw GUI
 		window->setView(fixed);
-        rooms[currentRoomIndex]->drawHUD(window, &fixed);
+        rooms[localCurrentRoomIndex]->drawHUD(window, &fixed);
 
+        // Refresh window
 		window->display();
+
+        // Check if window is closed
+		sf::Event event;
+		while (window->pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+            {
+				window->close();
+                go = false;
+			}
+		}
     }
 }

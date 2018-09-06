@@ -17,6 +17,8 @@ private:
 public:
 	Shape(int numPoints, int xPos, int yPos, int xSize, int ySize);
 	void setPosition(int xPos, int yPos);
+	void setXPosition(int xPos);
+	void setYPosition(int yPos);
 	void move(int dx, int dy);
 	void rotate(int angle);
 	void setSize(int xSize, int ySize);

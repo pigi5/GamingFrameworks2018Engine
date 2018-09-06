@@ -7,22 +7,24 @@
 int main()
 {
 	sf::VideoMode defaultMode = sf::VideoMode(800,600);
-	sf::RenderWindow* window = new sf::RenderWindow();
+	sf::RenderWindow window;
 	
-	window->create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
+	window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
 
 	std::list<Overlay*> overlays;
 	HUD h = HUD();
 	overlays.push_back(&h);
 	std::list<Actor*> actors;
-	actors.push_back(new Wall(actors));
-	actors.push_back(new Player(actors));
+    Wall wall;
+    Player player;
+	actors.push_back(&wall);
+	actors.push_back(&player);
 	std::vector<Room*> rooms;
-	rooms.push_back(new Room(actors, overlays));
+    Room startRoom(actors, overlays);
+	rooms.push_back(&startRoom);
 
 	Engine engine = Engine(rooms);
-	engine.run(window);
-
+	engine.run(&window);
 
 
     return 0;

@@ -6,13 +6,10 @@
 
 class Player : public Actor {
 private:
-	std::list<Actor*>& actorList;
 	int xSize = 30, ySize = 30;
 	vector<Button> buttons;
 public:
-	Player(std::list<Actor*>& actorList);
-	~Player();
+	Player();
 	void step();
 	void draw(sf::RenderWindow* window, sf::View* view);
-	void onCollision(const Actor* other);
 };

@@ -8,11 +8,3 @@ HUD::HUD() {
 	this->shape = new Shape(4, xPos, yPos, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Red);
 }
-
-HUD::~HUD() {
-    delete shape;
-}
-
-void HUD::draw(sf::RenderWindow* window, sf::View* view) {
-	this->shape->draw(window);
-}
