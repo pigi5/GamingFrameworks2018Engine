@@ -3,7 +3,7 @@
 
 class HUD : public Overlay {
 private:
-	int xPos, yPos, xSize, ySize;
+	int xSize, ySize;
 
 public:
 	HUD();
