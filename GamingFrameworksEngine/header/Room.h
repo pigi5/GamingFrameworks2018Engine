@@ -2,16 +2,15 @@
 
 #include <list>
 #include "Actor.h"
-#include "Overlay.h"
 
 // Similar to a stage.
 class Room
 {
 private:
     std::list<Actor*> actors;
-    std::list<Overlay*> overlays;
+    std::list<Actor*> overlays;
 public:
-    Room(std::list<Actor*> actors, std::list<Overlay*> overlays);
+    Room(std::list<Actor*> actors, std::list<Actor*> overlays);
     ~Room();
 
     void step();

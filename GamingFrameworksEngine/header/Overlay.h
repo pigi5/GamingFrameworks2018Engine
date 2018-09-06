@@ -7,4 +7,5 @@
 class Overlay : public Actor
 {
 public:
+    Overlay();
 };

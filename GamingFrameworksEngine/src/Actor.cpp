@@ -41,6 +41,7 @@ void Actor::move(const std::list<Actor*>& actors)
     bool collidesY;
     for (Actor* other : actors)
     {
+        // Don't perform collisions with self
         if (other == this)
         {
             continue;
@@ -76,14 +77,13 @@ void Actor::move(const std::list<Actor*>& actors)
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    ySpeed = engine_util::sign(ySpeed) * std::min(0.0f, abs(ySpeed) - other->getMaterial()->getFriction());
+                    ySpeed = engine_util::sign(ySpeed) * std::max(0.0f, abs(ySpeed) - other->getMaterial()->getFriction());
                 }
             } 
             else if (collidesY)
             {
                 // Set speed such that this object will go up to the colliding object but not past
-                ySpeed = 0;
-                //ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(other);
+                ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(*other);
                 // Friction that goes against direction of motion in opposite axis
                 Material* otherMaterial = other->getMaterial();
                 if (otherMaterial != NULL)
