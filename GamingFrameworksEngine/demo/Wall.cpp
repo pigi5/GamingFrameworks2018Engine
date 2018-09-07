@@ -9,6 +9,7 @@ Wall::Wall()
 	this->xSpeed = 0;
 	this->ySpeed = 0;
 	this->xSize = 600;
+	this->ySize = 50;
 	this->hitbox = new Rectangle(xPosition, yPosition, xSize, ySize);
 	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::Green);

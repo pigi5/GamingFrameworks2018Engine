@@ -8,6 +8,8 @@ Actor::Actor()
 {
     // Set the default yAcceleration to gravity
     yAcceleration = engine_constant::GRAVITY;
+	maxXSpeed = -1;
+	maxYSpeed = -1;
 }
 
 Actor::~Actor()
@@ -34,7 +36,15 @@ void Actor::move(const std::list<Actor*>& actors)
 {
     // Increment speeds
     xSpeed += xAcceleration;
+    if (maxXSpeed >= 0 && abs(xSpeed) >= maxXSpeed)
+    {
+        xSpeed = engine_util::sign(xSpeed) * maxXSpeed;
+    }
     ySpeed += yAcceleration;
+    if (maxYSpeed >= 0 && abs(ySpeed) >= maxYSpeed)
+    {
+        ySpeed = engine_util::sign(ySpeed) * maxYSpeed;
+    }
     
     // Collision detection logic (look-ahead style)
     bool collidesX;
@@ -229,6 +239,16 @@ Rectangle* Actor::getHitbox() const
 Material* Actor::getMaterial() const
 {
     return material;
+}
+
+void Actor::setXAcceleration(float xAcceleration)
+{
+	this->xAcceleration = xAcceleration;
+}
+
+void Actor::setYAcceleration(float yAcceleration) 
+{
+	this->yAcceleration = yAcceleration;
 }
 
 void Actor::setXSpeed(float xSpeed)

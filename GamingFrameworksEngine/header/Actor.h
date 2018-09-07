@@ -23,6 +23,8 @@ protected:
     float yPosition;
 	float xPositionPrevious;
 	float yPositionPrevious;
+	float maxXSpeed;
+	float maxYSpeed;
 
     Material* material;
 
@@ -70,8 +72,8 @@ public:
 	// Setters
 	void setXSpeed(float);
 	void setYSpeed(float);
-
-    // Setters
+	void setXAcceleration(float);
+	void setYAcceleration(float);
     void setXPosition(float);
     void setYPosition(float);
 };
