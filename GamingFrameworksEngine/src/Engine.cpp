@@ -101,6 +101,15 @@ void Engine::run(sf::RenderWindow* window)
         // Refresh window
 		window->display();
 
+		// Mouse Info
+		sf::Vector2i windowPos = sf::Mouse::getPosition(*window);
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			std::cout << "Left: " << windowPos.x << " " << windowPos.y << endl;
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+			std::cout << "Right: " << windowPos.x << " " << windowPos.y << endl;
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
+			std::cout << "Middle: " << windowPos.x << " " << windowPos.y << endl;
+
         // Check if window is closed
 		sf::Event event;
 		while (window->pollEvent(event))
