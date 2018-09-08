@@ -1,4 +1,5 @@
 #include <chrono>
+#include <thread>
 #include <iostream>
 #include <deque>
 #include <numeric>
@@ -54,6 +55,12 @@ void Engine::run(sf::RenderWindow* window)
         // Calculate the time elapsed (in seconds) between the beginning of the last loop and now
 		loopDeltaTime = std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1>>>(currentTime - previousTime).count();
 		previousTime = currentTime;
+
+        // Sleep if necessary to cap framerate
+        if (engine_constant::MIN_FRAME_TIME > 0 && loopDeltaTime < engine_constant::MIN_FRAME_TIME)
+        {
+            std::this_thread::sleep_for(std::chrono::duration<double>(engine_constant::MIN_FRAME_TIME - loopDeltaTime));
+        }
         
         // Calculate average framerate
         if (loopDeltaTimes.size() >= 10)
@@ -65,9 +72,9 @@ void Engine::run(sf::RenderWindow* window)
         averageFrameRate = 1.0 / averageLoopDeltaTime;
 
 		// Cap the maximum calculated time between frames
-		if (loopDeltaTime < engine_constant::MAX_DELTA_TIME)
+		if (engine_constant::DELTA_TIME_CAP > 0 && loopDeltaTime > engine_constant::DELTA_TIME_CAP)
 		{
-			loopDeltaTime = engine_constant::MAX_DELTA_TIME;
+			loopDeltaTime = engine_constant::DELTA_TIME_CAP;
 		}
 
 		// Add calculated time since frame to accumulator
@@ -85,7 +92,7 @@ void Engine::run(sf::RenderWindow* window)
 		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
-		rooms[localCurrentRoomIndex]->interpolateState(-accumulator / engine_constant::PHYSICS_DELTA_TIME);
+		rooms[localCurrentRoomIndex]->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
 		window->clear(sf::Color::Black);

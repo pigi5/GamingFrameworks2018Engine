@@ -12,11 +12,11 @@ int main()
 	window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
 
 	std::list<Actor*> overlays;
-	HUD h = HUD();
+    HUD h({20, 20});
 	overlays.push_back(&h);
 	std::list<Actor*> actors;
-    Wall wall;
-    Player player;
+    Wall wall({200, 400});
+    Player player({200, 200});
 	actors.push_back(&wall);
 	actors.push_back(&player);
 	std::vector<Room*> rooms;

@@ -5,6 +5,44 @@
 #include "Shape.h"
 #include "Material.h"
 
+struct State
+{
+    float xPosition;
+    float yPosition;
+
+    State operator*(float blend) const
+    {
+        State newState;
+        newState.xPosition = xPosition * blend;
+        newState.yPosition = yPosition * blend;
+        return newState;
+    }
+
+    State operator+(const State& other) const
+    {
+        State newState;
+        newState.xPosition = xPosition + other.xPosition;
+        newState.yPosition = yPosition + other.yPosition;
+        return newState;
+    }
+
+    State operator-(const State& other) const
+    {
+        State newState;
+        newState.xPosition = xPosition - other.xPosition;
+        newState.yPosition = yPosition - other.yPosition;
+        return newState;
+    }
+
+    State& operator=(State other)
+    {
+        xPosition = other.xPosition;
+        yPosition = other.yPosition;
+        return *this;
+    }
+};
+
+
 // A "world object" that can move and be drawn to the screen. Its
 // position is in world or "room" coordinates.
 class Actor
@@ -19,10 +57,9 @@ protected:
     float yAcceleration;
     float xSpeed;
     float ySpeed;
-    float xPosition;
-    float yPosition;
-	float xPositionPrevious;
-	float yPositionPrevious;
+    State currentState;
+    State nextState;
+    State previousState;
 	float maxXSpeed;
 	float maxYSpeed;
 
@@ -40,7 +77,7 @@ protected:
     float imageAngle;
 
 public:
-    Actor();
+    Actor(State startState);
     ~Actor();
     
     // Override to perform custom object code every game loop
@@ -74,6 +111,4 @@ public:
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
-    void setXPosition(float);
-    void setYPosition(float);
 };

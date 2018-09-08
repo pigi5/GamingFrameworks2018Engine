@@ -6,10 +6,12 @@
 
 class Player : public Actor {
 private:
-	int xSize = 30, ySize = 30;
+    State startState;
+	int xSize;
+    int ySize;
 	vector<Button> buttons;
 public:
-	Player();
+	Player(State startState);
 	void step();
 	void draw(sf::RenderWindow* window, sf::View* view);
 };

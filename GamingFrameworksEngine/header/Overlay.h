@@ -7,5 +7,5 @@
 class Overlay : public Actor
 {
 public:
-    Overlay();
+    Overlay(State startState);
 };

@@ -2,19 +2,20 @@
 #include <iostream>
 
 
-Player::Player()
+Player::Player(State startState) : Actor(startState)
 {
+	this->xSize = 30;
+    this->ySize = 30;
+    this->startState = startState;
 	this->id = 0;
 	this->objName = "Player";
-	this->xPosition = 200;
-	this->yPosition = 200;
-	this->maxXSpeed = 0.00075;
-	this->maxYSpeed = 0.0025;
-	this->hitbox = new Rectangle(xPosition, yPosition, xSize, ySize);
-	this->shape = new Shape(4, xPosition, yPosition, xSize, ySize);
+	this->maxXSpeed = 2;
+	this->maxYSpeed = 10;
+	this->hitbox = new Rectangle(startState.xPosition, startState.yPosition, xSize, ySize);
+	this->shape = new Shape(4, startState.xPosition, startState.yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::White);
-	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-.00000004)));
-	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, .00000004)));
+	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-0.03)));
+	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, 0.03)));
 	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005)));
 	vector<double> x = { 200, 200 };
 	this->buttons.push_back(Button(sf::Keyboard::R, x));
@@ -36,7 +37,7 @@ void Player::step()
 				this->setXAcceleration(b.getParams()[0]);
 				break;
 			case sf::Keyboard::R:
-				this->setYPosition(b.getParams()[1]);
+				this->nextState = startState;
 				this->setXSpeed(0);
 				this->setYSpeed(0);
 				this->shape->setColorFill(sf::Color::White);
@@ -53,10 +54,10 @@ void Player::step()
 	if (sf::Joystick::isConnected(0)) {
 		if (sf::Joystick::hasAxis(0, sf::Joystick::X)) {
 			if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) > 50) {
-				this->setXSpeed(.0005);
+				this->setXSpeed(.5);
 			}
 			else if (sf::Joystick::getAxisPosition(0, sf::Joystick::X) < -50) {
-				this->setXSpeed(-.0005);
+				this->setXSpeed(-.5);
 			}
 		}
 		if (sf::Joystick::isButtonPressed(0, 0)) {
@@ -72,8 +73,7 @@ void Player::step()
 			this->shape->setColorFill(sf::Color::Yellow);
 		}
 		if (sf::Joystick::isButtonPressed(0, 7)) {
-			this->setXPosition(200);
-			this->setYPosition(200);
+			this->nextState = startState;
 			this->setXSpeed(0);
 			this->setYSpeed(0);
 			this->shape->setColorFill(sf::Color::White);
@@ -83,6 +83,6 @@ void Player::step()
 
 void Player::draw(sf::RenderWindow* window, sf::View* view)
 {
-	view->setCenter(xPosition, yPosition);
+	view->setCenter(currentState.xPosition, currentState.yPosition);
 	Actor::draw(window, view);
 }

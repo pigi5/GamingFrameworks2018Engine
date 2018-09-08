@@ -1,10 +1,12 @@
 #pragma once
 #include "../header/Overlay.h"
 
-class HUD : public Overlay {
+class HUD : public Overlay 
+{
 private:
-	int xSize, ySize;
+	int xSize;
+    int ySize;
 
 public:
-	HUD();
+	HUD(State startState);
 };

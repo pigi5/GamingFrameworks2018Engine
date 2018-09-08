@@ -4,12 +4,14 @@
 #include "../header/Constants.h"
 #include "../header/Utils.h"
 
-Actor::Actor()
+Actor::Actor(State startState)
 {
     // Set the default yAcceleration to gravity
     yAcceleration = engine_constant::GRAVITY;
 	maxXSpeed = -1;
 	maxYSpeed = -1;
+    previousState = startState;
+    nextState = startState;
 }
 
 Actor::~Actor()
@@ -109,22 +111,31 @@ void Actor::move(const std::list<Actor*>& actors)
     }
     
     // Increment positions
-	xPositionPrevious = xPosition;
-	yPositionPrevious = yPosition;
-    setXPosition(xPosition + xSpeed);
-    setYPosition(yPosition + ySpeed);
+	previousState = nextState;
+    nextState.xPosition += xSpeed;
+    nextState.yPosition += ySpeed;
+    // Move hitbox with actor
+    if (isCollidable())
+    {
+        hitbox->x = nextState.xPosition + xSpriteOffset;
+        hitbox->y = nextState.yPosition + ySpriteOffset;
+    }
 }
 
 // Does a linear interpolation of the actors current state and its previous
 // state based on the given progress value
 // params:
-//   progress - the amount to interpolate; must be between 0 and 1, where
-//              0 indicates to use the previous state and 1 indicates to
-//              use the current state
-void Actor::interpolateState(float progress)
+//   blend - the amount to interpolate; must be between 0 and 1, where
+//              1 indicates to use the previous state and 0 indicates to
+//              use the next state
+void Actor::interpolateState(float blend)
 {
-	setXPosition(xPositionPrevious + (xPositionPrevious - xPosition) * progress);
-	setYPosition(yPositionPrevious + (yPositionPrevious - yPosition) * progress);
+	currentState = nextState - nextState * blend + previousState * blend;
+    // Move shape with actor
+    if (shape != NULL)
+    {
+	    shape->setPosition(currentState.xPosition, currentState.yPosition);
+    }
 }
 
 // Draws the shape, if there is one set, to the screen
@@ -259,41 +270,4 @@ void Actor::setXSpeed(float xSpeed)
 void Actor::setYSpeed(float ySpeed) 
 {
 	this->ySpeed = ySpeed;
-}
-
-
-// Sets the current x-axis position of actor.
-// params:
-//   xPosition - new x-axis position
-void Actor::setXPosition(float xPosition)
-{
-    this->xPosition = xPosition;
-    // Move hitbox with actor
-    if (isCollidable())
-    {
-        hitbox->x = xPosition + xSpriteOffset;
-    }
-    // Move shape with actor
-    if (shape != NULL)
-    {
-	    shape->setXPosition(xPosition);
-    }
-}
-
-// Sets the current y-axis position of actor.
-// params:
-//   xPosition - new y-axis position
-void Actor::setYPosition(float yPosition)
-{
-    this->yPosition = yPosition;
-    // Move hitbox with actor
-    if (isCollidable())
-    {
-        hitbox->y = yPosition + ySpriteOffset;
-    }
-    // Move shape with actor
-    if (shape != NULL)
-    {
-	    shape->setYPosition(yPosition);
-    }
 }

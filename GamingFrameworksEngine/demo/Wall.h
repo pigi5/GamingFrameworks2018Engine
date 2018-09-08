@@ -6,5 +6,5 @@ private:
 	int xSize;
     int ySize;
 public:
-	Wall();
+	Wall(State startState);
 };
