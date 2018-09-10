@@ -10,6 +10,7 @@ Engine::Engine(std::vector<Room*> rooms)
 {
 	this->rooms = rooms;
 	currentRoomIndex = 0;
+	this->demoSound = Audio();
 }
 
 Engine::~Engine()
@@ -23,6 +24,15 @@ void Engine::run(sf::RenderWindow* window)
     
     // Defines the current room index locally so that the room cannot be changed during loops
     int localCurrentRoomIndex;
+
+	//load demo sound into buffer
+	int loaded = demoSound.loadSound("demoSound.wav");
+
+	//Play sound
+	if (loaded != -1)
+	{
+		demoSound.playSound();
+	}
 
     // Setup camera
 	sf::View camera = window->getView();
