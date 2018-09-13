@@ -1,10 +1,14 @@
 #pragma once
 
 #include <list>
+#include <map>
 #include "Sprite.h"
 #include "Shape.h"
 #include "Material.h"
+#include "Trigger.h"
+#include "Action.h"
 
+// The state of the object that needs to be interpolated between frames
 struct State
 {
     float xPosition;
@@ -76,6 +80,9 @@ protected:
     float ySpriteOffset;
     float imageAngle;
 
+    // triggers/actions
+    map<Trigger*, list<Action*>> actionMap;
+
 public:
     Actor(State startState);
     ~Actor();
@@ -89,6 +96,9 @@ public:
 
     // Draws the object to the screen
 	virtual void draw(sf::RenderWindow*, sf::View*);
+
+    // Performs actions given a trigger
+    void fireTrigger(Trigger*);
     
     // Collision functions
     bool isCollidable() const;

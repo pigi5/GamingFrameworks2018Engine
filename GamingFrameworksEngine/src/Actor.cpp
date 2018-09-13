@@ -150,6 +150,14 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
     }
 }
 
+void Actor::fireTrigger(Trigger* trigger)
+{
+    for (Action* action : actionMap[trigger])
+    {
+        action->run(this);
+    }
+}
+
 // Tests if the actor has a hitbox.
 // returns: if the object has a hitbox
 bool Actor::isCollidable() const
