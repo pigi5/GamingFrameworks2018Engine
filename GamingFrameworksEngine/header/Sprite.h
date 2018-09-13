@@ -19,7 +19,7 @@ private:
 	int xPos, yPos;
 	int numFrames;
 public:
-    Sprite(string filename, int xPos, int yPos, int xSize, int ySize);
+    Sprite(int xPos, int yPos);
     ~Sprite();
 
     Rectangle* getHitbox() const;
@@ -28,6 +28,8 @@ public:
 	void move(int dx, int dy);
 	void rotate(int angle);
 	void setSize(int sizeX, int sizeY);
-	void setTexture(string filename, int xSize, int ySize);
+	void setTexture(string filename);
+	void setPartialTexture(string filename, int xSize, int ySize);
+	vector<sf::Sprite> parseSpriteSheet(string filename, int xSize, int ySize, int num);
 	void draw(sf::RenderWindow* window);
 };
