@@ -6,6 +6,8 @@
 
 Actor::Actor(State startState)
 {
+    static int _id = 0;
+    id = _id++;
     // Set the default yAcceleration to gravity
     yAcceleration = engine_constant::GRAVITY;
 	maxXSpeed = -1;
@@ -278,4 +280,10 @@ void Actor::setXSpeed(float xSpeed)
 void Actor::setYSpeed(float ySpeed) 
 {
 	this->ySpeed = ySpeed;
+}
+
+
+bool Actor::operator<(const Actor& other) const
+{
+    return id < other.id;
 }

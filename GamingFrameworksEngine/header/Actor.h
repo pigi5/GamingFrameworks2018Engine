@@ -121,4 +121,7 @@ public:
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
+
+    // Comparison
+    bool operator<(const Actor&) const;
 };

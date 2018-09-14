@@ -2,20 +2,35 @@
 
 // Macro for cleaner trigger definitions
 // Note that name is NOT in quotes
-#define CREATE_TRIGGER(name, type)          \
-class name : public TriggerType<type>       \
-{                                           \
-public:                                     \
-    name(type* data) : TriggerType(data){}; \
-};                                          \
+// type is the type of the id pointer in TriggerType
+#define CREATE_TRIGGER(name, type)                  \
+class name : public TriggerType<type>               \
+{                                                   \
+public:                                             \
+    name(type* id) : TriggerType(id){};             \
+};                                                  \
 
 #include "Trigger.h"
 #include "Actor.h"
+
+
+// this should probably be moved to an appropriate file (watching circular dependencies)
+struct ButtonInputType
+{
+    short id;
+    bool state;
+
+    bool operator<(const ButtonInputType& other) const
+    {
+        return id * 2 + state < other.id * 2 + other.state;
+    }
+};
 
 // All trigger presets are defined here
 namespace trigger_preset
 {
     CREATE_TRIGGER(Collision, Actor);
+    CREATE_TRIGGER(ButtonInput, ButtonInputType);
 }
 
 #undef create_trigger

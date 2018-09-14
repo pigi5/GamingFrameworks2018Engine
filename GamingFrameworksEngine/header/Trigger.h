@@ -8,15 +8,17 @@ public:
 };
 
 // All explicit triggers should inherit from this
+// T is the type of the Trigger ID, which is used as the key in a mapping.
+// Because of this, T must implement the < operator
 template <typename T>
 class TriggerType : public Trigger
 {
 private:
-    T* data;
+    T* id;
 public:
-    TriggerType(T* data)
+    TriggerType(T* id)
     {
-        this->data = data;
+        this->id = id;
     }
     
     // If the triggers are the same type, compare their data, otherwise compare addresses
@@ -24,7 +26,7 @@ public:
     {
         if (typeid(*this) == typeid(other))
         {
-            return *data < *(static_cast<const TriggerType&>(other).data);
+            return *id < *(static_cast<const TriggerType&>(other).id);
         }
         return this < &other;
     }
