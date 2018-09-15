@@ -3,6 +3,7 @@
 #include "../header/Actor.h"
 #include "../header/Constants.h"
 #include "../header/Utils.h"
+#include "../header/TriggerPresets.h"
 
 Actor::Actor(State startState)
 {
@@ -14,22 +15,34 @@ Actor::Actor(State startState)
 	maxYSpeed = -1;
     previousState = startState;
     nextState = startState;
+    
+    trigger_preset::Create trigger(this);
+    fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
+    trigger_preset::Destroy trigger(this);
+    fireTrigger(trigger);
+
     if (shape != NULL) 
     {
         delete shape;
     }
-    if (shape != NULL) 
+    if (hitbox != NULL) 
     {
         delete hitbox;
     }
-    if (shape != NULL) 
+    if (material != NULL) 
     {
         delete material;
     }
+}
+
+void Actor::step()
+{
+    trigger_preset::Step trigger(this);
+    fireTrigger(trigger);
 }
 
 // Moves the object based on its physics attributes and performs collision detection
@@ -140,24 +153,38 @@ void Actor::interpolateState(float blend)
     }
 }
 
+void Actor::offset(float xOffset, float yOffset)
+{
+    setPosition(nextState.xPosition + xOffset, nextState.yPosition + yOffset);
+}
+
 // Draws the shape, if there is one set, to the screen
 // params:
 //   window: the window to draw to
 //   view: the view of the world
 void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
+    trigger_preset::Draw trigger(this);
+    fireTrigger(trigger);
+
     if (shape != NULL)
     {
 	    shape->draw(window);
     }
 }
 
-void Actor::fireTrigger(Trigger* trigger)
+void Actor::fireTrigger(const Trigger& trigger)
 {
-    for (Action* action : actionMap[trigger])
+    for (const Action* action : actionMap[&trigger])
     {
         action->run(this);
     }
+}
+
+void Actor::onCollision(Actor* other)
+{
+    trigger_preset::Collision trigger(other);
+    fireTrigger(trigger);
 }
 
 // Tests if the actor has a hitbox.
@@ -244,12 +271,17 @@ float Actor::getHitboxDistanceY(const Actor& other) const
 // Getters/Setters
 std::string Actor::getName() const
 {
-	return this->objName;
+	return objName;
 }
 
 int Actor::getId() const
 {
-	return this->id;
+	return id;
+}
+
+State Actor::getState() const
+{
+    return nextState;
 }
 
 Rectangle* Actor::getHitbox() const
@@ -260,6 +292,19 @@ Rectangle* Actor::getHitbox() const
 Material* Actor::getMaterial() const
 {
     return material;
+}
+
+void Actor::setPosition(float xPosition, float yPosition)
+{
+    nextState.xPosition = xPosition;
+    nextState.yPosition = yPosition;
+
+    // Move hitbox with actor
+    if (isCollidable())
+    {
+        hitbox->x = nextState.xPosition + xSpriteOffset;
+        hitbox->y = nextState.yPosition + ySpriteOffset;
+    }
 }
 
 void Actor::setXAcceleration(float xAcceleration)

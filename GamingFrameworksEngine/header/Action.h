@@ -6,5 +6,5 @@ class Actor;
 class Action 
 {
 public:
-    virtual void run(Actor*) = 0;
+    virtual void run(Actor* ) const = 0;
 };

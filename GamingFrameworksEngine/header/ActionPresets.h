@@ -15,9 +15,43 @@ namespace action_preset
             this->acceleration = acceleration;
         }
     
-        void run(Actor* actor)
+        void run(Actor* actor) const
         {
             actor->setXAcceleration(acceleration);
+        }
+    };
+    
+    class MoveTo : Action
+    {
+    private:
+        Actor* other;
+    public:
+        MoveTo(Actor* other)
+        {
+            this->other = other;
+        }
+    
+        void run(Actor* actor) const
+        {
+            actor->setPosition(other->getState().xPosition, other->getState().yPosition);
+        }
+    };
+    
+    class Move : Action
+    {
+    private:
+        float xOffset;
+        float yOffset;
+    public:
+        Move(float xOffset, float yOffset)
+        {
+            this->xOffset = xOffset;
+            this->yOffset = yOffset;
+        }
+    
+        void run(Actor* actor) const
+        {
+            actor->offset(xOffset, yOffset);
         }
     };
 }

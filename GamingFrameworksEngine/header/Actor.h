@@ -81,42 +81,44 @@ protected:
     float imageAngle;
 
     // triggers/actions
-    map<Trigger*, list<Action*>> actionMap;
+    map<const Trigger*, list<const Action*>> actionMap;
 
 public:
     Actor(State startState);
     ~Actor();
     
-    // Override to perform custom object code every game loop
-    virtual void step() {};
+    void step();
 
     // Implements collision and motion of the object
     void move(const std::list<Actor*>&);
 	void interpolateState(float);
 
+    void offset(float, float);
+
     // Draws the object to the screen
-	virtual void draw(sf::RenderWindow*, sf::View*);
+	void draw(sf::RenderWindow*, sf::View*);
 
     // Performs actions given a trigger
-    void fireTrigger(Trigger*);
+    void fireTrigger(const Trigger&);
     
     // Collision functions
+    void onCollision(Actor*);
     bool isCollidable() const;
     bool willCollideX(const Actor&) const;
     bool willCollideY(const Actor&) const;
     bool willCollide(const Actor&) const;
     float getHitboxDistanceX(const Actor&) const;
     float getHitboxDistanceY(const Actor&) const;
-    // Override to perform custom object code on collision with another actor
-    virtual void onCollision(Actor*) {};
     
     // Getters
 	std::string getName() const;
 	int getId() const;
+    State getState() const;
     Rectangle* getHitbox() const;
     Material* getMaterial() const;
     
 	// Setters
+    void setPosition(float, float);
 	void setXSpeed(float);
 	void setYSpeed(float);
 	void setXAcceleration(float);
