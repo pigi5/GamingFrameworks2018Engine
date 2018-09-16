@@ -6,6 +6,4 @@ public:
     float friction;
 
     Material(float);
-    
-    float getFriction() const;
 };

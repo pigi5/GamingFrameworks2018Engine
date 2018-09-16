@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 // Base class for triggers to be treated polymorphically
 class Trigger 
 {

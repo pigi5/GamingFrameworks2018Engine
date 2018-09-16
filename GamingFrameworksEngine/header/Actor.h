@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
+#include "ActorType.h"
 
 // The state of the object that needs to be interpolated between frames
 struct State
@@ -67,8 +68,6 @@ protected:
 	float maxXSpeed;
 	float maxYSpeed;
 
-    Material* material;
-
     // drawing
     //Sprite* sprite;
     Rectangle* hitbox;
@@ -79,9 +78,9 @@ protected:
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
-
-    // triggers/actions
-    map<const Trigger*, list<const Action*>> actionMap;
+    
+    // Type data
+    ActorType* type;
 
 public:
     Actor(State startState);
@@ -112,10 +111,10 @@ public:
     
     // Getters
 	std::string getName() const;
+	ActorType* getType() const;
 	int getId() const;
     State getState() const;
     Rectangle* getHitbox() const;
-    Material* getMaterial() const;
     
 	// Setters
     void setPosition(float, float);

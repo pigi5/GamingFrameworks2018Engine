@@ -33,10 +33,6 @@ Actor::~Actor()
     {
         delete hitbox;
     }
-    if (material != NULL) 
-    {
-        delete material;
-    }
 }
 
 void Actor::step()
@@ -100,11 +96,11 @@ void Actor::move(const std::list<Actor*>& actors)
                 // Set speed such that this object will go up to the colliding object but not past
                 xSpeed = engine_util::sign(xSpeed) * getHitboxDistanceX(*other);
                 // Friction that goes against direction of motion in opposite axis
-                Material* otherMaterial = other->getMaterial();
+                Material* otherMaterial = other->getType()->material;
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    ySpeed = engine_util::sign(ySpeed) * std::max(0.0f, abs(ySpeed) - other->getMaterial()->getFriction());
+                    ySpeed = engine_util::sign(ySpeed) * std::max(0.0f, abs(ySpeed) - other->getType()->material->friction);
                 }
             } 
             else if (collidesY)
@@ -112,11 +108,11 @@ void Actor::move(const std::list<Actor*>& actors)
                 // Set speed such that this object will go up to the colliding object but not past
                 ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(*other);
                 // Friction that goes against direction of motion in opposite axis
-                Material* otherMaterial = other->getMaterial();
+                Material* otherMaterial = other->getType()->material;
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    xSpeed = engine_util::sign(xSpeed) * std::max(0.0f, abs(xSpeed) - other->getMaterial()->getFriction());
+                    xSpeed = engine_util::sign(xSpeed) * std::max(0.0f, abs(xSpeed) - other->getType()->material->friction);
                 }
             }
             // Fire collision event
@@ -175,7 +171,7 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 
 void Actor::fireTrigger(const Trigger& trigger)
 {
-    for (const Action* action : actionMap[&trigger])
+    for (const Action* action : type->actionMap[&trigger])
     {
         action->run(this);
     }
@@ -274,6 +270,11 @@ std::string Actor::getName() const
 	return objName;
 }
 
+ActorType* Actor::getType() const
+{
+    return type;
+}
+
 int Actor::getId() const
 {
 	return id;
@@ -287,11 +288,6 @@ State Actor::getState() const
 Rectangle* Actor::getHitbox() const
 {
     return hitbox;
-}
-
-Material* Actor::getMaterial() const
-{
-    return material;
 }
 
 void Actor::setPosition(float xPosition, float yPosition)
@@ -326,7 +322,6 @@ void Actor::setYSpeed(float ySpeed)
 {
 	this->ySpeed = ySpeed;
 }
-
 
 bool Actor::operator<(const Actor& other) const
 {
