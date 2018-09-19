@@ -11,7 +11,7 @@ Player::Player(State startState) : Actor(startState)
 	this->objName = "Player";
 	this->maxXSpeed = 2;
 	this->maxYSpeed = 10;
-	this->hitbox = new Rectangle(startState.xPosition, startState.yPosition, xSize, ySize);
+	this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, xSize, ySize);
 	this->shape = new Shape(4, startState.xPosition, startState.yPosition, xSize, ySize);
 	this->shape->setColorFill(sf::Color::White);
 	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-0.03)));

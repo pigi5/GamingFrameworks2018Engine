@@ -6,6 +6,7 @@
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 #include "../header/InputHandler.h"
+#include "../header/Configurable.h"
 
 Engine::Engine(std::vector<Room*> rooms)
 {
@@ -27,6 +28,10 @@ void Engine::run(sf::RenderWindow* window)
 
     // Defines the current room index locally so that the room cannot be changed during loops
     int localCurrentRoomIndex;
+    /*
+    // Load resources
+    loadAll<Material>("../resources/materials");
+    loadAll<ActorType>("../resources/actor_types");*/
 
     // Setup camera
 	sf::View camera = window->getView();

@@ -1,0 +1,16 @@
+---
+name    : player
+material: ~
+triggers: 
+    - type   : ButtonInput
+      id     : 1
+      state  : down
+      actions: 
+          - type        : ApplyForceX
+            acceleration: -5
+    - type   : ButtonInput
+      id     : 2
+      state  : down
+      actions: 
+          - type        : ApplyForceX
+            acceleration: 5

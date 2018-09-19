@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <SFML\Graphics.hpp>
-#include "Rectangle.h"
+#include "Hitbox.h"
 
 using namespace std;
 
@@ -10,7 +10,7 @@ using namespace std;
 class Sprite
 {
 private:
-	Rectangle* hitbox;
+	Hitbox* hitbox;
 	
 	sf::Sprite s;
 	sf::Texture t;
@@ -22,7 +22,7 @@ public:
     Sprite(int xPos, int yPos);
     ~Sprite();
 
-    Rectangle* getHitbox() const;
+    Hitbox* getHitbox() const;
 
 	void setPosition(int xPos, int yPos);
 	void move(int dx, int dy);

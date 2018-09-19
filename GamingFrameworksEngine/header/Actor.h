@@ -2,12 +2,12 @@
 
 #include <list>
 #include <map>
+#include "ActorType.h"
 #include "Sprite.h"
 #include "Shape.h"
 #include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
-#include "ActorType.h"
 
 // The state of the object that needs to be interpolated between frames
 struct State
@@ -70,7 +70,7 @@ protected:
 
     // drawing
     //Sprite* sprite;
-    Rectangle* hitbox;
+    Hitbox* hitbox;
 	Shape* shape;
     float imageSpeed;
     int imageFrame;
@@ -83,7 +83,7 @@ protected:
     ActorType* type;
 
 public:
-    Actor(State startState);
+    Actor(ActorType* type);
     ~Actor();
     
     void step();
@@ -114,7 +114,7 @@ public:
 	ActorType* getType() const;
 	int getId() const;
     State getState() const;
-    Rectangle* getHitbox() const;
+    Hitbox* getHitbox() const;
     
 	// Setters
     void setPosition(float, float);

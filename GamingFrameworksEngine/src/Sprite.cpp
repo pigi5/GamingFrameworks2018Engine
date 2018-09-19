@@ -10,7 +10,7 @@ Sprite::~Sprite()
 {
 }
 
-Rectangle* Sprite::getHitbox() const
+Hitbox* Sprite::getHitbox() const
 {
     return hitbox;
 }

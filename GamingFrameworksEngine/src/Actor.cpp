@@ -5,24 +5,25 @@
 #include "../header/Utils.h"
 #include "../header/TriggerPresets.h"
 
-Actor::Actor(State startState)
+Actor::Actor(ActorType* type)
 {
     static int _id = 0;
     id = _id++;
+    this->type = type;
     // Set the default yAcceleration to gravity
     yAcceleration = engine_constant::GRAVITY;
 	maxXSpeed = -1;
 	maxYSpeed = -1;
-    previousState = startState;
-    nextState = startState;
+    previousState = {0, 0};
+    nextState = {0, 0};
     
-    trigger_preset::Create trigger(this);
+    trigger_preset::Create trigger(type);
     fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
-    trigger_preset::Destroy trigger(this);
+    trigger_preset::Destroy trigger(type);
     fireTrigger(trigger);
 
     if (shape != NULL) 
@@ -37,7 +38,7 @@ Actor::~Actor()
 
 void Actor::step()
 {
-    trigger_preset::Step trigger(this);
+    trigger_preset::Step trigger(type);
     fireTrigger(trigger);
 }
 
@@ -96,11 +97,11 @@ void Actor::move(const std::list<Actor*>& actors)
                 // Set speed such that this object will go up to the colliding object but not past
                 xSpeed = engine_util::sign(xSpeed) * getHitboxDistanceX(*other);
                 // Friction that goes against direction of motion in opposite axis
-                Material* otherMaterial = other->getType()->material;
+                const Material* otherMaterial = other->getType()->material;
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    ySpeed = engine_util::sign(ySpeed) * std::max(0.0f, abs(ySpeed) - other->getType()->material->friction);
+                    ySpeed = engine_util::sign(ySpeed) * max(0.0f, abs(ySpeed) - other->getType()->material->friction);
                 }
             } 
             else if (collidesY)
@@ -108,11 +109,11 @@ void Actor::move(const std::list<Actor*>& actors)
                 // Set speed such that this object will go up to the colliding object but not past
                 ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(*other);
                 // Friction that goes against direction of motion in opposite axis
-                Material* otherMaterial = other->getType()->material;
+                const Material* otherMaterial = other->getType()->material;
                 if (otherMaterial != NULL)
                 {
                     // Don't let speed change signs
-                    xSpeed = engine_util::sign(xSpeed) * std::max(0.0f, abs(xSpeed) - other->getType()->material->friction);
+                    xSpeed = engine_util::sign(xSpeed) * max(0.0f, abs(xSpeed) - other->getType()->material->friction);
                 }
             }
             // Fire collision event
@@ -160,7 +161,7 @@ void Actor::offset(float xOffset, float yOffset)
 //   view: the view of the world
 void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
-    trigger_preset::Draw trigger(this);
+    trigger_preset::Draw trigger(type);
     fireTrigger(trigger);
 
     if (shape != NULL)
@@ -179,7 +180,7 @@ void Actor::fireTrigger(const Trigger& trigger)
 
 void Actor::onCollision(Actor* other)
 {
-    trigger_preset::Collision trigger(other);
+    trigger_preset::Collision trigger(other->type);
     fireTrigger(trigger);
 }
 
@@ -285,7 +286,7 @@ State Actor::getState() const
     return nextState;
 }
 
-Rectangle* Actor::getHitbox() const
+Hitbox* Actor::getHitbox() const
 {
     return hitbox;
 }
@@ -321,9 +322,4 @@ void Actor::setXSpeed(float xSpeed)
 void Actor::setYSpeed(float ySpeed) 
 {
 	this->ySpeed = ySpeed;
-}
-
-bool Actor::operator<(const Actor& other) const
-{
-    return id < other.id;
 }
