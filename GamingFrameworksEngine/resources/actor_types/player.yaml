@@ -14,3 +14,9 @@ triggers:
       actions: 
           - type        : ApplyForceX
             acceleration: 5
+    - type   : Create
+      name   : player
+      actions:
+          - type        : MoveTo
+            xPosition   : 200
+            yPosition   : 200
