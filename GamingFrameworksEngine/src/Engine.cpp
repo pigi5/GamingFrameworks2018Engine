@@ -9,6 +9,7 @@
 #include "../header/Constants.h"
 #include "../header/InputHandler.h"
 #include "../header/Text.h"
+#include "../header/Configurable.h"
 
 Engine::Engine(std::vector<Room*> rooms)
 {
