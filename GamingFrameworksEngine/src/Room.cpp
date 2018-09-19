@@ -5,10 +5,12 @@ Room::Room(std::list<Actor*> actors, std::list<Actor*> overlays, string musicFil
 	this->actors = actors;
 	this->overlays = overlays;
 	this->music = Music(musicFile);
+	this->music.playMusic();
 }
 
 Room::~Room()
 {
+	this->music.stopMusic();
 }
 
 void Room::step()
