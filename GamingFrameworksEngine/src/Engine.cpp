@@ -127,7 +127,10 @@ void Engine::run(sf::RenderWindow* window)
 			}
 
 			if (event.type == sf::Event::KeyPressed) {
-				input.setState(event.key.code, true);
+				input.handlePress(event.key.code, true);
+			}
+			if (event.type == sf::Event::KeyReleased) {
+				input.handlePress(event.key.code, false);
 			}
 		}
     }
