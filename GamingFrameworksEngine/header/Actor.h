@@ -1,10 +1,15 @@
 #pragma once
 
 #include <list>
+#include <map>
 #include "Sprite.h"
 #include "Shape.h"
 #include "Material.h"
+#include "Trigger.h"
+#include "Action.h"
+#include "ActorType.h"
 
+// The state of the object that needs to be interpolated between frames
 struct State
 {
     float xPosition;
@@ -63,8 +68,6 @@ protected:
 	float maxXSpeed;
 	float maxYSpeed;
 
-    Material* material;
-
     // drawing
     //Sprite* sprite;
     Rectangle* hitbox;
@@ -75,40 +78,51 @@ protected:
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
+    
+    // Type data
+    ActorType* type;
 
 public:
     Actor(State startState);
     ~Actor();
     
-    // Override to perform custom object code every game loop
-    virtual void step() {};
+    void step();
 
     // Implements collision and motion of the object
     void move(const std::list<Actor*>&);
 	void interpolateState(float);
 
+    void offset(float, float);
+
     // Draws the object to the screen
-	virtual void draw(sf::RenderWindow*, sf::View*);
+	void draw(sf::RenderWindow*, sf::View*);
+
+    // Performs actions given a trigger
+    void fireTrigger(const Trigger&);
     
     // Collision functions
+    void onCollision(Actor*);
     bool isCollidable() const;
     bool willCollideX(const Actor&) const;
     bool willCollideY(const Actor&) const;
     bool willCollide(const Actor&) const;
     float getHitboxDistanceX(const Actor&) const;
     float getHitboxDistanceY(const Actor&) const;
-    // Override to perform custom object code on collision with another actor
-    virtual void onCollision(Actor*) {};
     
     // Getters
 	std::string getName() const;
+	ActorType* getType() const;
 	int getId() const;
+    State getState() const;
     Rectangle* getHitbox() const;
-    Material* getMaterial() const;
     
 	// Setters
+    void setPosition(float, float);
 	void setXSpeed(float);
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
+
+    // Comparison
+    bool operator<(const Actor&) const;
 };
