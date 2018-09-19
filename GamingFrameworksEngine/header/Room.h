@@ -2,6 +2,7 @@
 
 #include <list>
 #include "Actor.h"
+#include "Music.h"
 
 // Similar to a stage.
 class Room
@@ -9,8 +10,9 @@ class Room
 private:
     std::list<Actor*> actors;
     std::list<Actor*> overlays;
+	Music music;
 public:
-    Room(std::list<Actor*> actors, std::list<Actor*> overlays);
+    Room(std::list<Actor*> actors, std::list<Actor*> overlays, string musicFile);
     ~Room();
 
     void step();

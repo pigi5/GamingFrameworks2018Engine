@@ -1,13 +1,16 @@
 #include "../header/Room.h"
 
-Room::Room(std::list<Actor*> actors, std::list<Actor*> overlays)
+Room::Room(std::list<Actor*> actors, std::list<Actor*> overlays, string musicFile)
 {
 	this->actors = actors;
 	this->overlays = overlays;
+	this->music = Music(musicFile);
+	this->music.playMusic();
 }
 
 Room::~Room()
 {
+	this->music.stopMusic();
 }
 
 void Room::step()

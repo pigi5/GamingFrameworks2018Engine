@@ -10,6 +10,16 @@ Button::Button(sf::Keyboard::Key key, vector<double> params) {
 	this->params = params;
 }
 
+Button::Button(sf::Keyboard::Key key, vector<double> params, string soundFile) {
+	this->key = key;
+	this->params = params;
+	this->sound = Sound(soundFile);
+	if (this->sound.loadSound())
+	{
+		this->hasSound = true;
+	}
+}
+
 
 Button::~Button(){
 }
@@ -42,6 +52,9 @@ bool Button::isPressed(){
 void Button::updateState(){
 	if (sf::Keyboard::isKeyPressed(this->key)) {
 		setState(true);
+		if (this->hasSound) {
+			this->sound.playSound();
+		}
 	}
 	else {
 		setState(false);

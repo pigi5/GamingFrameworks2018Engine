@@ -1,10 +1,10 @@
 #pragma once
 #include <map>
 #include <SFML/Window.hpp>
+#include "..\header\TriggerPresets.h"
 
 
-// this should probably be moved to an appropriate file (watching circular dependencies)
-struct ButtonInputType
+struct ButtonInputType 
 {
 	short id;
 	bool state = false;
@@ -35,27 +35,39 @@ struct ButtonInputType
 class InputHandler {
 
 private:
-	std::map <sf::Keyboard::Key, ButtonInputType> keyMapping;
+	// map key codes to their state 
+	std::map <short, sf::Keyboard::Key> keyMapping;
+	// Keep track of what id number to use.
 	short currId = 0;
 
+	// make sure a given key is in the map, and if its not, add it
 	void checkInMap(sf::Keyboard::Key k) {
 		auto search = keyMapping.find(k);
 		if (search != keyMapping.end() && k != -1) {
-			ButtonInputType b;
-			b.id = currId;
-			keyMapping.insert(std::pair< sf::Keyboard::Key, ButtonInputType>(k,b));
+			keyMapping.insert(std::pair<short, sf::Keyboard::Key>(currId, k));
 			currId++;
 
 		}
 	}
 
 public:
-	// map key codes to their state 
 
-
-	void setState(sf::Keyboard::Key k, bool state) {
+	void handlePress(sf::Keyboard::Key k, bool state) {
 		checkInMap(k);
+		ButtonInputType b;
+		b.id = keyMapping.find(k)->first;
+		b.state = state;
+		trigger_preset::ButtonInput trigger(&b);
+	}
+
+	void changeMapping(sf::Keyboard::Key k) {
 		auto search = keyMapping.find(k);
-		search->second.state = state;
+		if (search != keyMapping.end() && k != -1) {
+			search->second = k;
+		}
+	}
+
+	std::map <short, sf::Keyboard::Key> getKeyMap() {
+		return keyMapping;
 	}
 };

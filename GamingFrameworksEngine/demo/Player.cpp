@@ -15,7 +15,7 @@ Player::Player(State startState) : Actor(startState)
 	this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, xSize, ySize);
 	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-0.03)));
 	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, 0.03)));
-	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005)));
+	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005), "../demoSound.wav"));
 	vector<double> x = { 200, 200 };
 	this->buttons.push_back(Button(sf::Keyboard::R, x));
 }
