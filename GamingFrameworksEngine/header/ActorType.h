@@ -20,9 +20,6 @@ public:
     const Material* material;
 
     // triggers/actions
-    std::map<const Trigger*, std::list<const Action*>> actionMap = std::map<const Trigger*, std::list<const Action*>>();
-
-    // triggers/actions
     std::map<const Trigger*, std::list<const Action*>> actionMap;
     ActorType(const YAML::Node&);
     ~ActorType();
