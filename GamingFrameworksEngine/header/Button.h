@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Window.hpp>
+#include <map>
 
 using namespace std;
 

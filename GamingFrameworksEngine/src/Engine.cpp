@@ -5,6 +5,7 @@
 #include <numeric>
 #include "../header/Engine.h"
 #include "../header/Constants.h"
+#include "../header/InputHandler.h"
 
 Engine::Engine(std::vector<Room*> rooms)
 {
@@ -20,7 +21,10 @@ Engine::~Engine()
 void Engine::run(sf::RenderWindow* window)
 {
     bool go = true;
-    
+
+	// Initialize input handler
+	InputHandler input;
+
     // Defines the current room index locally so that the room cannot be changed during loops
     int localCurrentRoomIndex;
 
@@ -29,6 +33,9 @@ void Engine::run(sf::RenderWindow* window)
 	camera.setCenter(0, 0);
 	camera.move(200, 200);
 	sf::View fixed = window->getView();
+
+	// Disable Repeat Delay
+	//window->setKeyRepeatEnabled(false);
 
     // Variables for game loop timing
 	std::chrono::steady_clock::time_point currentTime;
@@ -108,14 +115,6 @@ void Engine::run(sf::RenderWindow* window)
         // Refresh window
 		window->display();
 
-		// Mouse Info
-		sf::Vector2i windowPos = sf::Mouse::getPosition(*window);
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			std::cout << "Left: " << windowPos.x << " " << windowPos.y << endl;
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-			std::cout << "Right: " << windowPos.x << " " << windowPos.y << endl;
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-			std::cout << "Middle: " << windowPos.x << " " << windowPos.y << endl;
 
         // Check if window is closed
 		sf::Event event;
@@ -125,6 +124,10 @@ void Engine::run(sf::RenderWindow* window)
             {
 				window->close();
                 go = false;
+			}
+
+			if (event.type == sf::Event::KeyPressed) {
+				input.setState(event.key.code, true);
 			}
 		}
     }

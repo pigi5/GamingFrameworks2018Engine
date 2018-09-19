@@ -12,19 +12,9 @@ public:                                     \
 
 #include "Trigger.h"
 #include "Actor.h"
+#include "../header/InputHandler.h"
 
 
-// this should probably be moved to an appropriate file (watching circular dependencies)
-struct ButtonInputType
-{
-    short id;
-    bool state;
-
-    bool operator<(const ButtonInputType& other) const
-    {
-        return id * 2 + state < other.id * 2 + other.state;
-    }
-};
 
 // All trigger presets are defined here
 namespace trigger_preset
