@@ -11,9 +11,8 @@ Player::Player(State startState) : Actor(startState)
 	this->objName = "Player";
 	this->maxXSpeed = 2;
 	this->maxYSpeed = 10;
-	this->hitbox = new Rectangle(startState.xPosition, startState.yPosition, xSize, ySize);
-	this->shape = new Shape(4, startState.xPosition, startState.yPosition, xSize, ySize);
-	this->shape->setColorFill(sf::Color::White);
+	this->sprite = new Sprite(startState.xPosition, startState.yPosition);
+	this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, xSize, ySize);
 	this->buttons.push_back(Button(sf::Keyboard::Left, vector<double>(1,-0.03)));
 	this->buttons.push_back(Button(sf::Keyboard::Right, vector<double>(1, 0.03)));
 	this->buttons.push_back(Button(sf::Keyboard::Up, vector<double>(1, -.0005)));
@@ -40,7 +39,6 @@ void Player::step()
 				this->nextState = startState;
 				this->setXSpeed(0);
 				this->setYSpeed(0);
-				this->shape->setColorFill(sf::Color::White);
 			default:
 				break;
 			}
@@ -60,23 +58,10 @@ void Player::step()
 				this->setXSpeed(-.5);
 			}
 		}
-		if (sf::Joystick::isButtonPressed(0, 0)) {
-			this->shape->setColorFill(sf::Color::Green);
-		}
-		if (sf::Joystick::isButtonPressed(0, 1)) {
-			this->shape->setColorFill(sf::Color::Red);
-		}
-		if (sf::Joystick::isButtonPressed(0, 2)) {
-			this->shape->setColorFill(sf::Color::Blue);
-		}
-		if (sf::Joystick::isButtonPressed(0, 3)) {
-			this->shape->setColorFill(sf::Color::Yellow);
-		}
 		if (sf::Joystick::isButtonPressed(0, 7)) {
 			this->nextState = startState;
 			this->setXSpeed(0);
 			this->setYSpeed(0);
-			this->shape->setColorFill(sf::Color::White);
 		}
 	}
 }

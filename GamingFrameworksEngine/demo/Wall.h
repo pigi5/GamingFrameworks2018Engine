@@ -5,6 +5,7 @@ class Wall : public Actor {
 private:
 	int xSize;
     int ySize;
+	Sprite spr_wall;
 public:
 	Wall(State startState);
 };

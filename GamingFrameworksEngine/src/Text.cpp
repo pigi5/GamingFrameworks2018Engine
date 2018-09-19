@@ -7,7 +7,7 @@ Text::Text(string txt, int xPos, int yPos) {
 	this->size = 32;
 	this->color = sf::Color();
 	this->style = 'r';
-	this->font.loadFromFile("arial.ttf");
+	this->font.loadFromFile("./demo/ariblk.ttf");
 	t = sf::Text(txt, font, size);
 	t.setPosition(xPos, yPos);
 }
