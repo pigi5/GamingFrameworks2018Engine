@@ -15,5 +15,9 @@ public:
 	int playMusic();
 	void stopMusic();
 
+	string getFileName();
+
+	Music& operator=(Music other);
+
 
 };

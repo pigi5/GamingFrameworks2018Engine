@@ -10,8 +10,9 @@ class Room
 private:
     std::list<Actor*> actors;
     std::list<Actor*> overlays;
+	Music music;
 public:
-    Room(std::list<Actor*> actors, std::list<Actor*> overlays);
+    Room(std::list<Actor*> actors, std::list<Actor*> overlays, string musicFile);
     ~Room();
 
     void step();

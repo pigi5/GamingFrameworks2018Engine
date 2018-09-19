@@ -30,3 +30,11 @@ void Music::stopMusic()
 {
 	this->music.stop();
 }
+
+string Music::getFileName() {
+	return this->fileName;
+}
+
+Music& Music::operator=(Music other) {
+	return other;
+}

@@ -1,6 +1,6 @@
-#include "../header/Rectangle.h"
+#include "../header/Hitbox.h"
 
-Rectangle::Rectangle(float x, float y, float width, float height)
+Hitbox::Hitbox(float x, float y, float width, float height)
 {
     this->x = x;
     this->y = y;
@@ -12,7 +12,7 @@ Rectangle::Rectangle(float x, float y, float width, float height)
 // params:
 //   other - rectangle to test collision against
 // returns: whether this rectangle overlaps the given rectangle
-bool Rectangle::collides(const Rectangle* other) const
+bool Hitbox::collides(const Hitbox* other) const
 {
     return x + width > other->x && 
             x < other->x + other->width && 
@@ -26,7 +26,7 @@ bool Rectangle::collides(const Rectangle* other) const
 //   other - rectangle to test collision against
 //   xSpeed - offset in the x-axis
 // returns: whether this rectangle will collide with the given rectangle
-bool Rectangle::willCollideX(const Rectangle* other, float xSpeed) const
+bool Hitbox::willCollideX(const Hitbox* other, float xSpeed) const
 {
     return x + width + xSpeed > other->x && 
             x + xSpeed < other->x + other->width && 
@@ -40,7 +40,7 @@ bool Rectangle::willCollideX(const Rectangle* other, float xSpeed) const
 //   other - rectangle to test collision against
 //   ySpeed - offset in the y-axis
 // returns: whether this rectangle will collide with the given rectangle
-bool Rectangle::willCollideY(const Rectangle* other, float ySpeed) const
+bool Hitbox::willCollideY(const Hitbox* other, float ySpeed) const
 {
     return x + width > other->x && 
             x < other->x + other->width && 
@@ -55,7 +55,7 @@ bool Rectangle::willCollideY(const Rectangle* other, float ySpeed) const
 //   xSpeed - offset in the x-axis
 //   ySpeed - offset in the y-axis
 // returns: whether this rectangle will collide with the given rectangle
-bool Rectangle::willCollide(const Rectangle* other, float xSpeed, float ySpeed) const
+bool Hitbox::willCollide(const Hitbox* other, float xSpeed, float ySpeed) const
 {
     return x + width + xSpeed > other->x && 
             x + xSpeed < other->x + other->width && 
@@ -67,7 +67,7 @@ bool Rectangle::willCollide(const Rectangle* other, float xSpeed, float ySpeed) 
 // params:
 //   other - rectangle to test distance against
 // returns: x-axis distance to the given object
-float Rectangle::getDistanceX(const Rectangle* other) const
+float Hitbox::getDistanceX(const Hitbox* other) const
 {
     if (x + width < other->x)
     {
@@ -84,7 +84,7 @@ float Rectangle::getDistanceX(const Rectangle* other) const
 // params:
 //   other - rectangle to test distance against
 // returns: y-axis distance to the given object
-float Rectangle::getDistanceY(const Rectangle* other) const
+float Hitbox::getDistanceY(const Hitbox* other) const
 {
     if (y + height < other->y)
     {

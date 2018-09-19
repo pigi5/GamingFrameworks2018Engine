@@ -1,5 +1,11 @@
 #include "../header/Sprite.h"
 
+Sprite::Sprite()
+{
+	this->xPos = 0;
+	this->yPos = 0;
+}
+
 Sprite::Sprite(int xPos, int yPos)
 {
 	this->xPos = xPos;
@@ -10,7 +16,7 @@ Sprite::~Sprite()
 {
 }
 
-Rectangle* Sprite::getHitbox() const
+Hitbox* Sprite::getHitbox() const
 {
     return hitbox;
 }
@@ -35,20 +41,20 @@ void Sprite::setSize(int xSize, int ySize) {
 }
 
 void Sprite::setTexture(string filename) {
-	this->t = sf::Texture();
-	t.loadFromFile(filename);
-	s.setTexture(t);
-	this->xSize = t.getSize().x;
-	this->ySize = t.getSize().y;
+	this->t = new sf::Texture();
+	t->loadFromFile(filename);
+	s.setTexture(*t);
+	this->xSize = t->getSize().x;
+	this->ySize = t->getSize().y;
 }
 
 void Sprite::setPartialTexture(string filename, int xSize, int ySize) {
 	this->xSize = xSize;
 	this->ySize = ySize;
-	sf::Texture t = sf::Texture();
-	sf::IntRect r = sf::IntRect(sf::Vector2i(xPos, yPos), sf::Vector2i(xSize, ySize));
-	t.loadFromFile(filename, r);
-	s.setTexture(t);
+	this->t = new sf::Texture();
+	this->r = sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(xSize, ySize));
+	t->loadFromFile(filename, r);
+	s.setTexture(*t);
 	s.setTextureRect(r);
 }
 
@@ -61,7 +67,7 @@ vector<sf::Sprite> Sprite::parseSpriteSheet(string filename, int xSize, int ySiz
 	this->ySize = tex.getSize().y;
 	int j = 0, k = 0;
 	for (int i = 0; i < num; i++) {
-		sf::IntRect rect = sf::IntRect(sf::Vector2i((j * xSize), (k * ySize)), sf::Vector2i(xSize, ySize));
+		sf::IntRect rect = sf::IntRect(sf::Vector2i((j * xSize), (k * ySize)), sf::Vector2i((j+1) * xSize, (k+1) * ySize));
 		tex.loadFromFile(filename, rect);
 		spr.setTexture(tex);
 		spr.setTextureRect(rect);

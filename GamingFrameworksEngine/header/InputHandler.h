@@ -4,7 +4,33 @@
 #include "..\header\TriggerPresets.h"
 
 
+struct ButtonInputType 
+{
+	short id;
+	bool state = false;
 
+	bool operator<(const ButtonInputType& other) const
+	{
+		return id * 2 + state < other.id * 2 + other.state;
+	}
+
+    ButtonInputType() {}
+
+    ButtonInputType(const YAML::Node& config)
+    {
+        id = config["id"].as<short>();
+        state = parseState(config["state"].as<std::string>());
+    }
+    
+    static bool parseState(std::string state)
+    {
+        if (state != "up" && state != "down")
+        {
+            throw ConfigurationError("Button Input Type state must be \"down\" or \"up\"");
+        }
+        return state == "up";
+    }
+};
 
 class InputHandler {
 

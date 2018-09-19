@@ -1,11 +1,15 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <iomanip>
 #include <deque>
+#include <sstream>
 #include <numeric>
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 #include "../header/InputHandler.h"
+#include "../header/Text.h"
+#include "../header/Configurable.h"
 
 Engine::Engine(std::vector<Room*> rooms)
 {
@@ -27,6 +31,10 @@ void Engine::run(sf::RenderWindow* window)
 
     // Defines the current room index locally so that the room cannot be changed during loops
     int localCurrentRoomIndex;
+    /*
+    // Load resources
+    loadAll<Material>("../resources/materials");
+    loadAll<ActorType>("../resources/actor_types");*/
 
     // Setup camera
 	sf::View camera = window->getView();
@@ -45,6 +53,8 @@ void Engine::run(sf::RenderWindow* window)
     std::deque<double> loopDeltaTimes;
     double averageLoopDeltaTime;
     double averageFrameRate;
+	Text frameCounter("", window->getSize().x - 70, 20);
+	frameCounter.setSize(16);
 
     // Run the game loop
     while (go) 
@@ -77,6 +87,10 @@ void Engine::run(sf::RenderWindow* window)
         loopDeltaTimes.push_back(loopDeltaTime);
         averageLoopDeltaTime = std::accumulate(loopDeltaTimes.begin(), loopDeltaTimes.end(), 0.0) / loopDeltaTimes.size();
         averageFrameRate = 1.0 / averageLoopDeltaTime;
+
+		ostringstream sstr;
+		sstr << setprecision(4) << averageFrameRate;
+		frameCounter.setText(sstr.str());
 
 		// Cap the maximum calculated time between frames
 		if (engine_constant::DELTA_TIME_CAP > 0 && loopDeltaTime > engine_constant::DELTA_TIME_CAP)
@@ -111,6 +125,7 @@ void Engine::run(sf::RenderWindow* window)
         // Draw GUI
 		window->setView(fixed);
         rooms[localCurrentRoomIndex]->drawHUD(window, &fixed);
+		frameCounter.draw(window);
 
         // Refresh window
 		window->display();
@@ -127,10 +142,10 @@ void Engine::run(sf::RenderWindow* window)
 			}
 
 			if (event.type == sf::Event::KeyPressed) {
-				input.handlePress(event.key.code, true);
+				//input.handlePress(event.key.code, true);
 			}
 			if (event.type == sf::Event::KeyReleased) {
-				input.handlePress(event.key.code, false);
+				//input.handlePress(event.key.code, false);
 			}
 		}
     }
