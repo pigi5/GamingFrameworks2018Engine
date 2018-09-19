@@ -1,20 +1,16 @@
 #include "../header/Audio.h"
 
+//basic constructor
 Audio::Audio()
 {
 }
 
-int Audio::loadSound(string fileName) {
-	if (!this->buffer.loadFromFile(fileName))
-	{
-		return -1;
-	}
-	return 0;
+//constructor that takes the name of an audio file
+Audio::Audio(string fileName) {
+	this->fileName = fileName;
 }
 
-void Audio::playSound() {
-	this->sound.setBuffer(buffer);
-
-	this->sound.play();
-
+//destructor
+Audio::~Audio() 
+{
 }

@@ -6,13 +6,11 @@ using namespace std;
 
 class Audio
 {
-private:
-	sf::SoundBuffer buffer;
-	sf::Sound sound;
+protected:
+	string fileName;
 
 public:
 	Audio();
-
-	int loadSound(string fileName);
-	void playSound();
+	Audio(string fileName);
+	~Audio();
 };

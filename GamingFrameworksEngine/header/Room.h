@@ -2,6 +2,7 @@
 
 #include <list>
 #include "Actor.h"
+#include "Music.h"
 
 // Similar to a stage.
 class Room
