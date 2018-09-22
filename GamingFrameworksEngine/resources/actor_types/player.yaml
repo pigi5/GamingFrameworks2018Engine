@@ -1,7 +1,10 @@
 ---
-name    : player
-material: ~
-triggers: 
+name     : player
+material : ~
+maxXSpeed: 2
+maxYSpeed: 10
+gravitous: true
+triggers : 
     - type   : ButtonInput
       id     : 1
       state  : down

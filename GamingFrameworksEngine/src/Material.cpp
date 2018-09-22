@@ -1,6 +1,6 @@
 #include "../header/Material.h"
 
-std::map<const std::string, const Material*> Material::objectMap;
+std::map<const std::string, Material*> Material::objectMap;
 
 Material::Material(const YAML::Node& config)
 {

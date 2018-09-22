@@ -1,0 +1,6 @@
+---
+name     : wall
+material : ground
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false

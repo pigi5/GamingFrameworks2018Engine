@@ -11,14 +11,21 @@
 #include "../header/Text.h"
 #include "../header/Configurable.h"
 
-Engine::Engine(std::vector<Room*> rooms)
+Engine::Engine()
 {
-	this->rooms = rooms;
-	currentRoomIndex = 0;
-}
+    for (const auto& pair : Room::objectMap)
+    {
+        if (pair.second->is_default)
+        {
+            currentRoom = pair.second;
+            break;
+        }
+    }
 
-Engine::~Engine()
-{
+    if (currentRoom == NULL)
+    {
+        throw ConfigurationError("No default room declared.");
+    }
 }
 
 // Runs the game loop until complete.
@@ -29,12 +36,14 @@ void Engine::run(sf::RenderWindow* window)
 	// Initialize input handler
 	InputHandler input;
 
-    // Defines the current room index locally so that the room cannot be changed during loops
-    int localCurrentRoomIndex;
+    // Defines the current room locally so that the room cannot be changed during loops
+    Room* localCurrentRoom;
+
     /*
     // Load resources
     loadAll<Material>("../resources/materials");
-    loadAll<ActorType>("../resources/actor_types");*/
+    loadAll<ActorType>("../resources/actor_types");
+    TODO load Rooms*/
 
     // Setup camera
 	sf::View camera = window->getView();
@@ -59,13 +68,7 @@ void Engine::run(sf::RenderWindow* window)
     // Run the game loop
     while (go) 
     {
-        localCurrentRoomIndex = currentRoomIndex;
-        // Error if room index out of bounds
-		if (localCurrentRoomIndex < 0 || localCurrentRoomIndex >= rooms.size())
-        {
-			cout << "Room index out of bounds." << endl;
-			exit(1);
-        }
+        localCurrentRoom = currentRoom;
 
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
@@ -105,7 +108,7 @@ void Engine::run(sf::RenderWindow* window)
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
 		{
 			// Perform iterative game logic
-			rooms[localCurrentRoomIndex]->step();
+			currentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
 
@@ -113,18 +116,18 @@ void Engine::run(sf::RenderWindow* window)
 		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
-		rooms[localCurrentRoomIndex]->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
+		currentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
 		window->clear(sf::Color::Black);
 
         // Draw world
 		window->setView(camera);
-		rooms[localCurrentRoomIndex]->draw(window, &camera);
+		currentRoom->draw(window, &camera);
 
         // Draw GUI
 		window->setView(fixed);
-        rooms[localCurrentRoomIndex]->drawHUD(window, &fixed);
+        currentRoom->drawHUD(window, &fixed);
 		frameCounter.draw(window);
 
         // Refresh window
@@ -149,4 +152,9 @@ void Engine::run(sf::RenderWindow* window)
 			}
 		}
     }
+
+    /*
+    // Unload resources
+    unloadAll<ActorType>();
+    unloadAll<Material>();*/
 }

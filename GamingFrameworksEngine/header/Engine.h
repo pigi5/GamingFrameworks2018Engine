@@ -3,16 +3,26 @@
 #include <vector>
 #include "Room.h"
 
+// Singleton pattern via Martin York - https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 class Engine
 {
-private:
-    std::vector<Room*> rooms;
-	int currentRoomIndex;
 public:
-    Engine(std::vector<Room*> rooms);
-    ~Engine();
+    static Engine& getInstance()
+    {
+        // Instance created on first call to function
+        static Engine instance;
+        return instance;
+    }
+private:
+    Room* currentRoom;
 
+    Engine();
+public:
     // Runs the main game loop
     void run(sf::RenderWindow* window);
+
+    // Functions that should not exist in the Singleton pattern
+    Engine(Engine const&) = delete;
+    void operator=(Engine const&) = delete;
 };
 

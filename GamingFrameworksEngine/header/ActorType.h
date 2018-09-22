@@ -14,13 +14,16 @@ class ActorType
 private:
 
 public:
-    static std::map<const std::string, const ActorType*> objectMap;
+    static std::map<const std::string, ActorType*> objectMap;
     
     std::string name;
     const Material* material;
+    float maxXSpeed;
+    float maxYSpeed;
+    bool gravitous;
 
     // triggers/actions
-    std::map<const Trigger*, std::list<const Action*>> actionMap;
+    std::map<const Trigger*, std::list<Action*>> actionMap;
     ActorType(const YAML::Node&);
     ~ActorType();
     bool operator<(const ActorType& other) const;

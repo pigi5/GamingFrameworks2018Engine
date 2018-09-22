@@ -16,9 +16,9 @@ template <typename T>
 class TriggerType : public Trigger
 {
 private:
-    T* id;
+    const T* id;
 public:
-    TriggerType(T* id)
+    TriggerType(const T* id)
     {
         this->id = id;
     }

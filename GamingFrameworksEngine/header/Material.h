@@ -8,7 +8,7 @@
 class Material
 {
 public:
-    static std::map<const std::string, const Material*> objectMap;
+    static std::map<const std::string, Material*> objectMap;
 
     std::string name;
     float friction;

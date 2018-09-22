@@ -8,6 +8,9 @@
 #include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
+//#include "Room.h"
+
+class Room;
 
 // The state of the object that needs to be interpolated between frames
 struct State
@@ -45,6 +48,20 @@ struct State
         yPosition = other.yPosition;
         return *this;
     }
+
+    State() {}
+
+    State(float xPosition, float yPosition)
+    {
+        this->xPosition = xPosition;
+        this->yPosition = yPosition;
+    }
+
+    State(const YAML::Node& node)
+    {
+        xPosition = node["xPosition"].as<float>();
+        yPosition = node["yPosition"].as<float>();
+    }
 };
 
 
@@ -55,7 +72,8 @@ class Actor
 protected:
 	// identifiers
 	int id;
-	std::string objName;
+
+    Room* room;
 
     // physics
     float xAcceleration;
@@ -65,8 +83,6 @@ protected:
     State currentState;
     State nextState;
     State previousState;
-	float maxXSpeed;
-	float maxYSpeed;
 
     // drawing
 	Sprite* sprite;
@@ -79,10 +95,10 @@ protected:
     float imageAngle;
     
     // Type data
-    ActorType* type;
+    const ActorType* type;
 
 public:
-    Actor(ActorType* type);
+    Actor(const ActorType*, State&);
     ~Actor();
     
     void step();
@@ -109,11 +125,11 @@ public:
     float getHitboxDistanceY(const Actor&) const;
     
     // Getters
-	std::string getName() const;
-	ActorType* getType() const;
+	const ActorType* getType() const;
 	int getId() const;
     State getState() const;
     Hitbox* getHitbox() const;
+    Room* getRoom() const;
     
 	// Setters
     void setPosition(float, float);

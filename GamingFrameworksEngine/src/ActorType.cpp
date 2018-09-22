@@ -5,7 +5,7 @@
 #include "../header/TriggerPresets.h"
 #include "../header/ActionPresets.h"
 
-std::map<const std::string, const ActorType*> ActorType::objectMap;
+std::map<const std::string, ActorType*> ActorType::objectMap;
 
 ActorType::ActorType(const YAML::Node& config)
 {
@@ -19,6 +19,33 @@ ActorType::ActorType(const YAML::Node& config)
             material = Material::objectMap[materialNode.as<std::string>()];
         }
     }
+
+    if (config["maxXSpeed"])
+    {
+        maxXSpeed = config["maxXSpeed"].as<float>();
+    }
+    else
+    {
+        maxXSpeed = -1;
+    }
+
+    if (config["maxYSpeed"])
+    {
+        maxYSpeed = config["maxYSpeed"].as<float>();
+    }
+    else
+    {
+        maxYSpeed = -1;
+    }
+
+    if (config["gravitous"])
+    {
+        gravitous = config["gravitous"].as<bool>();
+    }
+    else
+    {
+        gravitous = true;
+    }
     
     if (config["triggers"])
     {
@@ -27,7 +54,7 @@ ActorType::ActorType(const YAML::Node& config)
         for (YAML::Node trigger : triggers)
         {
             Trigger* newTrigger = trigger_preset::createTrigger(trigger["type"].as<std::string>(), trigger);
-            std::list<const Action*> actionList;
+            std::list<Action*> actionList;
             
             if (trigger["actions"])
             {

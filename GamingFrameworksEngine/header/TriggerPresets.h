@@ -7,7 +7,7 @@
 class _name : public TriggerType<type>          \
 {                                               \
 public:                                         \
-    _name(type* id) : TriggerType(id){};        \
+    _name(const type* id) : TriggerType(id){};  \
     _name(const YAML::Node& node) : TriggerType(new type(node)) {}; \
 };                                              \
 

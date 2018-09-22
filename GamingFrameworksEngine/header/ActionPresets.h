@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Action.h"
+#include "Room.h"
 #include "Actor.h"
 #include "yaml-cpp/yaml.h"
 
@@ -21,7 +22,7 @@ namespace action_preset
             acceleration = node["acceleration"].as<int>();
         }
     
-        void run(Actor* actor) const
+        void run(Actor* actor)
         {
             actor->setXAcceleration(acceleration);
         }
@@ -61,7 +62,7 @@ namespace action_preset
             yPosition = node["yPosition"].as<float>();
         }
     
-        void run(Actor* actor) const
+        void run(Actor* actor)
         {
             actor->setPosition(xPosition, yPosition);
         }
@@ -85,9 +86,43 @@ namespace action_preset
             yOffset = node["yOffset"].as<float>();
         }
     
-        void run(Actor* actor) const
+        void run(Actor* actor)
         {
             actor->offset(xOffset, yOffset);
+        }
+    };
+    
+    class Create : public Action
+    {
+    private:
+        const ActorType* actorType;
+        State startState;
+    public:
+        Create(const ActorType* actorType, State& startState)
+        {
+            this->actorType = actorType;
+            this->startState = startState;
+        }
+
+        Create(const YAML::Node& node)
+        {
+            std::string typeName = node["name"].as<std::string>();
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Actor Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+            this->actorType = (*mapItem).second;
+
+            this->startState = State(node);
+        }
+    
+        void run(Actor* actor)
+        {
+            Actor* newActor = new Actor(actorType, startState);
+            actor->getRoom()->addActor(newActor);
         }
     };
 
@@ -105,6 +140,10 @@ namespace action_preset
         else if (typeName == "Move")
         {
             return new Move(node);
+        }
+        else if (typeName == "Create")
+        {
+            return new Create(node);
         }
         else
         {

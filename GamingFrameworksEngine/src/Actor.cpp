@@ -5,17 +5,18 @@
 #include "../header/Utils.h"
 #include "../header/TriggerPresets.h"
 
-Actor::Actor(ActorType* type)
+Actor::Actor(const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
     this->type = type;
     // Set the default yAcceleration to gravity
-    yAcceleration = engine_constant::GRAVITY;
-	maxXSpeed = -1;
-	maxYSpeed = -1;
-    previousState = {0, 0};
-    nextState = {0, 0};
+    if (type->gravitous)
+    {
+        yAcceleration = engine_constant::GRAVITY;
+    }
+    previousState = startState;
+    nextState = startState;
     
     trigger_preset::Create trigger(type);
     fireTrigger(trigger);
@@ -50,14 +51,14 @@ void Actor::move(const std::list<Actor*>& actors)
 {
     // Increment speeds
     xSpeed += xAcceleration;
-    if (maxXSpeed >= 0 && abs(xSpeed) >= maxXSpeed)
+    if (type->maxXSpeed >= 0 && abs(xSpeed) >= type->maxXSpeed)
     {
-        xSpeed = engine_util::sign(xSpeed) * maxXSpeed;
+        xSpeed = engine_util::sign(xSpeed) * type->maxXSpeed;
     }
     ySpeed += yAcceleration;
-    if (maxYSpeed >= 0 && abs(ySpeed) >= maxYSpeed)
+    if (type->maxYSpeed >= 0 && abs(ySpeed) >= type->maxYSpeed)
     {
-        ySpeed = engine_util::sign(ySpeed) * maxYSpeed;
+        ySpeed = engine_util::sign(ySpeed) * type->maxYSpeed;
     }
     
     // Collision detection logic (look-ahead style)
@@ -172,9 +173,14 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 
 void Actor::fireTrigger(const Trigger& trigger)
 {
-    for (const Action* action : type->actionMap[&trigger])
+    const Trigger* ptr = &trigger;
+    auto actions = type->actionMap.find(ptr);
+    if (actions != type->actionMap.end())
     {
-        action->run(this);
+        for (Action* action : actions->second)
+        {
+            action->run(this);
+        }
     }
 }
 
@@ -266,12 +272,8 @@ float Actor::getHitboxDistanceY(const Actor& other) const
 
 
 // Getters/Setters
-std::string Actor::getName() const
-{
-	return objName;
-}
 
-ActorType* Actor::getType() const
+const ActorType* Actor::getType() const
 {
     return type;
 }
@@ -289,6 +291,11 @@ State Actor::getState() const
 Hitbox* Actor::getHitbox() const
 {
     return hitbox;
+}
+
+Room* Actor::getRoom() const
+{
+    return room;
 }
 
 void Actor::setPosition(float xPosition, float yPosition)
