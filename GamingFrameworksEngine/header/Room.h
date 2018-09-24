@@ -26,6 +26,8 @@ public:
     
     void addActor(Actor*);
     void addOverlay(Actor*);
+    
+    std::list<Actor*> getActors() const;
 
     friend std::ostream& operator<<(std::ostream&, const Room&);
 };

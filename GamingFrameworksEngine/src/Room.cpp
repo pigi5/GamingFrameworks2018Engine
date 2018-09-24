@@ -20,9 +20,18 @@ Room::Room(const YAML::Node& config)
         YAML::Node actorsNode = config["actors"];
         for (YAML::Node actor : actorsNode)
         {
-            const ActorType* type = ActorType::objectMap[actor["type"].as<std::string>()];
+            std::string typeName = actor["type"].as<std::string>();
+            
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Actor Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
             State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
-            actors.push_back(new Actor(type, startState));
+            actors.push_back(new Actor(mapItem->second, startState));
         }
     }
 
@@ -31,9 +40,18 @@ Room::Room(const YAML::Node& config)
         YAML::Node overlaysNode = config["overlays"];
         for (YAML::Node overlay : overlaysNode)
         {
-            const OverlayType* type = OverlayType::objectMap[overlay["type"].as<std::string>()];
+            std::string typeName = overlay["type"].as<std::string>();
+            
+            auto mapItem = OverlayType::objectMap.find(typeName);
+            if (mapItem == OverlayType::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Overlay Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
             State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
-            overlays.push_back(new Overlay(type, startState));
+            overlays.push_back(new Overlay(mapItem->second, startState));
         }
     }
 }
@@ -95,6 +113,11 @@ void Room::addActor(Actor* newActor)
 void Room::addOverlay(Actor* newOverlay)
 {
     overlays.push_back(newOverlay);
+}
+
+std::list<Actor*> Room::getActors() const
+{
+    return actors;
 }
 
 std::ostream& operator<<(std::ostream& output, const Room& object)

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cmath>
 #include "Action.h"
 #include "Room.h"
 #include "Actor.h"
+#include "Utils.h"
 #include "yaml-cpp/yaml.h"
 
 namespace action_preset
@@ -28,22 +30,90 @@ namespace action_preset
         }
     };
     
-    /*class MoveTo : public Action
+    // instantly move to the position of the nearest actor of the given type
+    class MoveToNearest : public Action
     {
     private:
-        Actor* other;
+        ActorType* type;
     public:
-        MoveTo(Actor* other)
+        MoveToNearest(ActorType* type)
         {
-            this->other = other;
+            this->type = type;
+        }
+
+        MoveToNearest(const YAML::Node& node)
+        {
+            std::string typeName = node["type"].as<std::string>();
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Actor Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
+            this->type = mapItem->second;
         }
     
-        void run(Actor* actor) const
+        void run(Actor* actor)
         {
-            actor->setPosition(other->getState().xPosition, other->getState().yPosition);
+            auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
+            actor->setPosition(nearest.first->getState().xPosition, nearest.first->getState().yPosition);
         }
-    };*/
+    };
     
+    // set the speed of the actor to move at the given speed to the 
+    // position of the nearest actor of the given type
+    class MoveTowardNearest : public Action
+    {
+    private:
+        ActorType* type;
+        float speed;
+    public:
+        MoveTowardNearest(ActorType* type, float speed)
+        {
+            this->type = type;
+            this->speed = speed;
+        }
+
+        MoveTowardNearest(const YAML::Node& node)
+        {
+            std::string typeName = node["type"].as<std::string>();
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Actor Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
+            this->type = mapItem->second;
+            this->speed = node["speed"].as<float>();
+        }
+    
+        void run(Actor* actor)
+        {
+            auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
+            
+            State distanceVector = nearest.first->getState() - actor->getState();
+            // special case to avoid divide-by-zero
+            if (distanceVector.xPosition == 0)
+            {
+                actor->setXSpeed(0);
+                actor->setYSpeed(speed);
+                return;
+            }
+            // calculate speeds
+            float angle = atan(distanceVector.yPosition / distanceVector.xPosition);
+            float xSpeed = speed * cos(angle) * engine_util::sign(distanceVector.yPosition);
+            float ySpeed = speed * sin(angle) * engine_util::sign(distanceVector.yPosition);
+
+            actor->setXSpeed(xSpeed);
+            actor->setYSpeed(ySpeed);
+        }
+    };
+    
+    // move the actor to the given location
     class MoveTo : public Action
     {
     private:
@@ -68,6 +138,7 @@ namespace action_preset
         }
     };
     
+    // move the actor a given offset amount
     class Move : public Action
     {
     private:
@@ -92,6 +163,7 @@ namespace action_preset
         }
     };
     
+    // spawn a new actor of the given type
     class Create : public Action
     {
     private:
@@ -114,7 +186,7 @@ namespace action_preset
                 errorMessage << "Actor Type " << typeName << " does not exist.";
                 throw ConfigurationError(errorMessage.str());
             }
-            this->actorType = (*mapItem).second;
+            this->actorType = mapItem->second;
 
             this->startState = State(node);
         }
@@ -126,12 +198,20 @@ namespace action_preset
         }
     };
 
-    // abstract factory
+    // abstract factory (**add new actions here**)
     static Action* createAction(const std::string typeName, const YAML::Node& node)
     {
         if (typeName == "ApplyForceX")
         {
             return new ApplyForceX(node);
+        }
+        else if (typeName == "MoveToNearest")
+        {
+            return new MoveToNearest(node);
+        }
+        else if (typeName == "MoveTowardNearest")
+        {
+            return new MoveTowardNearest(node);
         }
         else if (typeName == "MoveTo")
         {
