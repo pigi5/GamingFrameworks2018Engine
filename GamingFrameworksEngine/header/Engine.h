@@ -15,11 +15,11 @@ public:
     }
 private:
     Room* currentRoom;
-
+	sf::RenderWindow window;
     Engine();
 public:
     // Runs the main game loop
-    void run(sf::RenderWindow* window);
+    void run();
 
     // Functions that should not exist in the Singleton pattern
     Engine(Engine const&) = delete;
