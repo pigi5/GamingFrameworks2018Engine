@@ -20,11 +20,6 @@ int main()
         loadAll<OverlayType>("./resources/overlay_types");
         loadAll<Room>("./resources/rooms");
 
-	    sf::VideoMode defaultMode = sf::VideoMode(800,600);
-	    sf::RenderWindow window;
-	
-	    window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
-
 	    //std::list<Actor*> overlays;
         //HUD h({20, 20});
 	    //overlays.push_back(&h);
@@ -38,7 +33,7 @@ int main()
         //Room startRoom(actors, overlays);
 	    //rooms.push_back(&startRoom);
 
-	    Engine::getInstance().run(&window);
+	    Engine::getInstance().run();
     
     
         unloadAll<Room>();
