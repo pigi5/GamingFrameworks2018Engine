@@ -16,11 +16,6 @@ int main()
 
     try 
     {
-	    sf::VideoMode defaultMode = sf::VideoMode(800,600);
-	    sf::RenderWindow window;
-	
-	    window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
-
 	    Engine::getInstance().run(&window);
     }
     catch (const ConfigurationError& e)

@@ -26,13 +26,16 @@ Engine::Engine()
     {
         throw ConfigurationError("No default room declared.");
     }
+
+	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
+	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
 }
 
 // Runs the game loop until complete.
-void Engine::run(sf::RenderWindow* window)
+void Engine::run()
 {
     bool go = true;
-
+	sf::RenderWindow* windowptr = &this->window;
 	// Initialize input handler
 	InputHandler input;
 
@@ -50,10 +53,10 @@ void Engine::run(sf::RenderWindow* window)
     loadAll<Room>("./resources/rooms");
 
     // Setup camera
-	sf::View camera = window->getView();
+	sf::View camera = windowptr->getView();
 	camera.setCenter(0, 0);
 	camera.move(200, 200);
-	sf::View fixed = window->getView();
+	sf::View fixed = windowptr->getView();
 
 	// Disable Repeat Delay
 	//window->setKeyRepeatEnabled(false);
@@ -66,7 +69,7 @@ void Engine::run(sf::RenderWindow* window)
     std::deque<double> loopDeltaTimes;
     double averageLoopDeltaTime;
     double averageFrameRate;
-	Text frameCounter("", window->getSize().x - 70, 20);
+	Text frameCounter("", windowptr->getSize().x - 70, 20);
 	frameCounter.setSize(16);
 
     // Run the game loop
@@ -123,28 +126,28 @@ void Engine::run(sf::RenderWindow* window)
 		currentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
-		window->clear(sf::Color::Black);
+		windowptr->clear(sf::Color::Black);
 
         // Draw world
-		window->setView(camera);
-		currentRoom->draw(window, &camera);
+		windowptr->setView(camera);
+		currentRoom->draw(windowptr, &camera);
 
         // Draw GUI
-		window->setView(fixed);
-        currentRoom->drawHUD(window, &fixed);
-		frameCounter.draw(window);
+		windowptr->setView(fixed);
+        currentRoom->drawHUD(windowptr, &fixed);
+		frameCounter.draw(windowptr);
 
         // Refresh window
-		window->display();
+		windowptr->display();
 
 
         // Check if window is closed
 		sf::Event event;
-		while (window->pollEvent(event))
+		while (windowptr->pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
             {
-				window->close();
+				windowptr->close();
                 go = false;
 			}
 
