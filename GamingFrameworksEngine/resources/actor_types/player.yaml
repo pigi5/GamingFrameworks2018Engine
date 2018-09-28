@@ -9,14 +9,16 @@ triggers :
       id     : 1
       state  : down
       actions: 
-          - type        : ApplyForceX
-            acceleration: -5
+          - type         : ApplyForce
+            xAcceleration: -5
+            yAcceleration: 0
     - type   : ButtonInput
       id     : 2
       state  : down
       actions: 
-          - type        : ApplyForceX
-            acceleration: 5
+          - type        : ApplyForce
+            xAcceleration: 5
+            yAcceleration: 0
     - type   : Create
       name   : player
       actions:

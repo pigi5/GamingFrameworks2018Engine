@@ -1,8 +1,16 @@
 #include "../header/Room.h"
+#include "../header/Constants.h"
+#include "../header/TriggerPresets.h"
 
 std::map<const std::string, Room*> Room::objectMap;
 
-Room::Room(const YAML::Node& config)
+Room::Room()
+{
+    name = "unknown";
+    is_default = false;
+}
+
+Room::Room(const YAML::Node& config, bool shallow)
 {
     name = config["name"].as<std::string>();
     
@@ -31,7 +39,7 @@ Room::Room(const YAML::Node& config)
             }
 
             State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
-            actors.push_back(new Actor(mapItem->second, startState));
+            actors.push_back(new Actor(this, mapItem->second, startState));
         }
     }
 
@@ -51,13 +59,26 @@ Room::Room(const YAML::Node& config)
             }
 
             State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
-            overlays.push_back(new Overlay(mapItem->second, startState));
+            overlays.push_back(new Overlay(this, mapItem->second, startState));
         }
+    }
+}
+
+Room::~Room()
+{
+    for (Actor* actor : actors)
+    {
+        delete actor;
+    }
+    for (Actor* overlay : overlays)
+    {
+        delete overlay;
     }
 }
 
 void Room::step()
 {
+    // perform step triggers
     for (Actor* actor : actors)
     {
         actor->step();
@@ -67,6 +88,20 @@ void Room::step()
         overlay->step();
     }
 
+    // decrement counters
+    for (int i = 0; i < Room::NUM_TIMERS; i++)
+    {
+        if (timers[i] > 0)
+        {
+            timers[i] -= engine_constant::PHYSICS_DELTA_TIME;
+            if (timers[i] <= 0)
+            {
+                fireTrigger(trigger_preset::Timer(&Index(i)));
+            }
+        }
+    }
+
+    // perform physics
     for (Actor* actor : actors)
     {
         actor->move(actors);
@@ -75,6 +110,20 @@ void Room::step()
     {
         overlay->move(overlays);
     }
+
+    // delete actors queued for deletion
+    for (Actor* actor : actorDeleteQueue)
+    {
+        actors.remove(actor);
+        delete actor;
+    }
+    actorDeleteQueue.clear();
+    for (Actor* overlay : overlayDeleteQueue)
+    {
+        overlays.remove(overlay);
+        delete overlay;
+    }
+    actorDeleteQueue.clear();
 }
 
 void Room::interpolateState(float progress)
@@ -105,14 +154,41 @@ void Room::drawHUD(sf::RenderWindow* window, sf::View* view)
     }
 }
 
+void Room::fireTrigger(const Trigger& trigger)
+{
+    for (Actor* actor : actors)
+    {
+        actor->fireTrigger(trigger);
+    }
+    for (Actor* overlay : overlays)
+    {
+        overlay->fireTrigger(trigger);
+    }
+}
+
 void Room::addActor(Actor* newActor)
 {
     actors.push_back(newActor);
 }
 
+void Room::deleteActor(Actor* actor)
+{
+    actorDeleteQueue.push_back(actor);
+}
+
 void Room::addOverlay(Actor* newOverlay)
 {
     overlays.push_back(newOverlay);
+}
+
+void Room::deleteOverlay(Actor* overlay)
+{
+    overlayDeleteQueue.push_back(overlay);
+}
+
+void Room::startTimer(int index, float time)
+{
+    timers[index] = time;
 }
 
 std::list<Actor*> Room::getActors() const

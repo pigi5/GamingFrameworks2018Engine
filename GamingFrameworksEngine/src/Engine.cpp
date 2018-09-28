@@ -38,12 +38,16 @@ void Engine::run(sf::RenderWindow* window)
 
     // Defines the current room locally so that the room cannot be changed during loops
     Room* localCurrentRoom;
-
-    /*
-    // Load resources
-    loadAll<Material>("../resources/materials");
-    loadAll<ActorType>("../resources/actor_types");
-    TODO load Rooms*/
+    
+    // load all configuration
+    loadAll<Material>("./resources/materials");
+    // load shallow first so we can have all the name references
+    loadAll<ActorType>("./resources/actor_types", true);
+    loadAll<ActorType>("./resources/actor_types");
+    // load shallow first so we can have all the name references
+    loadAll<OverlayType>("./resources/overlay_types", true);
+    loadAll<OverlayType>("./resources/overlay_types");
+    loadAll<Room>("./resources/rooms");
 
     // Setup camera
 	sf::View camera = window->getView();
@@ -152,9 +156,10 @@ void Engine::run(sf::RenderWindow* window)
 			}
 		}
     }
-
-    /*
-    // Unload resources
+    
+    // unload all configuration
+    unloadAll<Room>();
+    unloadAll<OverlayType>();
     unloadAll<ActorType>();
-    unloadAll<Material>();*/
+    unloadAll<Material>();
 }

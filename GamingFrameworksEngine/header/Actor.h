@@ -62,6 +62,13 @@ struct State
         xPosition = node["xPosition"].as<float>();
         yPosition = node["yPosition"].as<float>();
     }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const State& obj)
+    {
+        out << YAML::Key << "xPosition" << YAML::Value << obj.xPosition;
+        out << YAML::Key << "yPosition" << YAML::Value << obj.yPosition;
+        return out;
+    }
 };
 
 
@@ -98,7 +105,7 @@ protected:
     const ActorType* type;
 
 public:
-    Actor(const ActorType*, State&);
+    Actor(Room* room, const ActorType* type, State& startState);
     ~Actor();
     
     void step();

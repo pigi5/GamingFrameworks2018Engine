@@ -7,6 +7,11 @@ class Trigger
 {
 public:
     virtual bool operator<(const Trigger& other) const = 0;
+    virtual YAML::Emitter& serialize(YAML::Emitter&) const = 0;
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Trigger& obj)
+    {
+        return obj.serialize(out);
+    }
 };
 
 // All explicit triggers should inherit from this
@@ -31,6 +36,13 @@ public:
             return *id < *(static_cast<const TriggerType&>(other).id);
         }
         return this < &other;
+    }
+
+    YAML::Emitter& serialize(YAML::Emitter& out, std::string typeName) const
+    {
+        out << YAML::Key << "type" << YAML::Value << typeName;
+        out << *id;
+        return out;
     }
 };
 

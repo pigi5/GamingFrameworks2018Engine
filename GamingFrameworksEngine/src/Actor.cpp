@@ -4,11 +4,13 @@
 #include "../header/Constants.h"
 #include "../header/Utils.h"
 #include "../header/TriggerPresets.h"
+#include "../header/ActionPresets.h"
 
-Actor::Actor(const ActorType* type, State& startState)
+Actor::Actor(Room* room, const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
+    this->room = room;
     this->type = type;
     // Set the default yAcceleration to gravity
     if (type->gravitous)
@@ -18,13 +20,13 @@ Actor::Actor(const ActorType* type, State& startState)
     previousState = startState;
     nextState = startState;
     
-    trigger_preset::Create trigger(type);
+    trigger_preset::Create trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
-    trigger_preset::Destroy trigger(type);
+    trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
     if (sprite != NULL) 
@@ -39,7 +41,7 @@ Actor::~Actor()
 
 void Actor::step()
 {
-    trigger_preset::Step trigger(type);
+    trigger_preset::Step trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
 
@@ -133,6 +135,17 @@ void Actor::move(const std::list<Actor*>& actors)
         hitbox->x = nextState.xPosition + xSpriteOffset;
         hitbox->y = nextState.yPosition + ySpriteOffset;
     }
+
+    // reset acceleration
+    if (type->gravitous)
+    {
+        yAcceleration = engine_constant::GRAVITY;
+    }
+    else
+    {
+        yAcceleration = 0;
+    }
+    xAcceleration = 0;
 }
 
 // Does a linear interpolation of the actors current state and its previous
@@ -162,7 +175,7 @@ void Actor::offset(float xOffset, float yOffset)
 //   view: the view of the world
 void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
-    trigger_preset::Draw trigger(type);
+    trigger_preset::Draw trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
     if (sprite != NULL)
@@ -180,13 +193,18 @@ void Actor::fireTrigger(const Trigger& trigger)
         for (Action* action : actions->second)
         {
             action->run(this);
+            // can't continue if deleted
+            if (dynamic_cast<action_preset::Destroy*>(action))
+            {
+                return;
+            }
         }
     }
 }
 
 void Actor::onCollision(Actor* other)
 {
-    trigger_preset::Collision trigger(other->type);
+    trigger_preset::Collision trigger(&ActorTypeWrapper(other->type));
     fireTrigger(trigger);
 }
 
