@@ -3,18 +3,24 @@
 // Macro for cleaner trigger definitions
 // Note that name is NOT in quotes
 // type is the type of the id pointer in TriggerType
-#define CREATE_TRIGGER(_name, type)             \
-class _name : public TriggerType<type>          \
-{                                               \
-public:                                         \
-    _name(const type* id) : TriggerType(id){};  \
+#define CREATE_TRIGGER(_name, type)                                 \
+class _name : public TriggerType<type>                              \
+{                                                                   \
+public:                                                             \
+    _name(const type* id) : TriggerType(id){};                      \
     _name(const YAML::Node& node) : TriggerType(new type(node)) {}; \
-};                                              \
+    YAML::Emitter& serialize(YAML::Emitter& out) const              \
+    {                                                               \
+        return TriggerType::serialize(out, #_name);                 \
+    }                                                               \
+};                                                                  \
 
 #include "Trigger.h"
 #include "Actor.h"
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
+
+// ID structures //
 
 struct ButtonInputType 
 {
@@ -31,7 +37,7 @@ struct ButtonInputType
     ButtonInputType(const YAML::Node& config)
     {
         id = config["id"].as<short>();
-        state = parseState(config["state"].as<std::string>());
+        state = ButtonInputType::parseState(config["state"].as<std::string>());
     }
     
     static bool parseState(std::string state)
@@ -42,17 +48,93 @@ struct ButtonInputType
         }
         return state == "up";
     }
+    
+    static std::string emitState(bool state)
+    {
+        return state ? "up" : "down";
+    }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const ButtonInputType& obj)
+    {
+        out << YAML::Key << "id" << YAML::Value << obj.id;
+        out << YAML::Key << "state" << YAML::Value << ButtonInputType::emitState(obj.state);
+        return out;
+    }
+};
+
+
+struct Index 
+{
+	int index;
+
+	bool operator<(const Index& other) const
+	{
+		return index < other.index;
+	}
+
+    Index(int index) 
+    {
+        this->index = index;
+    }
+
+    Index(const YAML::Node& config)
+    {
+        index = config["index"].as<int>();
+    }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Index& obj)
+    {
+        out << YAML::Key << "index" << YAML::Value << obj.index;
+        return out;
+    }
+};
+
+
+struct ActorTypeWrapper 
+{
+	const ActorType* type;
+
+	bool operator<(const ActorTypeWrapper& other) const
+	{
+		return *type < *(other.type);
+	}
+
+    ActorTypeWrapper(const ActorType* type) 
+    {
+        this->type = type;
+    }
+
+    ActorTypeWrapper(const YAML::Node& config)
+    {
+        std::string typeName = config["type"].as<std::string>();
+        auto mapItem = ActorType::objectMap.find(typeName);
+        if (mapItem == ActorType::objectMap.end())
+        {
+            std::stringstream errorMessage;
+            errorMessage << "Actor Type " << typeName << " does not exist.";
+            throw ConfigurationError(errorMessage.str());
+        }
+        type = mapItem->second;
+    }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorTypeWrapper& obj)
+    {
+        out << YAML::Key << "type" << YAML::Value << obj.type;
+        return out;
+    }
 };
 
 // All trigger presets are defined here
 namespace trigger_preset
 {
-    CREATE_TRIGGER(Collision, ActorType);
-    CREATE_TRIGGER(ButtonInput, ButtonInputType);
-    CREATE_TRIGGER(Create, ActorType);
-    CREATE_TRIGGER(Step, ActorType);
-    CREATE_TRIGGER(Draw, ActorType);
-    CREATE_TRIGGER(Destroy, ActorType);
+    CREATE_TRIGGER(Collision, ActorTypeWrapper)
+    CREATE_TRIGGER(ButtonInput, ButtonInputType)
+    CREATE_TRIGGER(Create, ActorTypeWrapper)
+    CREATE_TRIGGER(Step, ActorTypeWrapper)
+    CREATE_TRIGGER(Draw, ActorTypeWrapper)
+    CREATE_TRIGGER(Destroy, ActorTypeWrapper)
+    CREATE_TRIGGER(Timer, Index)
+    CREATE_TRIGGER(Custom, Index)
 
     // abstract factory
     static Trigger* createTrigger(const std::string typeName, const YAML::Node& node)
@@ -80,6 +162,14 @@ namespace trigger_preset
         else if (typeName == "Destroy")
         {
             return new Destroy(node);
+        }
+        else if (typeName == "Timer")
+        {
+            return new Timer(node);
+        }
+        else if (typeName == "Custom")
+        {
+            return new Custom(node);
         }
         else
         {

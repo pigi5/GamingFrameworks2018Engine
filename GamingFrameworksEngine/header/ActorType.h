@@ -24,8 +24,9 @@ public:
 
     // triggers/actions
     std::map<const Trigger*, std::list<Action*>> actionMap;
-    ActorType(const YAML::Node&);
+    ActorType();
+    ActorType(const YAML::Node&, bool);
     ~ActorType();
     bool operator<(const ActorType& other) const;
-    friend std::ostream& operator<<(std::ostream&, const ActorType&);
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj);
 };

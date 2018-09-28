@@ -1,6 +1,5 @@
 #include "../header/Overlay.h"
 
-Overlay::Overlay(const OverlayType* overlayType, State& startState) : Actor(overlayType, startState)
+Overlay::Overlay(Room* room, const OverlayType* overlayType, State& startState) : Actor(room, overlayType, startState)
 {
-    yAcceleration = 0;
 }

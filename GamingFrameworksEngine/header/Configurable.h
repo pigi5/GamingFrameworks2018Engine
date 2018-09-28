@@ -7,14 +7,16 @@
 #include "yaml-cpp/yaml.h"
 
 template <typename T>
-static void loadAll(std::string directoryName)
+static void loadAll(std::string directoryName, bool shallow = false)
 {
+    std::map<const std::string, T*> objectMap;
+
     DIR *dir;
     struct dirent *file;
     char* loc;
     if ((dir = opendir(directoryName.c_str())) != NULL) 
     {
-        /* print all the files and directories within directory */
+        // iterate all files in the given directory
         while ((file = readdir(dir)) != NULL)
         {
             if ((loc = strstr(file->d_name, ".yaml")) != NULL)
@@ -23,9 +25,9 @@ static void loadAll(std::string directoryName)
                 std::stringstream relativePath;
                 relativePath << directoryName << "/" << file->d_name;
                 YAML::Node config = YAML::LoadFile(relativePath.str());
-                T* object = new T(config);
+                T* object = new T(config, shallow);
                 // add actor type to map, keyed by name
-                if (!T::objectMap.emplace(object->name, object).second)
+                if (!objectMap.emplace(object->name, object).second)
                 {
                     // if key already existed, throw error
                     std::stringstream errorMessage;
@@ -42,12 +44,18 @@ static void loadAll(std::string directoryName)
         errorMessage << "Directory " << directoryName << " could not be opened.";
         throw ConfigurationError(errorMessage.str());
     }
+
+    // via https://stackoverflow.com/questions/3639741/merge-two-stl-maps
+    objectMap.insert(T::objectMap.begin(), T::objectMap.end());
+    std::swap(objectMap, T::objectMap);
     
+    /*
     std::cout << "Loaded:" << std::endl;
     for (const auto& pair : T::objectMap)
     {
         std::cout << pair.first << ": " << *pair.second << std::endl;
     }
+    */
 }
 
 // must be called to avoid memory leak of actor type pointers
@@ -58,4 +66,5 @@ static void unloadAll()
     {
         delete pair.second;
     }
+    T::objectMap.clear();
 }

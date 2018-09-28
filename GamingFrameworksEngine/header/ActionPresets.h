@@ -9,24 +9,42 @@
 
 namespace action_preset
 {
-    class ApplyForceX : public Action
+    class ApplyForce : public Action
     {
     private:
-        int acceleration;
+        float xAcceleration;
+        float yAcceleration;
     public:
-        ApplyForceX(int acceleration)
+        ApplyForce(float acceleration)
         {
-            this->acceleration = acceleration;
+            this->xAcceleration = xAcceleration;
+            this->yAcceleration = yAcceleration;
         }
 
-        ApplyForceX(const YAML::Node& node)
+        ApplyForce(const YAML::Node& node)
         {
-            acceleration = node["acceleration"].as<int>();
+            xAcceleration = node["xAcceleration"].as<float>();
+            yAcceleration = node["yAcceleration"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "ApplyForce";
+	        out << YAML::Key << "xAcceleration" << YAML::Value << xAcceleration;
+	        out << YAML::Key << "yAcceleration" << YAML::Value << yAcceleration;
+	        return out;
         }
     
         void run(Actor* actor)
         {
-            actor->setXAcceleration(acceleration);
+            if (xAcceleration != 0)
+            {
+                actor->setXAcceleration(xAcceleration);
+            }
+            if (yAcceleration != 0)
+            {
+                actor->setYAcceleration(yAcceleration);
+            }
         }
     };
     
@@ -34,16 +52,16 @@ namespace action_preset
     class MoveToNearest : public Action
     {
     private:
-        ActorType* type;
+        ActorType* targetType;
     public:
-        MoveToNearest(ActorType* type)
+        MoveToNearest(ActorType* targetType)
         {
-            this->type = type;
+            this->targetType = targetType;
         }
 
         MoveToNearest(const YAML::Node& node)
         {
-            std::string typeName = node["type"].as<std::string>();
+            std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
@@ -52,7 +70,14 @@ namespace action_preset
                 throw ConfigurationError(errorMessage.str());
             }
 
-            this->type = mapItem->second;
+            this->targetType = mapItem->second;
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "MoveToNearest";
+	        out << YAML::Key << "target" << YAML::Value << targetType->name;
+	        return out;
         }
     
         void run(Actor* actor)
@@ -67,18 +92,18 @@ namespace action_preset
     class MoveTowardNearest : public Action
     {
     private:
-        ActorType* type;
+        ActorType* targetType;
         float speed;
     public:
-        MoveTowardNearest(ActorType* type, float speed)
+        MoveTowardNearest(ActorType* targetType, float speed)
         {
-            this->type = type;
+            this->targetType = targetType;
             this->speed = speed;
         }
 
         MoveTowardNearest(const YAML::Node& node)
         {
-            std::string typeName = node["type"].as<std::string>();
+            std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
@@ -87,8 +112,16 @@ namespace action_preset
                 throw ConfigurationError(errorMessage.str());
             }
 
-            this->type = mapItem->second;
+            this->targetType = mapItem->second;
             this->speed = node["speed"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "MoveTowardNearest";
+	        out << YAML::Key << "target" << YAML::Value << targetType->name;
+	        out << YAML::Key << "speed" << YAML::Value << speed;
+	        return out;
         }
     
         void run(Actor* actor)
@@ -131,6 +164,14 @@ namespace action_preset
             xPosition = node["xPosition"].as<float>();
             yPosition = node["yPosition"].as<float>();
         }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "MoveTo";
+	        out << YAML::Key << "xPosition" << YAML::Value << xPosition;
+	        out << YAML::Key << "yPosition" << YAML::Value << yPosition;
+	        return out;
+        }
     
         void run(Actor* actor)
         {
@@ -156,6 +197,14 @@ namespace action_preset
             xOffset = node["xOffset"].as<float>();
             yOffset = node["yOffset"].as<float>();
         }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "Move";
+	        out << YAML::Key << "xOffset" << YAML::Value << xOffset;
+	        out << YAML::Key << "yOffset" << YAML::Value << yOffset;
+	        return out;
+        }
     
         void run(Actor* actor)
         {
@@ -178,7 +227,7 @@ namespace action_preset
 
         Create(const YAML::Node& node)
         {
-            std::string typeName = node["name"].as<std::string>();
+            std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
@@ -190,20 +239,124 @@ namespace action_preset
 
             this->startState = State(node);
         }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "Create";
+	        out << YAML::Key << "target" << YAML::Value << actorType;
+	        out << startState;
+	        return out;
+        }
     
         void run(Actor* actor)
         {
-            Actor* newActor = new Actor(actorType, startState);
+            Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
             actor->getRoom()->addActor(newActor);
+        }
+    };
+    
+    // destroys the actor
+    class Destroy : public Action
+    {
+    private:
+    public:
+        Destroy()
+        {
+        }
+
+        Destroy(const YAML::Node& node)
+        {
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "Destroy";
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            actor->getRoom()->deleteActor(actor);
+        }
+    };
+    
+    // starts a timer
+    class SetTimer : public Action
+    {
+    private:
+        int index;
+        float time;
+    public:
+        SetTimer(int index, float time)
+        {
+            this->index = index;
+            this->time = time;
+        }
+
+        SetTimer(const YAML::Node& node)
+        {
+            this->index = node["index"].as<int>();
+
+            if (index < 0 || index >= Room::NUM_TIMERS)
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Timer index " << index << " out of bounds.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
+            this->time = node["time"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "SetTimer";
+	        out << YAML::Key << "index" << YAML::Value << index;
+	        out << YAML::Key << "time" << YAML::Value << time;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            actor->getRoom()->startTimer(index, time);
+        }
+    };
+    
+    // fires a custom trigger
+    class CallCustom : public Action
+    {
+    private:
+        int index;
+    public:
+        CallCustom(int index)
+        {
+            this->index = index;
+        }
+
+        CallCustom(const YAML::Node& node)
+        {
+            this->index = node["index"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "CallCustom";
+	        out << YAML::Key << "index" << YAML::Value << index;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            trigger_preset::Custom trigger(&Index(index));
+            actor->getRoom()->fireTrigger(trigger);
         }
     };
 
     // abstract factory (**add new actions here**)
     static Action* createAction(const std::string typeName, const YAML::Node& node)
     {
-        if (typeName == "ApplyForceX")
+        if (typeName == "ApplyForce")
         {
-            return new ApplyForceX(node);
+            return new ApplyForce(node);
         }
         else if (typeName == "MoveToNearest")
         {
@@ -224,6 +377,18 @@ namespace action_preset
         else if (typeName == "Create")
         {
             return new Create(node);
+        }
+        else if (typeName == "Destroy")
+        {
+            return new Destroy(node);
+        }
+        else if (typeName == "SetTimer")
+        {
+            return new SetTimer(node);
+        }
+        else if (typeName == "CallCustom")
+        {
+            return new CallCustom(node);
         }
         else
         {

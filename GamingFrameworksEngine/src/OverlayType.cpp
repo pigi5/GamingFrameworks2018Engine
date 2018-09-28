@@ -7,30 +7,23 @@
 
 std::map<const std::string, OverlayType*> OverlayType::objectMap;
 
-bool OverlayType::operator<(const OverlayType& other) const
+OverlayType::OverlayType() : ActorType()
 {
-    return name < other.name;
+    gravitous = false;
 }
 
-std::ostream& operator<<(std::ostream& output, const OverlayType& object)
+OverlayType::OverlayType(const YAML::Node& config, bool shallow) : ActorType(config, shallow) 
 {
-    output << " name: " << object.name;
-    if (object.material == NULL)
+    if (config["gravitous"])
     {
-        output << " material: NULL";
+        gravitous = config["gravitous"].as<bool>();
     }
     else
     {
-         output << " material: " << object.material;
+        gravitous = false;
     }
-   
-    for (const auto& pair : object.actionMap)
-    {
-        output << " trigger: ";
-        for (const Action* action : pair.second)
-        {
-            output << " action ";
-        }
-    }
-    return output;
+}
+bool OverlayType::operator<(const OverlayType& other) const
+{
+    return name < other.name;
 }

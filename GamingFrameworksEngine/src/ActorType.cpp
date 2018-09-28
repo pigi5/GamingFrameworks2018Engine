@@ -7,48 +7,39 @@
 
 std::map<const std::string, ActorType*> ActorType::objectMap;
 
-ActorType::ActorType(const YAML::Node& config)
+ActorType::ActorType()
+{
+    name = "unknown";
+    material = NULL;
+    maxXSpeed = -1;
+    maxYSpeed = -1;
+    gravitous = true;
+}
+
+ActorType::ActorType(const YAML::Node& config, bool shallow)
 {
     name = config["name"].as<std::string>();
 
-    if (config["material"])
+    if (!shallow)
     {
         YAML::Node materialNode = config["material"];
         if (!materialNode.IsNull())
         {
-            material = Material::objectMap[materialNode.as<std::string>()];
+            std::string typeName = materialNode.as<std::string>();
+            auto mapItem = Material::objectMap.find(typeName);
+            if (mapItem == Material::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Material Type " << typeName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+            material = mapItem->second;
         }
-    }
 
-    if (config["maxXSpeed"])
-    {
         maxXSpeed = config["maxXSpeed"].as<float>();
-    }
-    else
-    {
-        maxXSpeed = -1;
-    }
-
-    if (config["maxYSpeed"])
-    {
         maxYSpeed = config["maxYSpeed"].as<float>();
-    }
-    else
-    {
-        maxYSpeed = -1;
-    }
-
-    if (config["gravitous"])
-    {
         gravitous = config["gravitous"].as<bool>();
-    }
-    else
-    {
-        gravitous = true;
-    }
     
-    if (config["triggers"])
-    {
         YAML::Node triggers = config["triggers"];
 
         for (YAML::Node trigger : triggers)
@@ -69,6 +60,28 @@ ActorType::ActorType(const YAML::Node& config)
         }
     }
 }
+    
+// TODO multiple of these i think
+YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
+{
+    out << YAML::Key << "name" << YAML::Value << obj.name;
+    out << YAML::Key << "material" << YAML::Value << obj.material->name;
+    out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
+    out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
+    out << YAML::Key << "triggers" << YAML::Value << YAML::BeginSeq;
+    for (auto pair : obj.actionMap)
+    {
+        out << *(pair.first);
+        out << YAML::Key << "actions" << YAML::Value << YAML::BeginSeq;
+        for (Action* action : pair.second)
+        {
+            out << *action;
+        }
+        out << YAML::EndSeq;
+    }
+    out << YAML::EndSeq;
+    return out;
+}
 
 ActorType::~ActorType()
 {
@@ -85,27 +98,4 @@ ActorType::~ActorType()
 bool ActorType::operator<(const ActorType& other) const
 {
     return name < other.name;
-}
-
-std::ostream& operator<<(std::ostream& output, const ActorType& object)
-{
-    output << " name: " << object.name;
-    if (object.material == NULL)
-    {
-        output << " material: NULL";
-    }
-    else
-    {
-         output << " material: " << object.material;
-    }
-   
-    for (const auto& pair : object.actionMap)
-    {
-        output << " trigger: ";
-        for (const Action* action : pair.second)
-        {
-            output << " action ";
-        }
-    }
-    return output;
 }

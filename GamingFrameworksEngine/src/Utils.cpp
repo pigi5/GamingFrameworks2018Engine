@@ -15,7 +15,7 @@ float engine_util::distance(Actor* actor1, Actor* actor2)
 // returns a pair: first is the nearest actor pointer, second is the distance
 std::pair<Actor*, float> engine_util::findNearest(Actor* source, const std::list<Actor*>& actors)
 {
-    Actor* nearest;
+    Actor* nearest = NULL;
     float nearestDistance;
     for (Actor* actor : actors)
     {

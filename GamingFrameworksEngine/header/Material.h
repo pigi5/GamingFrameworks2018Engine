@@ -12,7 +12,8 @@ public:
 
     std::string name;
     float friction;
-
-    Material(const YAML::Node&);
+    
+    Material();
+    Material(const YAML::Node&, bool);
     friend std::ostream& operator<<(std::ostream&, const Material&);
 };

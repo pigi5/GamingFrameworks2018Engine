@@ -8,5 +8,5 @@
 class Overlay : public Actor
 {
 public:
-    Overlay(const OverlayType*, State&);
+    Overlay(Room* room, const OverlayType* overlayType, State& startState);
 };
