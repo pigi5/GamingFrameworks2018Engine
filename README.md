@@ -23,7 +23,7 @@ The "How to Build" section of yaml-cpp's README.md explains how to make the yaml
 # Configuring wxWidgets
 We use wxWidgets to create the engine GUI elements
 
-* Download wxWidgets [here.] (https://www.wxwidgets.org/downloads/) 
+* Download wxWidgets [here](https://www.wxwidgets.org/downloads/).
 * Download the 3.1.1 version
 * Use your IDE of choice to open the relevant project in the "build" folder given by wxWidgets.
 * Change to release, and change all projects to use Multi-Byte Character Set, which is located in the General section of Properties.
