@@ -13,54 +13,40 @@ Room::Room()
 Room::Room(const YAML::Node& config, bool shallow)
 {
     name = config["name"].as<std::string>();
-    
-    if (config["default"])
-    {
-        is_default = config["default"].as<bool>();
-    }
-    else
-    {
-        is_default = false;
-    }
+    is_default = config["default"].as<bool>();
 
-    if (config["actors"])
+    YAML::Node actorsNode = config["actors"];
+    for (YAML::Node actor : actorsNode)
     {
-        YAML::Node actorsNode = config["actors"];
-        for (YAML::Node actor : actorsNode)
-        {
-            std::string typeName = actor["type"].as<std::string>();
+        std::string typeName = actor["type"].as<std::string>();
             
-            auto mapItem = ActorType::objectMap.find(typeName);
-            if (mapItem == ActorType::objectMap.end())
-            {
-                std::stringstream errorMessage;
-                errorMessage << "Actor Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
-            }
-
-            State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
-            actors.push_back(new Actor(this, mapItem->second, startState));
+        auto mapItem = ActorType::objectMap.find(typeName);
+        if (mapItem == ActorType::objectMap.end())
+        {
+            std::stringstream errorMessage;
+            errorMessage << "Actor Type " << typeName << " does not exist.";
+            throw ConfigurationError(errorMessage.str());
         }
+
+        State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
+        actors.push_back(new Actor(this, mapItem->second, startState));
     }
 
-    if (config["overlays"])
+    YAML::Node overlaysNode = config["overlays"];
+    for (YAML::Node overlay : overlaysNode)
     {
-        YAML::Node overlaysNode = config["overlays"];
-        for (YAML::Node overlay : overlaysNode)
-        {
-            std::string typeName = overlay["type"].as<std::string>();
+        std::string typeName = overlay["type"].as<std::string>();
             
-            auto mapItem = OverlayType::objectMap.find(typeName);
-            if (mapItem == OverlayType::objectMap.end())
-            {
-                std::stringstream errorMessage;
-                errorMessage << "Overlay Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
-            }
-
-            State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
-            overlays.push_back(new Overlay(this, mapItem->second, startState));
+        auto mapItem = OverlayType::objectMap.find(typeName);
+        if (mapItem == OverlayType::objectMap.end())
+        {
+            std::stringstream errorMessage;
+            errorMessage << "Overlay Type " << typeName << " does not exist.";
+            throw ConfigurationError(errorMessage.str());
         }
+
+        State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
+        overlays.push_back(new Overlay(this, mapItem->second, startState));
     }
 }
 

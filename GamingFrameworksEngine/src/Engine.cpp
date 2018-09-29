@@ -13,21 +13,7 @@
 
 Engine::Engine()
 {
-    for (const auto& pair : Room::objectMap)
-    {
-        if (pair.second->is_default)
-        {
-            currentRoom = pair.second;
-            break;
-        }
-    }
-
-    if (currentRoom == NULL)
-    {
-        throw ConfigurationError("No default room declared.");
-    }
-
-	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
+    sf::VideoMode defaultMode = sf::VideoMode(800, 600);
 	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
 }
 
@@ -35,7 +21,6 @@ Engine::Engine()
 void Engine::run()
 {
     bool go = true;
-	sf::RenderWindow* windowptr = &this->window;
 	// Initialize input handler
 	InputHandler input;
 
@@ -52,11 +37,26 @@ void Engine::run()
     loadAll<OverlayType>("./resources/overlay_types");
     loadAll<Room>("./resources/rooms");
 
+    // find default room
+    for (const auto& pair : Room::objectMap)
+    {
+        if (pair.second->is_default)
+        {
+            currentRoom = pair.second;
+            break;
+        }
+    }
+
+    if (currentRoom == NULL)
+    {
+        throw ConfigurationError("No default room declared.");
+    }
+
     // Setup camera
-	sf::View camera = windowptr->getView();
+	sf::View camera = window.getView();
 	camera.setCenter(0, 0);
 	camera.move(200, 200);
-	sf::View fixed = windowptr->getView();
+	sf::View fixed = window.getView();
 
 	// Disable Repeat Delay
 	//window->setKeyRepeatEnabled(false);
@@ -69,7 +69,7 @@ void Engine::run()
     std::deque<double> loopDeltaTimes;
     double averageLoopDeltaTime;
     double averageFrameRate;
-	Text frameCounter("", windowptr->getSize().x - 70, 20);
+	Text frameCounter("", window.getSize().x - 70, 20);
 	frameCounter.setSize(16);
 
     // Run the game loop
@@ -126,28 +126,28 @@ void Engine::run()
 		currentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
-		windowptr->clear(sf::Color::Black);
+		window.clear(sf::Color::Black);
 
         // Draw world
-		windowptr->setView(camera);
-		currentRoom->draw(windowptr, &camera);
+		window.setView(camera);
+		currentRoom->draw(&window, &camera);
 
         // Draw GUI
-		windowptr->setView(fixed);
-        currentRoom->drawHUD(windowptr, &fixed);
-		frameCounter.draw(windowptr);
+		window.setView(fixed);
+        currentRoom->drawHUD(&window, &fixed);
+		frameCounter.draw(&window);
 
         // Refresh window
-		windowptr->display();
+		window.display();
 
 
         // Check if window is closed
 		sf::Event event;
-		while (windowptr->pollEvent(event))
+		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
             {
-				windowptr->close();
+				window.close();
                 go = false;
 			}
 

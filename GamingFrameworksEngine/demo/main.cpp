@@ -16,7 +16,7 @@ int main()
 
     try 
     {
-	    Engine::getInstance().run(&window);
+	    Engine::getInstance().run();
     }
     catch (const ConfigurationError& e)
     {

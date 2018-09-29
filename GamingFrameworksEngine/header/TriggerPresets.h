@@ -106,7 +106,7 @@ struct ActorTypeWrapper
 
     ActorTypeWrapper(const YAML::Node& config)
     {
-        std::string typeName = config["type"].as<std::string>();
+        std::string typeName = config["target"].as<std::string>();
         auto mapItem = ActorType::objectMap.find(typeName);
         if (mapItem == ActorType::objectMap.end())
         {
