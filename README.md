@@ -19,3 +19,14 @@ The "How to Build" section of yaml-cpp's README.md explains how to make the yaml
 * You may get some "errors" that say something like "warning interpreted as error". You should be able to ignore them if the following is true:  
 * You should now now have the file libyaml-cppmd.lib in the /Release directory.  
 * You can now add the /include directory to your additional include directories, the /Release directory to your additional library directories, and libyaml-cppmd.lib to your additional dependencies in Visual Studio for the project.
+
+# Configuring wxWidgets
+We use wxWidgets to create the engine GUI elements
+
+* Download wxWidgets [here.] (https://www.wxwidgets.org/downloads/) 
+* Download the 3.1.1 version
+* Use your IDE of choice to open the relevant project in the "build" folder given by wxWidgets.
+* Change to release, and change all projects to use Multi-Byte Character Set, which is located in the General section of Properties.
+* Build the project
+* Add the /include folder and the /include/msvc folder to your project's include directory
+* Add the /lib/vc_lib folder to your project's additional library directory
