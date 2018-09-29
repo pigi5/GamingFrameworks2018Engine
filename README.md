@@ -17,15 +17,18 @@ The "How to Build" section of yaml-cpp's README.md explains how to make the yaml
 * Following those instructions will create a .sln file that you can open in Visual Studio 2017.  
 * Switch to the Release branch and build the solution.  
 * You may get some "errors" that say something like "warning interpreted as error". You should be able to ignore them if the following is true:  
-* You should now now have the file libyaml-cppmd.lib in the /Release directory.  
-* You can now add the /include directory to your additional include directories, the /Release directory to your additional library directories, and libyaml-cppmd.lib to your additional dependencies in Visual Studio for the project.
+* You should now now have the file libyaml-cppmd.lib in the \Release directory.  
+* You can now add the \include directory to your additional include directories, the \Release directory to your additional library directories, and libyaml-cppmd.lib to your additional dependencies in Visual Studio for the project.
 
 # Configuring wxWidgets
 We use wxWidgets to create the engine GUI elements
 
 * Download [version 3.1.1 of wxWidgets](https://www.wxwidgets.org/downloads/).
-* Use your IDE of choice to open the relevant project in the "build" folder given by wxWidgets.
-* Change to release, and change all projects to use Multi-Byte Character Set, which is located in the General section of Properties.
-* Build the project
-* Add the /include folder and the /include/msvc folder to your project's include directory
-* Add the /lib/vc_lib folder to your project's additional library directory
+* Navigate to \build\msw\ and open the solution file that matches your version of Visual Studio (or the highest one if your version is higher).
+* Change to Release.
+* Select all projects in the solution -> Properties -> General.
+* Change the Character Set to Use Multi-Byte Character Set.
+* Make sure the Windows SDK Version matches your operating system version.
+* Build the project.
+* Add the \include folder and the \include\msvc folder to your additional include directories.
+* Add the \lib\vc_lib folder to your additional library directories.
