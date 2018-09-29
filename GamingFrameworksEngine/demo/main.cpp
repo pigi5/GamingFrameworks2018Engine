@@ -14,9 +14,11 @@ int main()
         std::cout << "Running from: " << buffer << std::endl;
     }
 
+
+
     try 
     {
-	    Engine::getInstance().run(&window);
+	    Engine::getInstance().run();
     }
     catch (const ConfigurationError& e)
     {
