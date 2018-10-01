@@ -116,6 +116,7 @@ void Engine::run()
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
 		{
 			// Perform iterative game logic
+			input.handleHolds();
 			currentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
@@ -160,7 +161,6 @@ void Engine::run()
 				input.handleRelease(event.key.code, ButtonState::RELEASE);
 				//cout << "Handling button release" << event.key.code << endl;
 			}
-			input.handleHolds();
 		}
     }
     
