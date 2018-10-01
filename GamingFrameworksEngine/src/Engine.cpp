@@ -5,6 +5,7 @@
 #include <deque>
 #include <sstream>
 #include <numeric>
+#include "../header/ButtonStates.h"
 #include "../header/Engine.h"
 #include "../header/Constants.h"
 #include "../header/InputHandler.h"
@@ -59,7 +60,7 @@ void Engine::run()
 	sf::View fixed = window.getView();
 
 	// Disable Repeat Delay
-	//window->setKeyRepeatEnabled(false);
+	window.setKeyRepeatEnabled(false);
 
     // Variables for game loop timing
 	std::chrono::steady_clock::time_point currentTime;
@@ -152,11 +153,14 @@ void Engine::run()
 			}
 
 			if (event.type == sf::Event::KeyPressed) {
-				//input.handlePress(event.key.code, true);
+				input.handlePress(event.key.code, ButtonState::PRESS);
+				//cout << "Handling button press" << event.key.code << endl;
 			}
 			if (event.type == sf::Event::KeyReleased) {
-				//input.handlePress(event.key.code, false);
+				input.handleRelease(event.key.code, ButtonState::RELEASE);
+				//cout << "Handling button release" << event.key.code << endl;
 			}
+			input.handleHolds();
 		}
     }
     

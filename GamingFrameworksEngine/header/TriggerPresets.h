@@ -19,13 +19,14 @@ public:                                                             \
 #include "Actor.h"
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
+#include "../header/ButtonStates.h"
 
 // ID structures //
 
 struct ButtonInputType 
 {
 	short id;
-	bool state = false;
+	ButtonState state = ButtonState::RELEASE;
 
 	bool operator<(const ButtonInputType& other) const
 	{
@@ -40,18 +41,40 @@ struct ButtonInputType
         state = ButtonInputType::parseState(config["state"].as<std::string>());
     }
     
-    static bool parseState(std::string state)
+    static ButtonState parseState(std::string state)
     {
-        if (state != "up" && state != "down")
+		ButtonState bs;
+        if (state != "up" && state != "down" && state != "hold")
         {
-            throw ConfigurationError("Button Input Type state must be \"down\" or \"up\"");
+            throw ConfigurationError("Button Input Type state must be \"down\", \"up\" or \"hold\"");
         }
-        return state == "up";
+		if (state == "up")
+			bs = ButtonState::RELEASE;
+		else if (state == "down")
+			bs = ButtonState::PRESS;
+		else
+			bs = ButtonState::HOLD;
+        return bs;
     }
     
-    static std::string emitState(bool state)
+    static std::string emitState(ButtonState bs)
     {
-        return state ? "up" : "down";
+		string state = "";
+		switch (bs)
+		{
+		case PRESS:
+			state = "down";
+			break;
+		case RELEASE:
+			state = "up";
+			break;
+		case HOLD:
+			state = "hold";
+			break;
+		default:
+			break;
+		}
+        return state;
     }
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ButtonInputType& obj)
