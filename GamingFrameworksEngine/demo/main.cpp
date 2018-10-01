@@ -3,6 +3,7 @@
 #include <iostream>
 #include <direct.h> 
 
+
 int main()
 {
     char a;

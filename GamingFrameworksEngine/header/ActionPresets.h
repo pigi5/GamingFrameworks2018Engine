@@ -2,6 +2,9 @@
 
 #include <cmath>
 #include "Action.h"
+#include "Audio.h"
+#include "Music.h"
+#include "Sound.h"
 #include "Room.h"
 #include "Actor.h"
 #include "Utils.h"
@@ -351,6 +354,125 @@ namespace action_preset
         }
     };
 
+	//play sound
+	class PlaySound : public Action
+	{
+	private:
+		Sound* sound;
+	public:
+		PlaySound(Sound* sound) 
+		{
+			this->sound = sound;
+			if (this->sound->loadSound())
+			{
+				this->sound->playSound();
+			}
+		}
+
+		PlaySound(const YAML::Node& node)
+		{
+			std::string typeName = node["name"].as<std::string>();
+			auto mapItem = ActorType::objectMap.find(typeName);
+			if (mapItem == ActorType::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Actor Type " << typeName << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+			//this->sound = new Sound(mapItem->second);
+
+			//this->startState = State(node);
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			
+			return out;
+		}
+
+		void run(Actor* actor)
+		{
+			this->sound->playSound();
+		}
+	};
+
+	//play music
+	class PlayMusic : public Action
+	{
+	private:
+		Music* music;
+	public:
+		PlayMusic(Music* music)
+		{
+			this->music = music;
+			this->music->playMusic();
+		}
+
+		PlayMusic(const YAML::Node& node)
+		{
+			std::string typeName = node["name"].as<std::string>();
+			auto mapItem = ActorType::objectMap.find(typeName);
+			if (mapItem == ActorType::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Actor Type " << typeName << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+			//this->sound = new Sound(mapItem->second);
+
+			//this->startState = State(node);
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			return out;
+		}
+
+		void run(Actor* actor)
+		{
+			this->music->playMusic();
+		}
+
+	};
+
+	//stop music
+	class StopMusic : public Action
+	{
+	private:
+		Music* music;
+	public:
+		StopMusic(Music* music)
+		{
+			this->music = music;
+			this->music->stopMusic();
+		}
+
+		StopMusic(const YAML::Node& node)
+		{
+			std::string typeName = node["name"].as<std::string>();
+			auto mapItem = ActorType::objectMap.find(typeName);
+			if (mapItem == ActorType::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Actor Type " << typeName << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+			//this->sound = new Sound(mapItem->second);
+
+			//this->startState = State(node);
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			return out;
+		}
+
+		void run(Actor* actor)
+		{
+			this->music->stopMusic();
+		}
+	};
+
     // abstract factory (**add new actions here**)
     static Action* createAction(const std::string typeName, const YAML::Node& node)
     {
@@ -386,10 +508,22 @@ namespace action_preset
         {
             return new SetTimer(node);
         }
-        else if (typeName == "CallCustom")
-        {
-            return new CallCustom(node);
-        }
+		else if (typeName == "CallCustom")
+		{
+			return new CallCustom(node);
+		}
+		else if (typeName == "PlaySound")
+		{
+			return new PlaySound(node);
+		}
+		else if (typeName == "PlayMusic")
+		{
+			return new PlayMusic(node);
+		}
+		else if (typeName == "StopMusic")
+		{
+			return new StopMusic(node);
+		}
         else
         {
             std::stringstream errorMessage;
