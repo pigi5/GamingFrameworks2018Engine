@@ -2,10 +2,19 @@
 #include "wx/splitter.h"
 #include "wx/dcmirror.h"
 
+wxString currentPath;
+
 // ID for the menu commands
 enum
 {
-	QUIT = 1
+	QUIT = 1,
+	NEW = 2,
+	OPEN = 3,
+	SAVE = 4,
+	ROOM = 5,
+	OBJECT = 6,
+	SPRITE = 7,
+	AUDIO = 8
 };
 
 // ----------------------------------------------------------------------------
@@ -29,6 +38,9 @@ public:
 	// Menu commands
 
 	void OnQuit(wxCommandEvent& event);
+	void OnNew(wxCommandEvent& event);
+	void OnOpen(wxCommandEvent& event);
+	void OnSave(wxCommandEvent& event);
 
 private:
 	wxWindow *m_left, *m_right;
@@ -53,6 +65,11 @@ class Sidebar : public wxScrolledWindow
 public:
 	Sidebar(wxWindow* parent);
 	virtual ~Sidebar() {};
+
+	void onSprite(wxCommandEvent& event);
+	void onAudio(wxCommandEvent& event);
+	void onObject(wxCommandEvent& event);
+	void onRoom(wxCommandEvent& event);
 };
 
 class Editor : public wxScrolledWindow
@@ -92,6 +109,9 @@ bool MyApp::OnInit()
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
 
 EVT_MENU(QUIT, MyFrame::OnQuit)
+EVT_MENU(NEW, MyFrame::OnNew)
+EVT_MENU(OPEN, MyFrame::OnOpen)
+EVT_MENU(SAVE, MyFrame::OnSave)
 
 wxEND_EVENT_TABLE()
 
@@ -105,7 +125,10 @@ MyFrame::MyFrame()
 	// Make a menubar
 	wxMenu *menu = new wxMenu;
 
-	menu->Append(QUIT, wxT("&Quit"), wxT("Quit"));
+	menu->Append(NEW, wxT("&New"));
+	menu->Append(OPEN, wxT("&Open"));
+	menu->Append(SAVE, wxT("&Save"));
+	menu->Append(QUIT, wxT("&Quit"));
 
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menu, wxT("&File"));
@@ -141,6 +164,39 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
 	Close(true);
 }
+void MyFrame::OnNew(wxCommandEvent& event) 
+{
+	wxString p = wxGetCwd();
+	wxString f;
+	wxTextEntryDialog *projName = new wxTextEntryDialog(this, "Enter Project Name: ");
+	if (projName->ShowModal() == wxID_OK)
+	{
+		f = projName->GetValue();
+	}
+	if (f != wxEmptyString)
+	{
+		f;
+		wxMkdir(f);
+		currentPath = p + f;
+	}
+	else
+	{
+		wxMessageDialog* err = new wxMessageDialog(this, "Must enter a project name. Please try again.", "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
+		err->ShowModal();
+	}
+}
+void MyFrame::OnOpen(wxCommandEvent& event) 
+{
+	wxDirDialog *openProjDialog = new wxDirDialog(this, "Select Project Directory");
+	if (openProjDialog->ShowModal() == wxID_OK) {
+		wxString fileName = openProjDialog->GetPath();
+		currentPath = fileName;
+	}
+}
+void MyFrame::OnSave(wxCommandEvent& event)
+{
+	Close(true);
+}
 
 // ----------------------------------------------------------------------------
 // MySplitterWindow
@@ -165,10 +221,13 @@ Sidebar::Sidebar(wxWindow* parent)
 	wxBoxSizer *vszr = new wxBoxSizer(wxVERTICAL);
 	wxGridSizer *buttons = new wxGridSizer(4, 1, 20, 20);
 	wxPanel *pnl = new wxPanel(this, wxID_ANY);
-	wxButton *bt1 = new wxButton(pnl, wxID_ANY, "Sprites");
-	wxButton *bt2 = new wxButton(pnl, wxID_ANY, "Audio");
-	wxButton *bt3 = new wxButton(pnl, wxID_ANY, "Rooms");
-	wxButton *bt4 = new wxButton(pnl, wxID_ANY, "Objects");
+	wxButton *bt1 = new wxButton(pnl, SPRITE, "Sprites");
+	wxButton *bt2 = new wxButton(pnl, AUDIO, "Audio");
+	wxButton *bt3 = new wxButton(pnl, ROOM, "Rooms");
+	wxButton *bt4 = new wxButton(pnl, OBJECT, "Objects");
+
+	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onSprite));
 
 	buttons->Add(bt1, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -182,7 +241,25 @@ Sidebar::Sidebar(wxWindow* parent)
 	this->SetSizer(vszr);
 
 	this->SetFocus();
+	pnl->SetFocus();
 	Centre();
+}
+
+void Sidebar::onSprite(wxCommandEvent& event)
+{
+
+}
+void Sidebar::onAudio(wxCommandEvent& WXUNUSED(event))
+{
+	
+}
+void Sidebar::onObject(wxCommandEvent& WXUNUSED(event))
+{
+	
+}
+void Sidebar::onRoom(wxCommandEvent& WXUNUSED(event))
+{
+	
 }
 
 //Editor Window
