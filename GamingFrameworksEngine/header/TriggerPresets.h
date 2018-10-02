@@ -113,6 +113,37 @@ struct Index
 };
 
 
+struct Pair 
+{
+	std::string key;
+	int value;
+
+	bool operator<(const Pair& other) const
+	{
+        return std::hash<std::string>{}(key) ^ value < std::hash<std::string>{}(other.key) ^ other.value;
+	}
+
+    Pair(std::string key, int value) 
+    {
+        this->key = key;
+        this->value = value;
+    }
+
+    Pair(const YAML::Node& config)
+    {
+        key = config["key"].as<std::string>();
+        value = config["value"].as<int>();
+    }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Pair& obj)
+    {
+        out << YAML::Key << "key" << YAML::Value << obj.key;
+        out << YAML::Key << "value" << YAML::Value << obj.value;
+        return out;
+    }
+};
+
+
 struct ActorTypeWrapper 
 {
 	const ActorType* type;
@@ -156,6 +187,11 @@ namespace trigger_preset
     CREATE_TRIGGER(Step, ActorTypeWrapper)
     CREATE_TRIGGER(Draw, ActorTypeWrapper)
     CREATE_TRIGGER(Destroy, ActorTypeWrapper)
+    CREATE_TRIGGER(AttributeEquals, Pair)
+    CREATE_TRIGGER(AttributeLT, Pair)
+    CREATE_TRIGGER(AttributeLTE, Pair)
+    CREATE_TRIGGER(AttributeGT, Pair)
+    CREATE_TRIGGER(AttributeGTE, Pair)
     CREATE_TRIGGER(Timer, Index)
     CREATE_TRIGGER(Custom, Index)
 
@@ -185,6 +221,26 @@ namespace trigger_preset
         else if (typeName == "Destroy")
         {
             return new Destroy(node);
+        }
+        else if (typeName == "AttributeEquals")
+        {
+            return new AttributeEquals(node);
+        }
+        else if (typeName == "AttributeLT")
+        {
+            return new AttributeLT(node);
+        }
+        else if (typeName == "AttributeLTE")
+        {
+            return new AttributeLTE(node);
+        }
+        else if (typeName == "AttributeGT")
+        {
+            return new AttributeGT(node);
+        }
+        else if (typeName == "AttributeGTE")
+        {
+            return new AttributeGTE(node);
         }
         else if (typeName == "Timer")
         {

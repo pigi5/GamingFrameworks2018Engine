@@ -104,6 +104,8 @@ protected:
     // Type data
     const ActorType* type;
 
+    std::map<const std::string, int> attributes;
+
 public:
     Actor(Room* room, const ActorType* type, State& startState);
     ~Actor();
@@ -144,7 +146,7 @@ public:
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
-
-    // Comparison
-    bool operator<(const Actor&) const;
+    
+    void setAttribute(std::string, int);
+    void changeAttribute(std::string, int);
 };

@@ -7,9 +7,23 @@
 
 std::map<const std::string, ActorType*> ActorType::objectMap;
 
-ActorType::ActorType()
+void ActorType::createActorType(std::string name)
 {
-    name = "unknown";
+    ActorType* newType = new ActorType(name);
+    
+    // add actor type to map, keyed by name
+    if (!objectMap.emplace(newType->name, newType).second)
+    {
+        // if key already existed, throw error
+        std::stringstream errorMessage;
+        errorMessage << "Actor Type name \"" << newType->name << "\" is not unique.";
+        throw ConfigurationError(errorMessage.str());
+    }
+}
+
+ActorType::ActorType(std::string name)
+{
+    this->name = name;
     material = NULL;
     maxXSpeed = -1;
     maxYSpeed = -1;
@@ -39,6 +53,21 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         maxXSpeed = config["maxXSpeed"].as<float>();
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
+        
+        YAML::Node attrsNode = config["attributes"];
+        for (auto attribute : attrsNode)
+        {
+            std::string attrName = attribute.first.as<std::string>();
+
+            if (!attributes.emplace(attrName, attribute.second.as<int>()).second)
+            {
+                // if key already existed, throw error
+                std::stringstream errorMessage;
+                errorMessage << "Attribute name \"" << attrName;
+                errorMessage << "\" (referenced in " << name << ") is not unique.";
+                throw ConfigurationError(errorMessage.str());
+            }
+        }
     
         YAML::Node triggers = config["triggers"];
 
@@ -68,6 +97,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "material" << YAML::Value << obj.material->name;
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
+    out << YAML::Key << "attributes" << YAML::Value << YAML::BeginMap;
+    for (auto pair : obj.attributes)
+    {
+        out << YAML::Key << pair.first << YAML::Value << pair.second;
+    }
+    out << YAML::EndMap;
     out << YAML::Key << "triggers" << YAML::Value << YAML::BeginSeq;
     for (auto pair : obj.actionMap)
     {

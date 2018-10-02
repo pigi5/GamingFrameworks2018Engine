@@ -19,13 +19,21 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     }
     previousState = startState;
     nextState = startState;
+
+    // set default values
+    for (auto pair : type->attributes)
+    {
+        attributes[pair.first] = pair.second;
+    }
     
+    // fire create trigger
     trigger_preset::Create trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
+    // fire destroy trigger
     trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
@@ -41,6 +49,7 @@ Actor::~Actor()
 
 void Actor::step()
 {
+    // fire step trigger
     trigger_preset::Step trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
@@ -347,4 +356,14 @@ void Actor::setXSpeed(float xSpeed)
 void Actor::setYSpeed(float ySpeed) 
 {
 	this->ySpeed = ySpeed;
+}
+
+void Actor::setAttribute(std::string key, int value)
+{
+    attributes[key] = value;
+}
+
+void Actor::changeAttribute(std::string key, int value)
+{
+    attributes[key] += value;
 }

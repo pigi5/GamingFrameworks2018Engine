@@ -26,7 +26,7 @@ static void loadAll(std::string directoryName, bool shallow = false)
                 relativePath << directoryName << "/" << file->d_name;
                 YAML::Node config = YAML::LoadFile(relativePath.str());
                 T* object = new T(config, shallow);
-                // add actor type to map, keyed by name
+                // add object to map, keyed by name
                 if (!objectMap.emplace(object->name, object).second)
                 {
                     // if key already existed, throw error

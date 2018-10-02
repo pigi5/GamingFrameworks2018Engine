@@ -280,6 +280,72 @@ namespace action_preset
         }
     };
     
+    // sets an attribute
+    class AttributeSet : public Action
+    {
+    private:
+        std::string key;
+        int value;
+    public:
+        AttributeSet(std::string key, int value)
+        {
+            this->key = key;
+            this->value = value;
+        }
+
+        AttributeSet(const YAML::Node& node)
+        {
+            this->key = node["key"].as<std::string>();
+            this->value = node["value"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "AttributeSet";
+	        out << YAML::Key << "key" << YAML::Value << key;
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            actor->setAttribute(key, value);
+        }
+    };
+    
+    // changes an attribute by offset
+    class AttributeChange : public Action
+    {
+    private:
+        std::string key;
+        int offset;
+    public:
+        AttributeChange(std::string key, int offset)
+        {
+            this->key = key;
+            this->offset = offset;
+        }
+
+        AttributeChange(const YAML::Node& node)
+        {
+            this->key = node["key"].as<std::string>();
+            this->offset = node["offset"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        out << YAML::Key << "type" << YAML::Value << "AttributeChange";
+	        out << YAML::Key << "key" << YAML::Value << key;
+	        out << YAML::Key << "offset" << YAML::Value << offset;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            actor->changeAttribute(key, offset);
+        }
+    };
+    
     // starts a timer
     class SetTimer : public Action
     {

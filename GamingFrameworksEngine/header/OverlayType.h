@@ -16,8 +16,10 @@ private:
 
 public:
     static std::map<const std::string, OverlayType*> objectMap;
-    
-    OverlayType();
+
+    static void createOverlayType(std::string);
+
+    OverlayType(std::string);
     OverlayType(const YAML::Node&, bool);
 
     bool operator<(const OverlayType&) const;
