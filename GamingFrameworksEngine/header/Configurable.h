@@ -19,7 +19,7 @@ static void loadAll(std::string directoryName, bool shallow = false)
         // iterate all files in the given directory
         while ((file = readdir(dir)) != NULL)
         {
-            if ((loc = strstr(file->d_name, ".yaml")) != NULL)
+            if ((loc = strstr(file->d_name, ".yml")) != NULL)
             {
                 // create new actor type
                 std::stringstream relativePath;
