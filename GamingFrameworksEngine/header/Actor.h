@@ -139,6 +139,7 @@ public:
     State getState() const;
     Hitbox* getHitbox() const;
     Room* getRoom() const;
+    int getAttribute(std::string) const;
     
 	// Setters
     void setPosition(float, float);

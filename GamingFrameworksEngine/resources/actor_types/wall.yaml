@@ -1,6 +1,8 @@
 ---
-name     : wall
-material : ground
-maxXSpeed: -1
-maxYSpeed: -1
-gravitous: false
+name      : wall
+material  : ground
+maxXSpeed : -1
+maxYSpeed : -1
+gravitous : false
+attributes: []
+triggers  : []

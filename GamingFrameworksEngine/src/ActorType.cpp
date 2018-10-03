@@ -106,6 +106,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "triggers" << YAML::Value << YAML::BeginSeq;
     for (auto pair : obj.actionMap)
     {
+        out << YAML::BeginMap;
         out << *(pair.first);
         out << YAML::Key << "actions" << YAML::Value << YAML::BeginSeq;
         for (Action* action : pair.second)
@@ -113,6 +114,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
             out << *action;
         }
         out << YAML::EndSeq;
+        out << YAML::EndMap;
     }
     out << YAML::EndSeq;
     return out;

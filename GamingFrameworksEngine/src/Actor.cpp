@@ -325,6 +325,18 @@ Room* Actor::getRoom() const
     return room;
 }
 
+int Actor::getAttribute(std::string key) const
+{
+    auto val = attributes.find(key);
+    if (val == attributes.end())
+    {
+        std::stringstream errorMessage;
+        errorMessage << "Attribute " << key << " does not exist.";
+        throw ConfigurationError(errorMessage.str());
+    }
+    return val->second;
+}
+
 void Actor::setPosition(float xPosition, float yPosition)
 {
     nextState.xPosition = xPosition;

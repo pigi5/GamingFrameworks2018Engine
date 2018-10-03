@@ -1,10 +1,12 @@
 ---
-name     : player
-material : ~
-maxXSpeed: 2
-maxYSpeed: 10
-gravitous: true
-triggers : 
+name      : player
+material  : ~
+maxXSpeed : 2
+maxYSpeed : 10
+gravitous : true
+attributes:
+    jumpsLeft: 1
+triggers  : 
     - type   : ButtonInput
       id     : 1
       state  : down
@@ -12,6 +14,7 @@ triggers :
           - type         : ApplyForce
             xAcceleration: -5
             yAcceleration: 0
+            conditionals : []
     - type   : ButtonInput
       id     : 2
       state  : down
@@ -19,9 +22,36 @@ triggers :
           - type         : ApplyForce
             xAcceleration: 5
             yAcceleration: 0
+            conditionals : []
+    - type   : ButtonInput
+      id     : 3
+      state  : down
+      actions: 
+          - type         : ApplyForce
+            xAcceleration: 0
+            yAcceleration: 5
+            conditionals :
+                - attribute    : jumpsLeft
+                  comparison   : gt
+                  value        : 0
+          - type         : AttributeChange
+            attribute    : jumpsLeft
+            offset       : -1
+            conditionals:
+                - attribute    : jumpsLeft
+                  comparison   : gt
+                  value        : 0
     - type   : Create
       target : player
       actions:
           - type         : MoveTo
             xPosition    : 200
             yPosition    : 200
+            conditionals : []
+    - type   : Collision
+      target : wall
+      actions:
+          - type         : AttributeSet
+            attribute    : jumpsLeft
+            value        : 1
+            conditionals : []
