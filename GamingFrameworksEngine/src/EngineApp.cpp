@@ -1,6 +1,9 @@
 #include "wx/wxprec.h"
 #include "wx/splitter.h"
 #include "wx/dcmirror.h"
+#include "../header/Engine.h"
+#include <direct.h>
+#include <iostream>
 
 wxString currentPath;
 
@@ -14,7 +17,11 @@ enum
 	ROOM = 5,
 	OBJECT = 6,
 	SPRITE = 7,
-	AUDIO = 8
+	AUDIO = 8,
+	NEW_ITEM = 9,
+	DELETE_ITEM = 10,
+	CLEAR = 11,
+	PLAY = 12
 };
 
 // ----------------------------------------------------------------------------
@@ -41,6 +48,7 @@ public:
 	void OnNew(wxCommandEvent& event);
 	void OnOpen(wxCommandEvent& event);
 	void OnSave(wxCommandEvent& event);
+	void OnPlay(wxCommandEvent& event);
 
 private:
 	wxWindow *m_left, *m_right;
@@ -70,6 +78,12 @@ public:
 	void onAudio(wxCommandEvent& event);
 	void onObject(wxCommandEvent& event);
 	void onRoom(wxCommandEvent& event);
+	void onNew(wxCommandEvent& event);
+	void onDelete(wxCommandEvent& event);
+	void onClear(wxCommandEvent& event);
+
+private:
+
 };
 
 class Editor : public wxScrolledWindow
@@ -112,6 +126,7 @@ EVT_MENU(QUIT, MyFrame::OnQuit)
 EVT_MENU(NEW, MyFrame::OnNew)
 EVT_MENU(OPEN, MyFrame::OnOpen)
 EVT_MENU(SAVE, MyFrame::OnSave)
+EVT_MENU(PLAY, MyFrame::OnPlay)
 
 wxEND_EVENT_TABLE()
 
@@ -124,14 +139,18 @@ MyFrame::MyFrame()
 
 	// Make a menubar
 	wxMenu *menu = new wxMenu;
+	wxMenu *game = new wxMenu;
 
 	menu->Append(NEW, wxT("&New"));
 	menu->Append(OPEN, wxT("&Open"));
 	menu->Append(SAVE, wxT("&Save"));
 	menu->Append(QUIT, wxT("&Quit"));
 
+	game->Append(PLAY, wxT("&Play"));
+
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menu, wxT("&File"));
+	menuBar->Append(game, wxT("&Game"));
 
 	SetMenuBar(menuBar);
 
@@ -177,7 +196,15 @@ void MyFrame::OnNew(wxCommandEvent& event)
 	{
 		f;
 		wxMkdir(f);
-		currentPath = p + f;
+		currentPath = p + "//" + f;
+		if (wxSetWorkingDirectory(currentPath))
+		{
+			wxMkdir("actor_types");
+			wxMkdir("materials");
+			wxMkdir("overlay_types");
+			wxMkdir("rooms");
+			wxSetWorkingDirectory(p);
+		}
 	}
 	else
 	{
@@ -197,10 +224,20 @@ void MyFrame::OnSave(wxCommandEvent& event)
 {
 	Close(true);
 }
+void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
+{
+	try
+	{
+		Engine::getInstance().run();
+	}
+	catch (const ConfigurationError& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
 
-// ----------------------------------------------------------------------------
+
 // MySplitterWindow
-// ----------------------------------------------------------------------------
 
 MySplitterWindow::MySplitterWindow(wxFrame *parent)
 	: wxSplitterWindow(parent, wxID_ANY,
@@ -247,17 +284,47 @@ Sidebar::Sidebar(wxWindow* parent)
 
 void Sidebar::onSprite(wxCommandEvent& event)
 {
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Sprite Control", wxDefaultPosition, wxSize(270, 200));
+	
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	wxListBox *spriteBox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	hbox->Add(spriteBox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	wxButton* clrBtn = new wxButton(btnPanel, CLEAR, wxT("Delete All"));
+
+	Connect(NEW_ITEM, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onNew));
+	Connect(DELETE_ITEM, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onDelete));
+	Connect(CLEAR, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onClear));
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	boxFrame->Show(true);
+}
+void Sidebar::onAudio(wxCommandEvent& event)
+{
+	
+}
+void Sidebar::onObject(wxCommandEvent& event)
+{
+	
+}
+void Sidebar::onRoom(wxCommandEvent& event)
+{
+	
+}
+void Sidebar::onNew(wxCommandEvent& event)
+{
 
 }
-void Sidebar::onAudio(wxCommandEvent& WXUNUSED(event))
+void Sidebar::onDelete(wxCommandEvent& event)
 {
-	
+
 }
-void Sidebar::onObject(wxCommandEvent& WXUNUSED(event))
-{
-	
-}
-void Sidebar::onRoom(wxCommandEvent& WXUNUSED(event))
+void Sidebar::onClear(wxCommandEvent& event)
 {
 	
 }

@@ -32,3 +32,4 @@ We use wxWidgets to create the engine GUI elements
 * Build the project.
 * Add the \include folder and the \include\msvc folder to your additional include directories.
 * Add the \lib\vc_lib folder to your additional library directories.
+* Change the subsytem in Properties->Linker->Subsystem to Windows
