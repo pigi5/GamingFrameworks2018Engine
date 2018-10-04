@@ -182,3 +182,12 @@ void Engine::unloadConfig()
     unloadAll<ActorType>();
     unloadAll<Material>();
 }
+
+// save configuration
+void Engine::saveConfig()
+{
+    saveAll<Material>("./resources");
+    saveAll<ActorType>("./resources");
+    saveAll<OverlayType>("./resources");
+    saveAll<Room>("./resources");
+}
