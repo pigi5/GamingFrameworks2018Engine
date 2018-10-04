@@ -2,6 +2,8 @@
 #include "../header/Constants.h"
 #include "../header/TriggerPresets.h"
 
+const std::string Room::DIR_NAME = "rooms";
+
 std::map<const std::string, Room*> Room::objectMap;
 
 Room::Room()
@@ -48,6 +50,31 @@ Room::Room(const YAML::Node& config, bool shallow)
         State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
         overlays.push_back(new Overlay(this, mapItem->second, startState));
     }
+}
+
+YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
+{
+    out << YAML::Key << "name" << YAML::Value << obj.name;
+    out << YAML::Key << "default" << YAML::Value << obj.is_default;
+
+    out << YAML::Key << "actors" << YAML::Value << YAML::BeginSeq;
+    for (Actor* actor : obj.actors)
+    {
+        out << YAML::BeginMap;
+        out << *actor;
+        out << YAML::EndMap;
+    }
+    out << YAML::EndSeq;
+    
+    out << YAML::Key << "overlays" << YAML::Value << YAML::BeginSeq;
+    for (Actor* overlay : obj.overlays)
+    {
+        out << YAML::BeginMap;
+        out << *overlay;
+        out << YAML::EndMap;
+    }
+    out << YAML::EndSeq;
+    return out;
 }
 
 Room::~Room()

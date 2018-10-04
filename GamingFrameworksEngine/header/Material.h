@@ -8,6 +8,7 @@
 class Material
 {
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, Material*> objectMap;
 
     std::string name;
@@ -15,5 +16,5 @@ public:
     
     Material();
     Material(const YAML::Node&, bool);
-    friend std::ostream& operator<<(std::ostream&, const Material&);
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Material&);
 };

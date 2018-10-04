@@ -19,6 +19,7 @@ private:
 
     float timers[NUM_TIMERS];
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, Room*> objectMap;
     
     std::string name;
@@ -26,6 +27,8 @@ public:
     
     Room();
     Room(const YAML::Node&, bool);
+
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
 
     ~Room();
 

@@ -17,6 +17,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     {
         yAcceleration = engine_constant::GRAVITY;
     }
+    this->startState = startState;
     previousState = startState;
     nextState = startState;
 
@@ -45,6 +46,14 @@ Actor::~Actor()
     {
         delete hitbox;
     }
+}
+
+YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
+{
+    out << YAML::Key << "type" << YAML::Value << obj.type->name;
+    out << YAML::Key << "startX" << YAML::Value << obj.startState.xPosition;
+    out << YAML::Key << "startY" << YAML::Value << obj.startState.yPosition;
+    return out;
 }
 
 void Actor::step()

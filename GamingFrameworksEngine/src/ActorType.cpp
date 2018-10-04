@@ -5,6 +5,8 @@
 #include "../header/TriggerPresets.h"
 #include "../header/ActionPresets.h"
 
+const std::string ActorType::DIR_NAME = "actor_types";
+
 std::map<const std::string, ActorType*> ActorType::objectMap;
 
 void ActorType::createActorType(std::string name)
@@ -91,7 +93,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 }
     
 // TODO multiple of these i think
-YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
+YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj) 
 {
     out << YAML::Key << "name" << YAML::Value << obj.name;
     out << YAML::Key << "material" << YAML::Value << obj.material->name;

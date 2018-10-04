@@ -17,6 +17,10 @@ private:
     Room* currentRoom;
 	sf::RenderWindow window;
     Engine();
+
+    void loadConfig();
+    void unloadConfig();
+    void saveConfig();
 public:
     // Runs the main game loop
     void run();

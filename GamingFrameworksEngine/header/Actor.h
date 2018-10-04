@@ -87,6 +87,7 @@ protected:
     float yAcceleration;
     float xSpeed;
     float ySpeed;
+    State startState;
     State currentState;
     State nextState;
     State previousState;
@@ -109,6 +110,8 @@ protected:
 public:
     Actor(Room* room, const ActorType* type, State& startState);
     ~Actor();
+
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Actor&);
     
     void step();
 
