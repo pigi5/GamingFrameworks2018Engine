@@ -16,5 +16,5 @@ public:
     
     Material();
     Material(const YAML::Node&, bool);
-    friend std::ostream& operator<<(std::ostream&, const Material&);
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Material&);
 };

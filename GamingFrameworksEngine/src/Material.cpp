@@ -16,9 +16,9 @@ Material::Material(const YAML::Node& config, bool shallow)
     friction = config["friction"].as<float>();
 }
 
-std::ostream& operator<<(std::ostream& output, const Material& object)
-{
-    output << " name: " << object.name;
-    output << " friction: " << object.friction;
-    return output;
+YAML::Emitter& operator<<(YAML::Emitter& out, const Material& obj)
+{ 
+    out << YAML::Key << "name" << YAML::Value << obj.name;
+    out << YAML::Key << "friction" << YAML::Value << obj.friction;
+    return out;
 }

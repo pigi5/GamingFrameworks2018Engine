@@ -52,6 +52,31 @@ Room::Room(const YAML::Node& config, bool shallow)
     }
 }
 
+YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
+{
+    out << YAML::Key << "name" << YAML::Value << obj.name;
+    out << YAML::Key << "default" << YAML::Value << obj.is_default;
+
+    out << YAML::Key << "actors" << YAML::Value << YAML::BeginSeq;
+    for (Actor* actor : obj.actors)
+    {
+        out << YAML::BeginMap;
+        out << *actor;
+        out << YAML::EndMap;
+    }
+    out << YAML::EndSeq;
+    
+    out << YAML::Key << "overlays" << YAML::Value << YAML::BeginSeq;
+    for (Actor* overlay : obj.overlays)
+    {
+        out << YAML::BeginMap;
+        out << *overlay;
+        out << YAML::EndMap;
+    }
+    out << YAML::EndSeq;
+    return out;
+}
+
 Room::~Room()
 {
     for (Actor* actor : actors)

@@ -28,6 +28,8 @@ public:
     Room();
     Room(const YAML::Node&, bool);
 
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
+
     ~Room();
 
     void step();
