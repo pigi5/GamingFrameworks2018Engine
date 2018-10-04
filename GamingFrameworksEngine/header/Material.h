@@ -8,6 +8,7 @@
 class Material
 {
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, Material*> objectMap;
 
     std::string name;

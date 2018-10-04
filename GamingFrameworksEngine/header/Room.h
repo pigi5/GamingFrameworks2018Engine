@@ -19,6 +19,7 @@ private:
 
     float timers[NUM_TIMERS];
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, Room*> objectMap;
     
     std::string name;

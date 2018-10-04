@@ -1,5 +1,7 @@
 #include "../header/Material.h"
 
+const std::string Material::DIR_NAME = "materials";
+
 std::map<const std::string, Material*> Material::objectMap;
 
 Material::Material()

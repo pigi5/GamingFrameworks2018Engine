@@ -14,6 +14,7 @@ class ActorType
 private:
 
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, ActorType*> objectMap;
 
     static void createActorType(std::string);

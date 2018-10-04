@@ -29,14 +29,7 @@ void Engine::run()
     Room* localCurrentRoom;
     
     // load all configuration
-    loadAll<Material>("./resources/materials");
-    // load shallow first so we can have all the name references
-    loadAll<ActorType>("./resources/actor_types", true);
-    loadAll<ActorType>("./resources/actor_types");
-    // load shallow first so we can have all the name references
-    loadAll<OverlayType>("./resources/overlay_types", true);
-    loadAll<OverlayType>("./resources/overlay_types");
-    loadAll<Room>("./resources/rooms");
+    loadConfig();
 
     // find default room
     for (const auto& pair : Room::objectMap)
@@ -165,6 +158,25 @@ void Engine::run()
     }
     
     // unload all configuration
+    unloadConfig();
+}
+
+// load all configuration
+void Engine::loadConfig()
+{
+    loadAll<Material>("./resources");
+    // load shallow first so we can have all the name references
+    loadAll<ActorType>("./resources", true);
+    loadAll<ActorType>("./resources");
+    // load shallow first so we can have all the name references
+    loadAll<OverlayType>("./resources", true);
+    loadAll<OverlayType>("./resources");
+    loadAll<Room>("./resources");
+}
+
+// unload all configuration
+void Engine::unloadConfig()
+{
     unloadAll<Room>();
     unloadAll<OverlayType>();
     unloadAll<ActorType>();

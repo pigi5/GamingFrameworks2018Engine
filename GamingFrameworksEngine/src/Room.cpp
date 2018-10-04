@@ -2,6 +2,8 @@
 #include "../header/Constants.h"
 #include "../header/TriggerPresets.h"
 
+const std::string Room::DIR_NAME = "rooms";
+
 std::map<const std::string, Room*> Room::objectMap;
 
 Room::Room()
