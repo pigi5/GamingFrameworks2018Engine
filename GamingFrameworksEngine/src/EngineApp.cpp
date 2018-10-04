@@ -203,6 +203,8 @@ void MyFrame::OnNew(wxCommandEvent& event)
 			wxMkdir("materials");
 			wxMkdir("overlay_types");
 			wxMkdir("rooms");
+			wxMkdir("Audio");
+			wxMkdir("Sprites");
 			wxSetWorkingDirectory(p);
 		}
 	}

@@ -14,13 +14,14 @@
 
 Engine::Engine()
 {
-    sf::VideoMode defaultMode = sf::VideoMode(800, 600);
-	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
+    
 }
 
 // Runs the game loop until complete.
 void Engine::run()
 {
+	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
+	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
     bool go = true;
 	// Initialize input handler
 	InputHandler input;
