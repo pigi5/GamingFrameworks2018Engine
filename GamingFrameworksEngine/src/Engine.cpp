@@ -29,9 +29,6 @@ void Engine::run()
 
     // Defines the current room locally so that the room cannot be changed during loops
     Room* localCurrentRoom;
-    
-    // load all configuration
-    loadConfig();
 
     // find default room
     for (const auto& pair : Room::objectMap)
@@ -158,41 +155,4 @@ void Engine::run()
 			}
 		}
     }
-    
-    // unload all configuration
-    unloadConfig();
-}
-
-// load all configuration
-void Engine::loadConfig()
-{
-    loadAll<Material>("./resources");
-	loadAll<Sprite>("./resources");
-    // load shallow first so we can have all the name references
-    loadAll<ActorType>("./resources", true);
-    loadAll<ActorType>("./resources");
-    // load shallow first so we can have all the name references
-    loadAll<OverlayType>("./resources", true);
-    loadAll<OverlayType>("./resources");
-    loadAll<Room>("./resources");
-}
-
-// unload all configuration
-void Engine::unloadConfig()
-{
-    unloadAll<Room>();
-    unloadAll<OverlayType>();
-    unloadAll<ActorType>();
-	unloadAll<Sprite>();
-    unloadAll<Material>();
-}
-
-// save configuration
-void Engine::saveConfig()
-{
-    saveAll<Material>("./resources");
-	saveAll<Sprite>("./resources");
-    saveAll<ActorType>("./resources");
-    saveAll<OverlayType>("./resources");
-    saveAll<Room>("./resources");
 }

@@ -1,14 +1,34 @@
 #include "../header/Room.h"
 #include "../header/Constants.h"
 #include "../header/TriggerPresets.h"
+#include "../header/Configurable.h"
 
 const std::string Room::DIR_NAME = "rooms";
 
 std::map<const std::string, Room*> Room::objectMap;
 
-Room::Room()
+void Room::createRoom(std::string name)
 {
-    name = "unknown";
+    Room* newType = new Room(name);
+
+    if (objectMap.empty())
+    {
+        newType->is_default = true;
+    }
+    
+    // add room to map, keyed by name
+    if (!objectMap.emplace(newType->name, newType).second)
+    {
+        // if key already existed, throw error
+        std::stringstream errorMessage;
+        errorMessage << "Room name \"" << newType->name << "\" is not unique.";
+        throw ConfigurationError(errorMessage.str());
+    }
+}
+
+Room::Room(std::string name)
+{
+    this->name = name;
     is_default = false;
 }
 
