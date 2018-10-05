@@ -5,9 +5,25 @@
 #include "../header/TriggerPresets.h"
 #include "../header/ActionPresets.h"
 
+const std::string OverlayType::DIR_NAME = "overlay_types";
+
 std::map<const std::string, OverlayType*> OverlayType::objectMap;
 
-OverlayType::OverlayType() : ActorType()
+void OverlayType::createOverlayType(std::string name)
+{
+    OverlayType* newType = new OverlayType(name);
+    
+    // add overlay type to map, keyed by name
+    if (!objectMap.emplace(newType->name, newType).second)
+    {
+        // if key already existed, throw error
+        std::stringstream errorMessage;
+        errorMessage << "Overlay Type name \"" << newType->name << "\" is not unique.";
+        throw ConfigurationError(errorMessage.str());
+    }
+}
+
+OverlayType::OverlayType(std::string name) : ActorType(name)
 {
     gravitous = false;
 }

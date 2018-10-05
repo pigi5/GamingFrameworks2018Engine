@@ -18,13 +18,18 @@ namespace action_preset
         float xAcceleration;
         float yAcceleration;
     public:
+        std::string getTypeName() const
+        {
+            return "ApplyForce";
+        }
+
         ApplyForce(float acceleration)
         {
             this->xAcceleration = xAcceleration;
             this->yAcceleration = yAcceleration;
         }
 
-        ApplyForce(const YAML::Node& node)
+        ApplyForce(const YAML::Node& node) : Action(node)
         {
             xAcceleration = node["xAcceleration"].as<float>();
             yAcceleration = node["yAcceleration"].as<float>();
@@ -32,7 +37,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "ApplyForce";
+	        Action::serialize(out);
 	        out << YAML::Key << "xAcceleration" << YAML::Value << xAcceleration;
 	        out << YAML::Key << "yAcceleration" << YAML::Value << yAcceleration;
 	        return out;
@@ -40,6 +45,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             if (xAcceleration != 0)
             {
                 actor->setXAcceleration(xAcceleration);
@@ -57,12 +64,17 @@ namespace action_preset
     private:
         ActorType* targetType;
     public:
+        std::string getTypeName() const
+        {
+            return "MoveToNearest";
+        }
+
         MoveToNearest(ActorType* targetType)
         {
             this->targetType = targetType;
         }
 
-        MoveToNearest(const YAML::Node& node)
+        MoveToNearest(const YAML::Node& node) : Action(node)
         {
             std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
@@ -78,13 +90,15 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "MoveToNearest";
+	        Action::serialize(out);
 	        out << YAML::Key << "target" << YAML::Value << targetType->name;
 	        return out;
         }
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             actor->setPosition(nearest.first->getState().xPosition, nearest.first->getState().yPosition);
         }
@@ -98,13 +112,18 @@ namespace action_preset
         ActorType* targetType;
         float speed;
     public:
+        std::string getTypeName() const
+        {
+            return "MoveTowardNearest";
+        }
+
         MoveTowardNearest(ActorType* targetType, float speed)
         {
             this->targetType = targetType;
             this->speed = speed;
         }
 
-        MoveTowardNearest(const YAML::Node& node)
+        MoveTowardNearest(const YAML::Node& node) : Action(node)
         {
             std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
@@ -121,7 +140,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "MoveTowardNearest";
+	        Action::serialize(out);
 	        out << YAML::Key << "target" << YAML::Value << targetType->name;
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
@@ -129,6 +148,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             
             State distanceVector = nearest.first->getState() - actor->getState();
@@ -156,13 +177,18 @@ namespace action_preset
         float xPosition;
         float yPosition;
     public:
+        std::string getTypeName() const
+        {
+            return "MoveTo";
+        }
+
         MoveTo(float xPosition, float yPosition)
         {
             this->xPosition = xPosition;
             this->yPosition = yPosition;
         }
 
-        MoveTo(const YAML::Node& node)
+        MoveTo(const YAML::Node& node) : Action(node)
         {
             xPosition = node["xPosition"].as<float>();
             yPosition = node["yPosition"].as<float>();
@@ -170,7 +196,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "MoveTo";
+	        Action::serialize(out);
 	        out << YAML::Key << "xPosition" << YAML::Value << xPosition;
 	        out << YAML::Key << "yPosition" << YAML::Value << yPosition;
 	        return out;
@@ -178,6 +204,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             actor->setPosition(xPosition, yPosition);
         }
     };
@@ -189,13 +217,18 @@ namespace action_preset
         float xOffset;
         float yOffset;
     public:
+        std::string getTypeName() const
+        {
+            return "Move";
+        }
+
         Move(float xOffset, float yOffset)
         {
             this->xOffset = xOffset;
             this->yOffset = yOffset;
         }
 
-        Move(const YAML::Node& node)
+        Move(const YAML::Node& node) : Action(node)
         {
             xOffset = node["xOffset"].as<float>();
             yOffset = node["yOffset"].as<float>();
@@ -203,7 +236,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "Move";
+	        Action::serialize(out);
 	        out << YAML::Key << "xOffset" << YAML::Value << xOffset;
 	        out << YAML::Key << "yOffset" << YAML::Value << yOffset;
 	        return out;
@@ -211,6 +244,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             actor->offset(xOffset, yOffset);
         }
     };
@@ -222,13 +257,18 @@ namespace action_preset
         const ActorType* actorType;
         State startState;
     public:
+        std::string getTypeName() const
+        {
+            return "Create";
+        }
+
         Create(const ActorType* actorType, State& startState)
         {
             this->actorType = actorType;
             this->startState = startState;
         }
 
-        Create(const YAML::Node& node)
+        Create(const YAML::Node& node) : Action(node)
         {
             std::string typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
@@ -245,7 +285,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "Create";
+	        Action::serialize(out);
 	        out << YAML::Key << "target" << YAML::Value << actorType;
 	        out << startState;
 	        return out;
@@ -253,6 +293,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
             actor->getRoom()->addActor(newActor);
         }
@@ -263,23 +305,100 @@ namespace action_preset
     {
     private:
     public:
-        Destroy()
+        std::string getTypeName() const
+        {
+            return "Destroy";
+        }
+
+        Destroy(const YAML::Node& node) : Action(node)
         {
         }
 
-        Destroy(const YAML::Node& node)
+        void run(Actor* actor)
         {
+            Action::run(actor);
+
+            actor->getRoom()->deleteActor(actor);
+        }
+    };
+    
+    // sets an attribute
+    class AttributeSet : public Action
+    {
+    private:
+        std::string key;
+        int value;
+    public:
+        std::string getTypeName() const
+        {
+            return "AttributeSet";
+        }
+
+        AttributeSet(std::string key, int value)
+        {
+            this->key = key;
+            this->value = value;
+        }
+
+        AttributeSet(const YAML::Node& node) : Action(node)
+        {
+            this->key = node["attribute"].as<std::string>();
+            this->value = node["value"].as<int>();
         }
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "Destroy";
+	        Action::serialize(out);
+	        out << YAML::Key << "attribute" << YAML::Value << key;
+	        out << YAML::Key << "value" << YAML::Value << value;
 	        return out;
         }
     
         void run(Actor* actor)
         {
-            actor->getRoom()->deleteActor(actor);
+            Action::run(actor);
+
+            actor->setAttribute(key, value);
+        }
+    };
+    
+    // changes an attribute by offset
+    class AttributeChange : public Action
+    {
+    private:
+        std::string key;
+        int offset;
+    public:
+        std::string getTypeName() const
+        {
+            return "AttributeChange";
+        }
+
+        AttributeChange(std::string key, int offset)
+        {
+            this->key = key;
+            this->offset = offset;
+        }
+
+        AttributeChange(const YAML::Node& node) : Action(node)
+        {
+            this->key = node["attribute"].as<std::string>();
+            this->offset = node["offset"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "attribute" << YAML::Value << key;
+	        out << YAML::Key << "offset" << YAML::Value << offset;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            Action::run(actor);
+
+            actor->changeAttribute(key, offset);
         }
     };
     
@@ -290,13 +409,18 @@ namespace action_preset
         int index;
         float time;
     public:
+        std::string getTypeName() const
+        {
+            return "SetTimer";
+        }
+
         SetTimer(int index, float time)
         {
             this->index = index;
             this->time = time;
         }
 
-        SetTimer(const YAML::Node& node)
+        SetTimer(const YAML::Node& node) : Action(node)
         {
             this->index = node["index"].as<int>();
 
@@ -312,7 +436,7 @@ namespace action_preset
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "SetTimer";
+	        Action::serialize(out);
 	        out << YAML::Key << "index" << YAML::Value << index;
 	        out << YAML::Key << "time" << YAML::Value << time;
 	        return out;
@@ -320,6 +444,8 @@ namespace action_preset
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             actor->getRoom()->startTimer(index, time);
         }
     };
@@ -330,25 +456,32 @@ namespace action_preset
     private:
         int index;
     public:
+        std::string getTypeName() const
+        {
+            return "CallCustom";
+        }
+
         CallCustom(int index)
         {
             this->index = index;
         }
 
-        CallCustom(const YAML::Node& node)
+        CallCustom(const YAML::Node& node) : Action(node)
         {
             this->index = node["index"].as<int>();
         }
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
-	        out << YAML::Key << "type" << YAML::Value << "CallCustom";
+	        Action::serialize(out);
 	        out << YAML::Key << "index" << YAML::Value << index;
 	        return out;
         }
     
         void run(Actor* actor)
         {
+            Action::run(actor);
+
             trigger_preset::Custom trigger(&Index(index));
             actor->getRoom()->fireTrigger(trigger);
         }
@@ -502,6 +635,14 @@ namespace action_preset
         else if (typeName == "Create")
         {
             return new Create(node);
+        }
+        else if (typeName == "AttributeSet")
+        {
+            return new AttributeSet(node);
+        }
+        else if (typeName == "AttributeChange")
+        {
+            return new AttributeChange(node);
         }
         else if (typeName == "Destroy")
         {

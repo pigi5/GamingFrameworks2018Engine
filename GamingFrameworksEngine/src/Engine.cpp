@@ -11,32 +11,24 @@
 #include "../header/InputHandler.h"
 #include "../header/Text.h"
 #include "../header/Configurable.h"
+#include "../header/Sprite.h"
 
 Engine::Engine()
 {
-    sf::VideoMode defaultMode = sf::VideoMode(800, 600);
-	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
+    
 }
 
 // Runs the game loop until complete.
 void Engine::run()
 {
+	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
+	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
     bool go = true;
 	// Initialize input handler
 	InputHandler input;
 
     // Defines the current room locally so that the room cannot be changed during loops
     Room* localCurrentRoom;
-    
-    // load all configuration
-    loadAll<Material>("./resources/materials");
-    // load shallow first so we can have all the name references
-    loadAll<ActorType>("./resources/actor_types", true);
-    loadAll<ActorType>("./resources/actor_types");
-    // load shallow first so we can have all the name references
-    loadAll<OverlayType>("./resources/overlay_types", true);
-    loadAll<OverlayType>("./resources/overlay_types");
-    loadAll<Room>("./resources/rooms");
 
     // find default room
     for (const auto& pair : Room::objectMap)
@@ -116,6 +108,7 @@ void Engine::run()
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
 		{
 			// Perform iterative game logic
+			input.handleHolds();
 			currentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
@@ -160,13 +153,6 @@ void Engine::run()
 				input.handleRelease(event.key.code, ButtonState::RELEASE);
 				//cout << "Handling button release" << event.key.code << endl;
 			}
-			input.handleHolds();
 		}
     }
-    
-    // unload all configuration
-    unloadAll<Room>();
-    unloadAll<OverlayType>();
-    unloadAll<ActorType>();
-    unloadAll<Material>();
 }

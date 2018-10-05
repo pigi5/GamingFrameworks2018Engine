@@ -1,6 +1,0 @@
----
-name    : hud
-material: ~
-maxXSpeed: -1
-maxYSpeed: -1
-gravitous: false

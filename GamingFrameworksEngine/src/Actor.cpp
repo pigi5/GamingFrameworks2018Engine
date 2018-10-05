@@ -10,6 +10,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
+	this->imageFrame = 0;
     this->room = room;
     this->type = type;
     // Set the default yAcceleration to gravity
@@ -17,15 +18,28 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     {
         yAcceleration = engine_constant::GRAVITY;
     }
+    this->startState = startState;
     previousState = startState;
     nextState = startState;
+	if (type->sprite != NULL)
+	{
+		this->sprite = new Sprite();
+		*this->sprite = *type->sprite;
+	}
+    // set default values
+    for (auto pair : type->attributes)
+    {
+        attributes[pair.first] = pair.second;
+    }
     
+    // fire create trigger
     trigger_preset::Create trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
+    // fire destroy trigger
     trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
@@ -39,8 +53,17 @@ Actor::~Actor()
     }
 }
 
+YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
+{
+    out << YAML::Key << "type" << YAML::Value << obj.type->name;
+    out << YAML::Key << "startX" << YAML::Value << obj.startState.xPosition;
+    out << YAML::Key << "startY" << YAML::Value << obj.startState.yPosition;
+    return out;
+}
+
 void Actor::step()
 {
+    // fire step trigger
     trigger_preset::Step trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 }
@@ -316,6 +339,18 @@ Room* Actor::getRoom() const
     return room;
 }
 
+int Actor::getAttribute(std::string key) const
+{
+    auto val = attributes.find(key);
+    if (val == attributes.end())
+    {
+        std::stringstream errorMessage;
+        errorMessage << "Attribute " << key << " does not exist.";
+        throw ConfigurationError(errorMessage.str());
+    }
+    return val->second;
+}
+
 void Actor::setPosition(float xPosition, float yPosition)
 {
     nextState.xPosition = xPosition;
@@ -347,4 +382,14 @@ void Actor::setXSpeed(float xSpeed)
 void Actor::setYSpeed(float ySpeed) 
 {
 	this->ySpeed = ySpeed;
+}
+
+void Actor::setAttribute(std::string key, int value)
+{
+    attributes[key] = value;
+}
+
+void Actor::changeAttribute(std::string key, int value)
+{
+    attributes[key] += value;
 }

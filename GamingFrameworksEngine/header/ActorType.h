@@ -8,23 +8,29 @@
 #include "../header/Action.h"
 #include "../header/Material.h"
 #include "yaml-cpp/yaml.h"
+#include "Sprite.h"
 
 class ActorType
 {
 private:
 
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, ActorType*> objectMap;
+
+    static void createActorType(std::string);
     
     std::string name;
     const Material* material;
     float maxXSpeed;
     float maxYSpeed;
     bool gravitous;
-
+	Sprite* sprite;
+    std::map<const std::string, int> attributes;
     // triggers/actions
     std::map<const Trigger*, std::list<Action*>> actionMap;
-    ActorType();
+
+    ActorType(std::string);
     ActorType(const YAML::Node&, bool);
     ~ActorType();
     bool operator<(const ActorType& other) const;

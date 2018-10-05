@@ -17,6 +17,8 @@ private:
     Room* currentRoom;
 	sf::RenderWindow window;
     Engine();
+
+    
 public:
     // Runs the main game loop
     void run();

@@ -15,9 +15,12 @@ class OverlayType : public ActorType
 private:
 
 public:
+    static const std::string DIR_NAME;
     static std::map<const std::string, OverlayType*> objectMap;
-    
-    OverlayType();
+
+    static void createOverlayType(std::string);
+
+    OverlayType(std::string);
     OverlayType(const YAML::Node&, bool);
 
     bool operator<(const OverlayType&) const;

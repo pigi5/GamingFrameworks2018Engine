@@ -2,31 +2,42 @@
 
 #include <string>
 #include <sstream>
+#include <fstream>
 #include "../header/ConfigurationError.h"
 #include "../header/dirent.h"
 #include "yaml-cpp/yaml.h"
 
 template <typename T>
-static void loadAll(std::string directoryName, bool shallow = false)
+static void loadAll(std::string projectDir, bool shallow = false)
 {
     std::map<const std::string, T*> objectMap;
 
-    DIR *dir;
-    struct dirent *file;
-    char* loc;
-    if ((dir = opendir(directoryName.c_str())) != NULL) 
+    std::stringstream directoryPath;
+    directoryPath << projectDir << "/" << T::DIR_NAME;
+
+    DIR* dir = opendir(directoryPath.str().c_str());
+    // if that directory does not exist, create it
+    if (dir == NULL && errno == ENOENT)
+    {
+        CreateDirectoryA(directoryPath.str().c_str(), NULL);
+        dir = opendir(directoryPath.str().c_str());
+    } 
+    if (dir != NULL) 
     {
         // iterate all files in the given directory
+        struct dirent* file;
         while ((file = readdir(dir)) != NULL)
         {
-            if ((loc = strstr(file->d_name, ".yaml")) != NULL)
+            // only consider files ending in .yml
+            char* loc = strstr(file->d_name, ".yml");
+            if (loc != NULL)
             {
                 // create new actor type
                 std::stringstream relativePath;
-                relativePath << directoryName << "/" << file->d_name;
+                relativePath << directoryPath.str() << "/" << file->d_name;
                 YAML::Node config = YAML::LoadFile(relativePath.str());
                 T* object = new T(config, shallow);
-                // add actor type to map, keyed by name
+                // add object to map, keyed by name
                 if (!objectMap.emplace(object->name, object).second)
                 {
                     // if key already existed, throw error
@@ -38,24 +49,18 @@ static void loadAll(std::string directoryName, bool shallow = false)
             }
         }
         closedir(dir);
-    } else {
+    }
+    else 
+    {
         // could not open directory
         std::stringstream errorMessage;
-        errorMessage << "Directory " << directoryName << " could not be opened.";
+        errorMessage << "Directory " << directoryPath.str() << " could not be opened.";
         throw ConfigurationError(errorMessage.str());
     }
 
     // via https://stackoverflow.com/questions/3639741/merge-two-stl-maps
     objectMap.insert(T::objectMap.begin(), T::objectMap.end());
     std::swap(objectMap, T::objectMap);
-    
-    /*
-    std::cout << "Loaded:" << std::endl;
-    for (const auto& pair : T::objectMap)
-    {
-        std::cout << pair.first << ": " << *pair.second << std::endl;
-    }
-    */
 }
 
 // must be called to avoid memory leak of actor type pointers
@@ -67,4 +72,27 @@ static void unloadAll()
         delete pair.second;
     }
     T::objectMap.clear();
+}
+
+template <typename T>
+static void saveAll(std::string projectDir)
+{
+    std::stringstream directoryPath;
+    directoryPath << projectDir << "/" << T::DIR_NAME;
+ 
+    // iterate all objects of type T in memory
+    for (const auto& pair : T::objectMap)
+    {
+        // write object to YAML emitter
+        YAML::Emitter emitter;
+        emitter << *(pair.second);
+
+        std::stringstream relativePath;
+        relativePath << directoryPath.str() << "/" << pair.first;
+
+        // write YAML to file
+        std::ofstream fout(relativePath.str());
+        fout << emitter.c_str();
+        fout.close();
+    }
 }

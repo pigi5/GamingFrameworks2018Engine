@@ -31,7 +31,7 @@ struct ButtonInputType
 
 	bool operator<(const ButtonInputType& other) const
 	{
-		return id * 2 + state < other.id * 2 + other.state;
+		return id * 3 + state < other.id * 3 + other.state;
 	}
 
     ButtonInputType() {}
@@ -112,7 +112,6 @@ struct Index
         return out;
     }
 };
-
 
 struct ActorTypeWrapper 
 {

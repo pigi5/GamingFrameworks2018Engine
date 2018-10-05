@@ -1,17 +1,53 @@
 #pragma once
 
+#include <string>
+#include "yaml-cpp/yaml.h"
+
 class Actor;
+
+enum Comparison
+{
+    EQUAL, NOT_EQUAL, LESS_THAN, LESS_THAN_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL
+};
+
+class Conditional
+{
+public:
+    Comparison comparison;
+    std::string key;
+    int value;
+
+    Conditional(const YAML::Node& node);
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj);
+};
 
 // implements the Visitor pattern
 class Action 
 {
 public:
-    virtual void run(Actor*) = 0;
+    std::list<Conditional*> conditionals;
+    
+    Action(){};
 
-    virtual YAML::Emitter& serialize(YAML::Emitter&) const = 0;
+    Action(const YAML::Node& node);
 
-    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Action& obj)
+    ~Action()
     {
-        return obj.serialize(out);
+        for (Conditional* conditional : conditionals)
+        {
+            delete conditional;
+        }
+        conditionals.clear();
     }
+    
+    virtual void run(Actor* actor);
+
+    virtual bool checkConditionals(Actor* actor);
+
+    virtual std::string getTypeName() const = 0;
+
+    virtual YAML::Emitter& serialize(YAML::Emitter& out) const;
+
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const Action& obj);
 };

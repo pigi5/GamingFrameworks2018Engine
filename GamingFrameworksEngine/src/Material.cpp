@@ -1,10 +1,27 @@
 #include "../header/Material.h"
+#include "../header/Configurable.h"
+
+const std::string Material::DIR_NAME = "materials";
 
 std::map<const std::string, Material*> Material::objectMap;
 
-Material::Material()
+void Material::createMaterial(std::string name)
 {
-    name = "unknown";
+    Material* newType = new Material(name);
+    
+    // add material to map, keyed by name
+    if (!objectMap.emplace(newType->name, newType).second)
+    {
+        // if key already existed, throw error
+        std::stringstream errorMessage;
+        errorMessage << "Material name \"" << newType->name << "\" is not unique.";
+        throw ConfigurationError(errorMessage.str());
+    }
+}
+
+Material::Material(std::string name)
+{
+    this->name = name;
     friction = 0.0f;
 }
 
@@ -14,9 +31,9 @@ Material::Material(const YAML::Node& config, bool shallow)
     friction = config["friction"].as<float>();
 }
 
-std::ostream& operator<<(std::ostream& output, const Material& object)
-{
-    output << " name: " << object.name;
-    output << " friction: " << object.friction;
-    return output;
+YAML::Emitter& operator<<(YAML::Emitter& out, const Material& obj)
+{ 
+    out << YAML::Key << "name" << YAML::Value << obj.name;
+    out << YAML::Key << "friction" << YAML::Value << obj.friction;
+    return out;
 }

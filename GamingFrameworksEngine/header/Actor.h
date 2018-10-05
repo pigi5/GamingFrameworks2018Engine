@@ -88,6 +88,7 @@ protected:
     float yAcceleration;
     float xSpeed;
     float ySpeed;
+    State startState;
     State currentState;
     State nextState;
     State previousState;
@@ -97,7 +98,6 @@ protected:
     Hitbox* hitbox;
     float imageSpeed;
     int imageFrame;
-    int imageNum;
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
@@ -105,9 +105,13 @@ protected:
     // Type data
     const ActorType* type;
 
+    std::map<const std::string, int> attributes;
+
 public:
     Actor(Room* room, const ActorType* type, State& startState);
     ~Actor();
+
+    friend YAML::Emitter& operator<<(YAML::Emitter&, const Actor&);
     
     void step();
 
@@ -138,6 +142,7 @@ public:
     State getState() const;
     Hitbox* getHitbox() const;
     Room* getRoom() const;
+    int getAttribute(std::string) const;
     
 	// Setters
     void setPosition(float, float);
@@ -145,7 +150,7 @@ public:
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
-
-    // Comparison
-    bool operator<(const Actor&) const;
+    
+    void setAttribute(std::string, int);
+    void changeAttribute(std::string, int);
 };
