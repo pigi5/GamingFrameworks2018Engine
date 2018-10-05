@@ -15,15 +15,22 @@ static void loadAll(std::string projectDir, bool shallow = false)
     std::stringstream directoryPath;
     directoryPath << projectDir << "/" << T::DIR_NAME;
 
-    DIR *dir;
-    struct dirent *file;
-    char* loc;
-    if ((dir = opendir(directoryPath.str().c_str())) != NULL) 
+    DIR* dir = opendir(directoryPath.str().c_str());
+    // if that directory does not exist, create it
+    if (dir == NULL && errno == ENOENT)
+    {
+        CreateDirectory(directoryPath.str().c_str(), NULL);
+        dir = opendir(directoryPath.str().c_str());
+    } 
+    if (dir != NULL) 
     {
         // iterate all files in the given directory
-        while ((file = readdir(dir)) != NULL)
+        struct dirent* file = readdir(dir);
+        while (file != NULL)
         {
-            if ((loc = strstr(file->d_name, ".yml")) != NULL)
+            // only consider files ending in .yml
+            char* loc = strstr(file->d_name, ".yml");
+            if (loc != NULL)
             {
                 // create new actor type
                 std::stringstream relativePath;
@@ -42,7 +49,9 @@ static void loadAll(std::string projectDir, bool shallow = false)
             }
         }
         closedir(dir);
-    } else {
+    }
+    else 
+    {
         // could not open directory
         std::stringstream errorMessage;
         errorMessage << "Directory " << directoryPath.str() << " could not be opened.";
