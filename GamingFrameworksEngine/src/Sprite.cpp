@@ -24,14 +24,12 @@ Sprite::Sprite()
 	this->xPos = 0;
 	this->yPos = 0;
 	this->name = "";
-	this->numFrames = 1;
 }
 
 Sprite::Sprite(std::string name) {
 	this->xPos = 0;
 	this->yPos = 0;
-	this->name = "";
-	this->numFrames = 1;
+	this->name = name;
 }
 
 Sprite::Sprite(int xPos, int yPos)
@@ -39,7 +37,6 @@ Sprite::Sprite(int xPos, int yPos)
 	this->xPos = xPos;
 	this->yPos = yPos;
 	this->name = "";
-	this->numFrames = 1;
 }
 
 Sprite::Sprite(const YAML::Node& config, bool shallow)
@@ -48,7 +45,6 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 	this->yPos = 0;
 	name = config["name"].as<std::string>();
 	if (!shallow) {
-		numFrames = config["numFrames"].as<int>();
 		xSize = config["xSize"].as<int>();
 		ySize = config["ySize"].as<int>();
 
@@ -68,6 +64,11 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 
 Sprite::~Sprite()
 {
+    for (sf::Texture* texture : textures)
+    {
+        delete texture;
+    }
+    textures.clear();
 }
 
 Hitbox* Sprite::getHitbox() const
@@ -165,7 +166,6 @@ void Sprite::draw(sf::RenderWindow* window) {
 YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
 {
 	out << YAML::Key << "name" << YAML::Value << obj.name;
-	out << YAML::Key << "numFrames" << YAML::Value << obj.numFrames;
 	out << YAML::Key << "xSize" << YAML::Value << obj.xSize;
 	out << YAML::Key << "ySize" << YAML::Value << obj.ySize;
 	out << YAML::Key << "textures" << YAML::Value << YAML::BeginSeq;

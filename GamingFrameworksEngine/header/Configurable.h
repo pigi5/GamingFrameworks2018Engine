@@ -19,14 +19,14 @@ static void loadAll(std::string projectDir, bool shallow = false)
     // if that directory does not exist, create it
     if (dir == NULL && errno == ENOENT)
     {
-        CreateDirectory(directoryPath.str().c_str(), NULL);
+        CreateDirectoryA(directoryPath.str().c_str(), NULL);
         dir = opendir(directoryPath.str().c_str());
     } 
     if (dir != NULL) 
     {
         // iterate all files in the given directory
-        struct dirent* file = readdir(dir);
-        while (file != NULL)
+        struct dirent* file;
+        while ((file = readdir(dir)) != NULL)
         {
             // only consider files ending in .yml
             char* loc = strstr(file->d_name, ".yml");

@@ -56,7 +56,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
 
-		spriteName = config["spriteName"].as<std::string>();
+		std::string spriteName = config["sprite"].as<std::string>();
 		auto checkName = Sprite::objectMap.find(spriteName);
 		if (checkName == Sprite::objectMap.end())
 		{
@@ -64,6 +64,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 			errorMessage << "Sprite " << spriteName << " does not exist.";
 			throw ConfigurationError(errorMessage.str());
 		}
+        sprite = checkName->second;
         
         YAML::Node attrsNode = config["attributes"];
         for (auto attribute : attrsNode)
@@ -108,6 +109,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "material" << YAML::Value << obj.material->name;
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
+    out << YAML::Key << "sprite" << YAML::Value << obj.sprite->name;
     out << YAML::Key << "attributes" << YAML::Value << YAML::BeginMap;
     for (auto pair : obj.attributes)
     {

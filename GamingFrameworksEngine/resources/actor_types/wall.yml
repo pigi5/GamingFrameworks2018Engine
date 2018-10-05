@@ -4,5 +4,6 @@ material  : ground
 maxXSpeed : -1
 maxYSpeed : -1
 gravitous : false
+sprite    : brick
 attributes: []
 triggers  : []

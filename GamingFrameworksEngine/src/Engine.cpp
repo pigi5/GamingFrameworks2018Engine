@@ -167,8 +167,8 @@ void Engine::run()
 void Engine::loadConfig()
 {
     loadAll<Material>("./resources");
-    // load shallow first so we can have all the name references
 	loadAll<Sprite>("./resources");
+    // load shallow first so we can have all the name references
     loadAll<ActorType>("./resources", true);
     loadAll<ActorType>("./resources");
     // load shallow first so we can have all the name references

@@ -18,7 +18,6 @@ private:
 	vector<string> textrFiles;
 	int xSize, ySize;
 	int xPos, yPos;
-	int numFrames;
 
 public:
 	static const std::string DIR_NAME;
