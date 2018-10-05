@@ -8,6 +8,7 @@
 #include "../header/Action.h"
 #include "../header/Material.h"
 #include "yaml-cpp/yaml.h"
+#include "Sprite.h"
 
 class ActorType
 {
@@ -24,6 +25,8 @@ public:
     float maxXSpeed;
     float maxYSpeed;
     bool gravitous;
+	std::string spriteName;
+	Sprite sprite;
     std::map<const std::string, int> attributes;
     // triggers/actions
     std::map<const Trigger*, std::list<Action*>> actionMap;

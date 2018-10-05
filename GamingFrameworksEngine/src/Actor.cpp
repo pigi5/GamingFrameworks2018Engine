@@ -10,6 +10,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
+	this->imageFrame = 0;
     this->room = room;
     this->type = type;
     // Set the default yAcceleration to gravity
