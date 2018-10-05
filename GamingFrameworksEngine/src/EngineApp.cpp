@@ -277,6 +277,16 @@ Sidebar::Sidebar(wxWindow* parent)
 
 	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onSprite));
+	Connect(AUDIO, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onAudio));
+	Connect(ROOM, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onRoom));
+	Connect(OBJECT, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onObject));
+	Connect(OVERLAY, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onOverlay));
+	Connect(MATERIAL, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onMaterial));
 
 	buttons->Add(bt1, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -340,23 +350,213 @@ void Sidebar::onSprite(wxCommandEvent& event)
 }
 void Sidebar::onAudio(wxCommandEvent& event)
 {
-	
+	operation = "audio";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Audio Control", wxDefaultPosition, wxSize(270, 200));
+
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//audio");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
 }
 void Sidebar::onObject(wxCommandEvent& event)
 {
-	
+	operation = "actor_types";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Object Control", wxDefaultPosition, wxSize(270, 200));
+
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//actor_types");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
 }
 void Sidebar::onRoom(wxCommandEvent& event)
 {
-	
+	operation = "rooms";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Room Control", wxDefaultPosition, wxSize(270, 200));
+
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//rooms");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
 }
 void Sidebar::onMaterial(wxCommandEvent& event)
 {
+	operation = "materials";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Material Control", wxDefaultPosition, wxSize(270, 200));
 
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//materials");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
 }
 void Sidebar::onOverlay(wxCommandEvent& event)
 {
+	operation = "overlay_types";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Overlay Control", wxDefaultPosition, wxSize(270, 200));
 
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//overlay_types");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
 }
 void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 {
@@ -372,6 +572,7 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 		wxSetWorkingDirectory(currentPath + "//" + operation);
 		wxFile* nf = new wxFile();
 		nf->Create(str + ".yaml");
+		nf->Close();
 		wxSetWorkingDirectory(currentPath);
 	}
 }
