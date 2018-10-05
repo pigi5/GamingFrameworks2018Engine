@@ -1,5 +1,6 @@
 ---
 name      : wall
+spriteName: brick
 material  : ground
 maxXSpeed : -1
 maxYSpeed : -1

@@ -156,6 +156,7 @@ YAML::Emitter& Action::serialize(YAML::Emitter& out) const
         out << YAML::EndMap;
     }
 	out << YAML::EndSeq;
+	return out;
 }
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const Action& obj)
