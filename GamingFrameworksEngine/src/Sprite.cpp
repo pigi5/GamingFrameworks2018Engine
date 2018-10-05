@@ -42,23 +42,26 @@ Sprite::Sprite(int xPos, int yPos)
 	this->numFrames = 1;
 }
 
-Sprite::Sprite(const YAML::Node& config)
+Sprite::Sprite(const YAML::Node& config, bool shallow)
 {
 	this->xPos = 0;
 	this->yPos = 0;
 	name = config["name"].as<std::string>();
-	numFrames = config["numFrames"].as<int>();
-	xSize = config["xSize"].as<int>();
-	ySize = config["ySize"].as<int>();
-	
-	YAML::Node txtrNode = config["textures"];
-	sf::Texture* t;
-	for (auto texture : txtrNode)
-	{
-		std::string filename = texture.as<std::string>();
-		t = new sf::Texture();
-		t->loadFromFile(filename);
-		textures.push_back(t);
+	if (!shallow) {
+		numFrames = config["numFrames"].as<int>();
+		xSize = config["xSize"].as<int>();
+		ySize = config["ySize"].as<int>();
+
+		YAML::Node txtrNode = config["textures"];
+		sf::Texture* t;
+		for (auto texture : txtrNode)
+		{
+			std::string filename = texture.as<std::string>();
+			textrFiles.push_back(filename);
+			t = new sf::Texture();
+			t->loadFromFile(filename);
+			textures.push_back(t);
+		}
 	}
 
 }
@@ -166,4 +169,8 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
 	out << YAML::Key << "xSize" << YAML::Value << obj.xSize;
 	out << YAML::Key << "ySize" << YAML::Value << obj.ySize;
 	out << YAML::Key << "textures" << YAML::Value << YAML::BeginSeq;
+	for (auto s : obj.textrFiles) {
+		out << s;
+	}
+	out << YAML::EndSeq;
 }
