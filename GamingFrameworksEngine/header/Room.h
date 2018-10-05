@@ -25,7 +25,9 @@ public:
     std::string name;
     bool is_default;
     
-    Room();
+    void createRoom(std::string);
+
+    Room(std::string);
     Room(const YAML::Node&, bool);
 
     friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
