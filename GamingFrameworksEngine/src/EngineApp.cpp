@@ -246,6 +246,15 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
+	loadAll<Material>(currentPath.ToStdString());
+	loadAll<Sprite>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<ActorType>(currentPath.ToStdString(), true);
+	loadAll<ActorType>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<OverlayType>(currentPath.ToStdString(), true);
+	loadAll<OverlayType>(currentPath.ToStdString());
+	loadAll<Room>(currentPath.ToStdString());
 	saveAll<Material>(currentPath.ToStdString());
 	saveAll<Sprite>(currentPath.ToStdString());
 	saveAll<ActorType>(currentPath.ToStdString());
@@ -254,6 +263,15 @@ void MyFrame::OnSave(wxCommandEvent& event)
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
+	loadAll<Material>(currentPath.ToStdString());
+	loadAll<Sprite>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<ActorType>(currentPath.ToStdString(), true);
+	loadAll<ActorType>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<OverlayType>(currentPath.ToStdString(), true);
+	loadAll<OverlayType>(currentPath.ToStdString());
+	loadAll<Room>(currentPath.ToStdString());
 	try
 	{
 		Engine::getInstance().run();
@@ -334,17 +352,12 @@ void Sidebar::onSprite(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//sprites");
-	if (directory->IsOpened() && directory->HasFiles())
+	
+	for (const auto& pair : Sprite::objectMap)
 	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
+		listbox->Append(pair.first);
 	}
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -376,17 +389,9 @@ void Sidebar::onAudio(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//audio");
-	if (directory->IsOpened() && directory->HasFiles())
-	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
-	}
+	
+	//Audio map
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -418,17 +423,12 @@ void Sidebar::onObject(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//actor_types");
-	if (directory->IsOpened() && directory->HasFiles())
+	
+	for (const auto& pair : ActorType::objectMap)
 	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
+		listbox->Append(pair.first);
 	}
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -460,17 +460,12 @@ void Sidebar::onRoom(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//rooms");
-	if (directory->IsOpened() && directory->HasFiles())
+	
+	for (const auto& pair : Room::objectMap)
 	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
+		listbox->Append(pair.first);
 	}
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -502,17 +497,12 @@ void Sidebar::onMaterial(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//materials");
-	if (directory->IsOpened() && directory->HasFiles())
+	
+	for (const auto& pair : Material::objectMap)
 	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
+		listbox->Append(pair.first);
 	}
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -544,17 +534,12 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	wxDir* directory = new wxDir(currentPath + "//overlay_types");
-	if (directory->IsOpened() && directory->HasFiles())
+	
+	for (const auto& pair : OverlayType::objectMap)
 	{
-		wxArrayString* filenames = new wxArrayString();
-		directory->GetAllFiles(directory->GetName(), filenames);
-		for (int i = 0; i < filenames->GetCount(); i++)
-		{
-			wxString fn = wxFileNameFromPath(filenames->Item(i));
-			listbox->Append(fn.BeforeLast('.'));
-		}
+		listbox->Append(pair.first);
 	}
+
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
@@ -601,6 +586,14 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 		{
 			OverlayType::createOverlayType(str.ToStdString());
 		}
+		else if (operation == "materials")
+		{
+			//Material::
+		}
+		else if (operation == "rooms")
+		{
+			//Room::
+		}
 	}
 }
 void Sidebar::onDelete(wxCommandEvent& event)
@@ -620,6 +613,14 @@ void Sidebar::onDelete(wxCommandEvent& event)
 		else if (operation == "overlay_types")
 		{
 			OverlayType::objectMap.erase(str.ToStdString());
+		}
+		else if (operation == "materials")
+		{
+			Material::objectMap.erase(str.ToStdString());
+		}
+		else if (operation == "rooms")
+		{
+			Room::objectMap.erase(str.ToStdString());
 		}
 	}
 }
