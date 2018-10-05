@@ -62,6 +62,7 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 			}
 			textures.push_back(t);
 		}
+		s.setTexture(*textures[0]);
 	}
 
 }
@@ -85,7 +86,11 @@ void Sprite::changeTexture(int pos, string filename)
 	if (pos < textures.size()) {
 		sf::Texture* t;
 		t = new sf::Texture();
-		t->loadFromFile(filename);
+		bool loaded = t->loadFromFile(filename);
+		if (!loaded)
+		{
+			// TODO handle this error
+		}
 		textures.push_back(t);
 	}
 }
@@ -124,7 +129,11 @@ void Sprite::setSprite(int pos)
 void Sprite::addTexture(string filename) {
 	sf::Texture* t;
 	t = new sf::Texture();
-	t->loadFromFile(filename);
+	bool loaded = t->loadFromFile(filename);
+	if (!loaded)
+	{
+		// TODO handle this error
+	}
 	textures.push_back(t);
 }
 
@@ -133,36 +142,14 @@ void Sprite::setPartialTexture(string filename, int xSize, int ySize) {
 	sf::Texture* t;
 	t = new sf::Texture();
 	r = sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(xSize, ySize));
-	t->loadFromFile(filename, r);
+	bool loaded = t->loadFromFile(filename, r);
+	if (!loaded)
+	{
+		// TODO handle this error
+	}
 	textures.push_back(t);
 }
 
-vector<sf::Sprite> Sprite::parseSpriteSheet(string filename, int xSize, int ySize, int num) {
-	vector<sf::Sprite> vect;
-	sf::Sprite spr = sf::Sprite();
-	sf::Texture tex = sf::Texture();
-	tex.loadFromFile(filename);
-	this->xSize = tex.getSize().x;
-	this->ySize = tex.getSize().y;
-	int j = 0, k = 0;
-	for (int i = 0; i < num; i++) {
-		sf::IntRect rect = sf::IntRect(sf::Vector2i((j * xSize), (k * ySize)), sf::Vector2i((j+1) * xSize, (k+1) * ySize));
-		tex.loadFromFile(filename, rect);
-		spr.setTexture(tex);
-		spr.setTextureRect(rect);
-		vect.push_back(spr);
-		if (j * xSize >= this->xSize) {
-			k++;
-			j = 0;
-		}
-		else {
-			j++;
-		}
-	}
-	this->xSize = xSize;
-	this->ySize = ySize;
-	return vect;
-}
 
 void Sprite::draw(sf::RenderWindow* window) {
 	window->draw(s);

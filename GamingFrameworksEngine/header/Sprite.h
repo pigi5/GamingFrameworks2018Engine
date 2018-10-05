@@ -42,7 +42,6 @@ public:
 	void setSize(int sizeX, int sizeY);
 	void addTexture(string filename);
 	void setPartialTexture(string filename, int xSize, int ySize);
-	vector<sf::Sprite> parseSpriteSheet(string filename, int xSize, int ySize, int num);
 	void draw(sf::RenderWindow* window);
 	friend YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj);
 };

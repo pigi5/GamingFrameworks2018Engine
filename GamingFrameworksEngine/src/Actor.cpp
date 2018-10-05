@@ -21,7 +21,11 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     this->startState = startState;
     previousState = startState;
     nextState = startState;
-
+	if (type->sprite != NULL)
+	{
+		this->sprite = new Sprite();
+		*this->sprite = *type->sprite;
+	}
     // set default values
     for (auto pair : type->attributes)
     {
