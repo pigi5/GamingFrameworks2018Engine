@@ -56,13 +56,16 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
 
-		spriteName = config["spriteName"].as<std::string>();
-		auto checkName = Sprite::objectMap.find(spriteName);
-		if (checkName == Sprite::objectMap.end())
-		{
-			std::stringstream errorMessage;
-			errorMessage << "Sprite " << spriteName << " does not exist.";
-			throw ConfigurationError(errorMessage.str());
+		YAML::Node spriteNode = config["spriteName"];
+		if (!spriteNode.IsNull()) {
+			spriteName = spriteNode.as<std::string>();
+			auto checkName = Sprite::objectMap.find(spriteName);
+			if (checkName == Sprite::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Sprite " << spriteName << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
 		}
         
         YAML::Node attrsNode = config["attributes"];

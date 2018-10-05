@@ -156,6 +156,7 @@ vector<sf::Sprite> Sprite::parseSpriteSheet(string filename, int xSize, int ySiz
 	}
 	this->xSize = xSize;
 	this->ySize = ySize;
+	return vect;
 }
 
 void Sprite::draw(sf::RenderWindow* window) {
@@ -173,4 +174,5 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
 		out << s;
 	}
 	out << YAML::EndSeq;
+	return out;
 }
