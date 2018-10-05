@@ -3,4 +3,4 @@ numFrames : 1
 xSize : 16
 ySize : 16
 textures :
-    - "D:\\hitec\\Documents\\CSI\\CSI 4342\\GamingFrameworksEngine\\resources\\sprites\\brick.png"
+    - "resources\\sprites\\brick.png"

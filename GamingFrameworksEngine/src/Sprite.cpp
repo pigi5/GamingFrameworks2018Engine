@@ -55,7 +55,11 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 			std::string filename = texture.as<std::string>();
 			textrFiles.push_back(filename);
 			t = new sf::Texture();
-			t->loadFromFile(filename);
+			bool loaded = t->loadFromFile(filename);
+			if (!loaded)
+			{
+				// TODO handle this error
+			}
 			textures.push_back(t);
 		}
 	}
