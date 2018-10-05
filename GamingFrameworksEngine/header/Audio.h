@@ -16,13 +16,21 @@ class Audio
 private:
 
 public:
+	static const std::string DIR_NAME;
+
 	static std::map<const std::string, Audio*> audioMap;
+	
+	//triggers/actions
 	std::map<const Trigger*, std::list<Action*>> actionMap;
 
+	static void createAudio(std::string);
+
+	std::string name;
 	std::string fileName;
+	std::string audioType;
 
 	Audio();
-	Audio(std::string fileName);
+	Audio(std::string name);
 	Audio(const YAML::Node&, bool);
 	~Audio();
 	bool operator<(const Audio& other) const;

@@ -20,7 +20,6 @@ public:                                                             \
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
 #include "../header/ButtonStates.h"
-#include "../header/Audio.h"
 
 // ID structures //
 
@@ -147,7 +146,7 @@ struct ActorTypeWrapper
     }
 };
 
-struct AudioWrapper
+/*struct AudioWrapper
 {
 	const Audio* type;
 
@@ -179,7 +178,7 @@ struct AudioWrapper
 		out << YAML::Key << "type" << YAML::Value << obj.type;
 		return out;
 	}
-};
+};*/
 
 // All trigger presets are defined here
 namespace trigger_preset
@@ -192,8 +191,8 @@ namespace trigger_preset
     CREATE_TRIGGER(Destroy, ActorTypeWrapper)
     CREATE_TRIGGER(Timer, Index)
     CREATE_TRIGGER(Custom, Index)
-	CREATE_TRIGGER(EnterRoom, AudioWrapper)
-	CREATE_TRIGGER(LeaveRoom, AudioWrapper)
+	//CREATE_TRIGGER(EnterRoom, AudioWrapper)
+	//CREATE_TRIGGER(LeaveRoom, AudioWrapper)
 
 
     // abstract factory
@@ -231,14 +230,14 @@ namespace trigger_preset
         {
             return new Custom(node);
         }
-		else if (typeName == "EnterRoom")
+		/*else if (typeName == "EnterRoom")
 		{
 			return new EnterRoom(node);
 		}
 		else if (typeName == "LeaveRoom")
 		{
 			return new LeaveRoom(node);
-		}
+		}*/
         else
         {
             std::stringstream errorMessage;

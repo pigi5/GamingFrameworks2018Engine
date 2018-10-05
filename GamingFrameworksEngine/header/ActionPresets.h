@@ -520,6 +520,11 @@ namespace action_preset
 			//this->startState = State(node);
 		}
 
+		std::string getTypeName() const
+		{
+			return "PlaySound";
+		}
+
 		YAML::Emitter& serialize(YAML::Emitter& out) const
 		{
 			
@@ -559,6 +564,11 @@ namespace action_preset
 			//this->startState = State(node);
 		}
 
+		std::string getTypeName() const
+		{
+			return "PlayMusic";
+		}
+
 		YAML::Emitter& serialize(YAML::Emitter& out) const
 		{
 			return out;
@@ -596,6 +606,11 @@ namespace action_preset
 			//this->sound = new Sound(mapItem->second);
 
 			//this->startState = State(node);
+		}
+
+		std::string getTypeName() const
+		{
+			return "StopMusic";
 		}
 
 		YAML::Emitter& serialize(YAML::Emitter& out) const
