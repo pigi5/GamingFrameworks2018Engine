@@ -97,7 +97,6 @@ protected:
     Hitbox* hitbox;
     float imageSpeed;
     int imageFrame;
-    int imageNum;
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
