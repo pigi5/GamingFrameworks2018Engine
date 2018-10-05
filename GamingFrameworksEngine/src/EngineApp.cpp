@@ -243,7 +243,9 @@ void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 	}
 	catch (const ConfigurationError& e)
 	{
-		std::cout << e.what() << std::endl;
+		//std::cout << e.what() << std::endl;
+		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
+		err->ShowModal();
 	}
 }
 

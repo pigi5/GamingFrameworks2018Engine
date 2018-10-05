@@ -1,0 +1,6 @@
+name : plSprite
+numFrames : 1
+xSize : 16
+ySize : 16
+textures :
+    - "resources\\sprites\\plSprite.png"

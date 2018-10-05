@@ -1,5 +1,6 @@
 ---
 name    : hud
+spriteName : ~
 material: ~
 maxXSpeed: -1
 maxYSpeed: -1

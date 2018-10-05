@@ -4,7 +4,7 @@ material  : ~
 maxXSpeed : 2
 maxYSpeed : 10
 gravitous : true
-sprite    : player
+spriteName : plSprite
 attributes:
     jumpsLeft: 1
 triggers  : 

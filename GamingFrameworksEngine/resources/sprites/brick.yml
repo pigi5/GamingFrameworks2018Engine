@@ -1,0 +1,6 @@
+name : brick
+numFrames : 1
+xSize : 16
+ySize : 16
+textures :
+    - "resources\\sprites\\brick.png"
