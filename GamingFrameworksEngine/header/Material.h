@@ -14,7 +14,7 @@ public:
     std::string name;
     float friction;
     
-    void createMaterial(std::string);
+    static void createMaterial(std::string);
     
     Material(std::string);
     Material(const YAML::Node&, bool);

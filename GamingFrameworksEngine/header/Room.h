@@ -25,7 +25,7 @@ public:
     std::string name;
     bool is_default;
     
-    void createRoom(std::string);
+    static void createRoom(std::string);
 
     Room(std::string);
     Room(const YAML::Node&, bool);

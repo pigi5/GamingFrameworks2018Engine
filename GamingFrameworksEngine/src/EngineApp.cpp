@@ -588,11 +588,11 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 		}
 		else if (operation == "materials")
 		{
-			//Material::
+			Material::createMaterial(str.ToStdString());
 		}
 		else if (operation == "rooms")
 		{
-			//Room::
+			Room::createRoom(str.ToStdString());
 		}
 	}
 }
