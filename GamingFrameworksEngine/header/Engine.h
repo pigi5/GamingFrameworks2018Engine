@@ -20,7 +20,7 @@ private:
 
     void loadConfig();
     void unloadConfig();
-    void saveConfig();
+	void saveConfig();
 public:
     // Runs the main game loop
     void run();
