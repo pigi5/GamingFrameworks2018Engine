@@ -58,7 +58,9 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 			bool loaded = t->loadFromFile(filename);
 			if (!loaded)
 			{
-				// TODO handle this error
+                std::stringstream errorMessage;
+                errorMessage << "Texture " << filename << " could not be loaded.";
+                throw ConfigurationError(errorMessage.str());
 			}
 			textures.push_back(t);
 		}
@@ -74,6 +76,26 @@ Sprite::~Sprite()
         delete texture;
     }
     textures.clear();
+    if (hitbox != NULL)
+    {
+        delete hitbox;
+    }
+}
+
+Sprite& Sprite::operator=(const Sprite& other)
+{
+    name = other.name;
+    if (hitbox != NULL)
+    {
+        *hitbox = *other.hitbox;
+    }
+    textures = other.textures;
+    textrFiles = other.textrFiles;
+    xSize = other.xSize;
+    ySize = other.ySize;
+    xPos = other.xPos;
+    yPos = other.yPos;
+    return *this;
 }
 
 Hitbox* Sprite::getHitbox() const

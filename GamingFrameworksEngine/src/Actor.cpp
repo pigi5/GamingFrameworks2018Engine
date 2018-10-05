@@ -23,8 +23,9 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     nextState = startState;
 	if (type->sprite != NULL)
 	{
-		this->sprite = new Sprite();
-		*this->sprite = *type->sprite;
+        this->sprite = type->sprite;
+		//this->sprite = new Sprite();
+		//*this->sprite = *type->sprite;
 	}
     // set default values
     for (auto pair : type->attributes)
@@ -43,14 +44,10 @@ Actor::~Actor()
     trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
-    if (sprite != NULL) 
-    {
-        delete sprite;
-    }
-    if (hitbox != NULL) 
-    {
-        delete hitbox;
-    }
+    //if (sprite != NULL) 
+    //{
+    //    delete sprite;
+    //}
 }
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
@@ -155,8 +152,8 @@ void Actor::move(const std::list<Actor*>& actors)
     // Move hitbox with actor
     if (isCollidable())
     {
-        hitbox->x = nextState.xPosition + xSpriteOffset;
-        hitbox->y = nextState.yPosition + ySpriteOffset;
+        sprite->getHitbox()->x = nextState.xPosition + xSpriteOffset;
+        sprite->getHitbox()->y = nextState.yPosition + ySpriteOffset;
     }
 
     // reset acceleration
@@ -235,7 +232,7 @@ void Actor::onCollision(Actor* other)
 // returns: if the object has a hitbox
 bool Actor::isCollidable() const
 {
-    return hitbox != NULL;
+    return sprite != NULL && sprite->getHitbox() != NULL;
 }
 
 // Tests if this actor will collide with the given actor after its new position is
@@ -250,7 +247,7 @@ bool Actor::willCollide(const Actor& other) const
         return false;
     }
     
-    return hitbox->willCollide(other.getHitbox(), xSpeed, ySpeed);
+    return sprite->getHitbox()->willCollide(other.getHitbox(), xSpeed, ySpeed);
 }
 
 // Tests if this actor will collide with the given actor in the x-axis after its new 
@@ -265,7 +262,7 @@ bool Actor::willCollideX(const Actor& other) const
         return false;
     }
     
-    return hitbox->willCollideX(other.getHitbox(), xSpeed);
+    return sprite->getHitbox()->willCollideX(other.getHitbox(), xSpeed);
 }
 
 // Tests if this actor will collide with the given actor in the y-axis after its new 
@@ -280,7 +277,7 @@ bool Actor::willCollideY(const Actor& other) const
         return false;
     }
     
-    return hitbox->willCollideY(other.getHitbox(), ySpeed);
+    return sprite->getHitbox()->willCollideY(other.getHitbox(), ySpeed);
 }
 
 // Calculate the distance along the x-axis to the given object.
@@ -294,7 +291,7 @@ float Actor::getHitboxDistanceX(const Actor& other) const
         return -1.0f;
     }
     
-    return hitbox->getDistanceX(other.getHitbox());
+    return sprite->getHitbox()->getDistanceX(other.getHitbox());
 }
 
 // Calculate the distance along the y-axis to the given object.
@@ -308,7 +305,7 @@ float Actor::getHitboxDistanceY(const Actor& other) const
         return -1.0f;
     }
     
-    return hitbox->getDistanceY(other.getHitbox());
+    return sprite->getHitbox()->getDistanceY(other.getHitbox());
 }
 
 
@@ -331,7 +328,7 @@ State Actor::getState() const
 
 Hitbox* Actor::getHitbox() const
 {
-    return hitbox;
+    return sprite->getHitbox();
 }
 
 Room* Actor::getRoom() const
@@ -359,8 +356,8 @@ void Actor::setPosition(float xPosition, float yPosition)
     // Move hitbox with actor
     if (isCollidable())
     {
-        hitbox->x = nextState.xPosition + xSpriteOffset;
-        hitbox->y = nextState.yPosition + ySpriteOffset;
+        sprite->getHitbox()->x = nextState.xPosition + xSpriteOffset;
+        sprite->getHitbox()->y = nextState.yPosition + ySpriteOffset;
     }
 }
 

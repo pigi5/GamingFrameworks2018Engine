@@ -8,6 +8,16 @@ Hitbox::Hitbox(float x, float y, float width, float height)
     this->height = height;
 }
 
+
+Hitbox& Hitbox::operator=(const Hitbox& other)
+{
+    x = other.x;
+    y = other.y;
+    width = other.width;
+    height = other.height;
+    return *this;
+}
+
 // Tests if this rectangle currently overlaps the given rectangle.
 // params:
 //   other - rectangle to test collision against

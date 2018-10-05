@@ -21,15 +21,18 @@ private:
 
 public:
 	static const std::string DIR_NAME;
-	string name;
 	static std::map<const std::string, Sprite*> objectMap;
 	static void createSprite(std::string);
+
+	string name;
 
 	Sprite();
 	Sprite(string name);
     Sprite(int xPos, int yPos);
 	Sprite(const YAML::Node&, bool);
     ~Sprite();
+
+    Sprite& operator=(const Sprite& other);
 
     Hitbox* getHitbox() const;
 

@@ -94,7 +94,6 @@ protected:
 
     // drawing
 	Sprite* sprite;
-    Hitbox* hitbox;
     float imageSpeed;
     int imageFrame;
     float xSpriteOffset;

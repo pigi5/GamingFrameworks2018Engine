@@ -56,6 +56,11 @@ public:
 	void OnOpen(wxCommandEvent& event);
 	void OnSave(wxCommandEvent& event);
 	void OnPlay(wxCommandEvent& event);
+    
+    void loadConfig();
+    void unloadConfig();
+    void saveConfig();
+    void reloadConfig();
 
 private:
 	wxWindow *m_left, *m_right;
@@ -184,15 +189,59 @@ MyFrame::~MyFrame()
 	}
 }
 
-// menu command handlers
 
-void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void MyFrame::loadConfig()
+{
+    try 
+    {
+	    loadAll<Material>(currentPath.ToStdString());
+	    loadAll<Sprite>(currentPath.ToStdString());
+	    // load shallow first so we can have all the name references
+	    loadAll<ActorType>(currentPath.ToStdString(), true);
+	    loadAll<ActorType>(currentPath.ToStdString());
+	    // load shallow first so we can have all the name references
+	    loadAll<OverlayType>(currentPath.ToStdString(), true);
+	    loadAll<OverlayType>(currentPath.ToStdString());
+	    loadAll<Room>(currentPath.ToStdString());
+    }
+	catch (const ConfigurationError& e)
+	{
+		std::cerr << e.what() << std::endl;
+		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
+		err->ShowModal();
+	}
+}
+
+void MyFrame::unloadConfig()
 {
 	unloadAll<Room>();
 	unloadAll<OverlayType>();
 	unloadAll<ActorType>();
 	unloadAll<Sprite>();
 	unloadAll<Material>();
+}
+
+void MyFrame::saveConfig()
+{
+	saveAll<Material>(currentPath.ToStdString());
+	saveAll<Sprite>(currentPath.ToStdString());
+	saveAll<ActorType>(currentPath.ToStdString());
+	saveAll<OverlayType>(currentPath.ToStdString());
+	saveAll<Room>(currentPath.ToStdString());
+}
+
+void MyFrame::reloadConfig()
+{
+    unloadConfig();
+    loadConfig();
+}
+
+
+// menu command handlers
+
+void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+{
+	unloadConfig();
 	Close(true);
 }
 void MyFrame::OnNew(wxCommandEvent& event) 
@@ -234,56 +283,26 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		currentPath = fileName;
 	}
 
-	loadAll<Material>(currentPath.ToStdString());
-	loadAll<Sprite>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<ActorType>(currentPath.ToStdString(), true);
-	loadAll<ActorType>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<OverlayType>(currentPath.ToStdString(), true);
-	loadAll<OverlayType>(currentPath.ToStdString());
-	loadAll<Room>(currentPath.ToStdString());
+	loadConfig();
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
-	loadAll<Material>(currentPath.ToStdString());
-	loadAll<Sprite>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<ActorType>(currentPath.ToStdString(), true);
-	loadAll<ActorType>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<OverlayType>(currentPath.ToStdString(), true);
-	loadAll<OverlayType>(currentPath.ToStdString());
-	loadAll<Room>(currentPath.ToStdString());
-	saveAll<Material>(currentPath.ToStdString());
-	saveAll<Sprite>(currentPath.ToStdString());
-	saveAll<ActorType>(currentPath.ToStdString());
-	saveAll<OverlayType>(currentPath.ToStdString());
-	saveAll<Room>(currentPath.ToStdString());
+	saveConfig();
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
-	loadAll<Material>(currentPath.ToStdString());
-	loadAll<Sprite>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<ActorType>(currentPath.ToStdString(), true);
-	loadAll<ActorType>(currentPath.ToStdString());
-	// load shallow first so we can have all the name references
-	loadAll<OverlayType>(currentPath.ToStdString(), true);
-	loadAll<OverlayType>(currentPath.ToStdString());
-	loadAll<Room>(currentPath.ToStdString());
+	reloadConfig();
 	try
 	{
 		Engine::getInstance().run();
 	}
 	catch (const ConfigurationError& e)
 	{
-		//std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
 		err->ShowModal();
 	}
 }
-
 
 // MySplitterWindow
 
