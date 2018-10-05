@@ -156,37 +156,3 @@ void Engine::run()
 		}
     }
 }
-
-// load all configuration
-void Engine::loadConfig(string path)
-{
-    loadAll<Material>(path);
-	loadAll<Sprite>(path);
-    // load shallow first so we can have all the name references
-    loadAll<ActorType>(path, true);
-    loadAll<ActorType>(path);
-    // load shallow first so we can have all the name references
-    loadAll<OverlayType>(path, true);
-    loadAll<OverlayType>(path);
-    loadAll<Room>(path);
-}
-
-// unload all configuration
-void Engine::unloadConfig()
-{
-    unloadAll<Room>();
-    unloadAll<OverlayType>();
-    unloadAll<ActorType>();
-	unloadAll<Sprite>();
-    unloadAll<Material>();
-}
-
-// save configuration
-void Engine::saveConfig(string path)
-{
-    saveAll<Material>(path);
-	saveAll<Sprite>(path);
-    saveAll<ActorType>(path);
-    saveAll<OverlayType>(path);
-    saveAll<Room>(path);
-}

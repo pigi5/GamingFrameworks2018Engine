@@ -188,7 +188,11 @@ MyFrame::~MyFrame()
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-	Engine::getInstance().unloadConfig();
+	unloadAll<Room>();
+	unloadAll<OverlayType>();
+	unloadAll<ActorType>();
+	unloadAll<Sprite>();
+	unloadAll<Material>();
 	Close(true);
 }
 void MyFrame::OnNew(wxCommandEvent& event) 
@@ -229,11 +233,24 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
 	}
-	Engine::getInstance().loadConfig(currentPath.ToStdString());
+
+	loadAll<Material>(currentPath.ToStdString());
+	loadAll<Sprite>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<ActorType>(currentPath.ToStdString(), true);
+	loadAll<ActorType>(currentPath.ToStdString());
+	// load shallow first so we can have all the name references
+	loadAll<OverlayType>(currentPath.ToStdString(), true);
+	loadAll<OverlayType>(currentPath.ToStdString());
+	loadAll<Room>(currentPath.ToStdString());
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
-	Engine::getInstance().saveConfig(currentPath.ToStdString());
+	saveAll<Material>(currentPath.ToStdString());
+	saveAll<Sprite>(currentPath.ToStdString());
+	saveAll<ActorType>(currentPath.ToStdString());
+	saveAll<OverlayType>(currentPath.ToStdString());
+	saveAll<Room>(currentPath.ToStdString());
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
