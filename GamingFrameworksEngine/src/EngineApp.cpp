@@ -188,7 +188,7 @@ MyFrame::~MyFrame()
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-	gameEngine.unloadConfig();
+	Engine::getInstance().unloadConfig();
 	Close(true);
 }
 void MyFrame::OnNew(wxCommandEvent& event) 
@@ -229,11 +229,11 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
 	}
-	gameEngine.loadConfig(currentPath.ToStdString());
+	Engine::getInstance().loadConfig(currentPath.ToStdString());
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
-	gameEngine.saveConfig(currentPath.ToStdString());
+	Engine::getInstance().saveConfig(currentPath.ToStdString());
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {

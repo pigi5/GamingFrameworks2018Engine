@@ -18,12 +18,14 @@ private:
 	sf::RenderWindow window;
     Engine();
 
-    void loadConfig();
-    void unloadConfig();
-	void saveConfig();
+    
 public:
     // Runs the main game loop
     void run();
+
+	void loadConfig(string path);
+	void unloadConfig();
+	void saveConfig(string path);
 
     // Functions that should not exist in the Singleton pattern
     Engine(Engine const&) = delete;
