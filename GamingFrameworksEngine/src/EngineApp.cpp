@@ -11,6 +11,7 @@ string operation;
 wxListBox* listbox;
 wxString currentPath;
 
+
 // ID for the menu commands
 enum
 {
@@ -187,6 +188,7 @@ MyFrame::~MyFrame()
 
 void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
+	gameEngine.unloadConfig();
 	Close(true);
 }
 void MyFrame::OnNew(wxCommandEvent& event) 
@@ -227,10 +229,11 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
 	}
+	gameEngine.loadConfig(currentPath.ToStdString());
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
-	Close(true);
+	gameEngine.saveConfig(currentPath.ToStdString());
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
@@ -559,7 +562,7 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 {
 	wxString str;
-	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New Sprite Name");
+	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New " + operation + " Name");
 	if (getTxt->ShowModal() == wxID_OK)
 	{
 		str = getTxt->GetValue();
@@ -567,22 +570,38 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 	if (str.Len() > 0)
 	{
 		listbox->Append(str);
-		wxSetWorkingDirectory(currentPath + "//" + operation);
-		wxFile* nf = new wxFile();
-		nf->Create(str + ".yaml");
-		nf->Close();
-		wxSetWorkingDirectory(currentPath);
+		if (operation == "sprites")
+		{
+			Sprite::createSprite(str.ToStdString());
+		}
+		else if (operation == "actor_types")
+		{
+			ActorType::createActorType(str.ToStdString());
+		}
+		else if (operation == "overlay_types")
+		{
+			OverlayType::createOverlayType(str.ToStdString());
+		}
 	}
 }
 void Sidebar::onDelete(wxCommandEvent& event)
 {
 	int sel = listbox->GetSelection();
 	if (sel != -1) {
-		wxSetWorkingDirectory(currentPath + "//" + operation);
 		wxString str = listbox->GetString(sel);
-		wxRemoveFile(str + ".yaml");
-		wxSetWorkingDirectory(currentPath);
 		listbox->Delete(sel);
+		if (operation == "sprites")
+		{
+			Sprite::objectMap.erase(str.ToStdString());
+		}
+		else if (operation == "actor_types")
+		{
+			ActorType::objectMap.erase(str.ToStdString());
+		}
+		else if (operation == "overlay_types")
+		{
+			OverlayType::objectMap.erase(str.ToStdString());
+		}
 	}
 }
 
