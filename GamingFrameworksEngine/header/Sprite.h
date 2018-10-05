@@ -15,20 +15,21 @@ private:
 	
 	sf::Sprite s;
 	vector<sf::Texture*> textures;
+	vector<string> textrFiles;
 	int xSize, ySize;
 	int xPos, yPos;
 	int numFrames;
-	string name;
 
 public:
 	static const std::string DIR_NAME;
+	string name;
 	static std::map<const std::string, Sprite*> objectMap;
 	static void createSprite(std::string);
 
 	Sprite();
 	Sprite(string name);
     Sprite(int xPos, int yPos);
-	Sprite(const YAML::Node&);
+	Sprite(const YAML::Node&, bool);
     ~Sprite();
 
     Hitbox* getHitbox() const;

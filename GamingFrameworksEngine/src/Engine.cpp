@@ -11,6 +11,7 @@
 #include "../header/InputHandler.h"
 #include "../header/Text.h"
 #include "../header/Configurable.h"
+#include "../header/Sprite.h"
 
 Engine::Engine()
 {
@@ -167,6 +168,7 @@ void Engine::loadConfig()
 {
     loadAll<Material>("./resources");
     // load shallow first so we can have all the name references
+	loadAll<Sprite>("./resources");
     loadAll<ActorType>("./resources", true);
     loadAll<ActorType>("./resources");
     // load shallow first so we can have all the name references
@@ -181,6 +183,7 @@ void Engine::unloadConfig()
     unloadAll<Room>();
     unloadAll<OverlayType>();
     unloadAll<ActorType>();
+	unloadAll<Sprite>();
     unloadAll<Material>();
 }
 
@@ -188,6 +191,7 @@ void Engine::unloadConfig()
 void Engine::saveConfig()
 {
     saveAll<Material>("./resources");
+	saveAll<Sprite>("./resources");
     saveAll<ActorType>("./resources");
     saveAll<OverlayType>("./resources");
     saveAll<Room>("./resources");

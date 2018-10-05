@@ -1,10 +1,14 @@
 #include "wx/wxprec.h"
 #include "wx/splitter.h"
 #include "wx/dcmirror.h"
+#include "wx/dir.h"
+#include "wx/file.h"
 #include "../header/Engine.h"
 #include <direct.h>
 #include <iostream>
 
+string operation;
+wxListBox* listbox;
 wxString currentPath;
 
 // ID for the menu commands
@@ -18,10 +22,12 @@ enum
 	OBJECT = 6,
 	SPRITE = 7,
 	AUDIO = 8,
-	NEW_ITEM = 9,
-	DELETE_ITEM = 10,
-	CLEAR = 11,
-	PLAY = 12
+	MATERIAL = 9,
+	OVERLAY = 10,
+	NEW_ITEM = 11,
+	DELETE_ITEM = 12,
+	CLEAR = 13,
+	PLAY = 14
 };
 
 // ----------------------------------------------------------------------------
@@ -78,12 +84,12 @@ public:
 	void onAudio(wxCommandEvent& event);
 	void onObject(wxCommandEvent& event);
 	void onRoom(wxCommandEvent& event);
+	void onMaterial(wxCommandEvent& event);
+	void onOverlay(wxCommandEvent& event);
 	void onNew(wxCommandEvent& event);
 	void onDelete(wxCommandEvent& event);
-	void onClear(wxCommandEvent& event);
 
 private:
-
 };
 
 class Editor : public wxScrolledWindow
@@ -203,8 +209,8 @@ void MyFrame::OnNew(wxCommandEvent& event)
 			wxMkdir("materials");
 			wxMkdir("overlay_types");
 			wxMkdir("rooms");
-			wxMkdir("Audio");
-			wxMkdir("Sprites");
+			wxMkdir("audio");
+			wxMkdir("sprites");
 			wxSetWorkingDirectory(p);
 		}
 	}
@@ -258,12 +264,14 @@ Sidebar::Sidebar(wxWindow* parent)
 {
 	SetScrollbars(20, 20, 5, 5);
 	wxBoxSizer *vszr = new wxBoxSizer(wxVERTICAL);
-	wxGridSizer *buttons = new wxGridSizer(4, 1, 20, 20);
+	wxGridSizer *buttons = new wxGridSizer(6, 1, 20, 20);
 	wxPanel *pnl = new wxPanel(this, wxID_ANY);
 	wxButton *bt1 = new wxButton(pnl, SPRITE, "Sprites");
 	wxButton *bt2 = new wxButton(pnl, AUDIO, "Audio");
 	wxButton *bt3 = new wxButton(pnl, ROOM, "Rooms");
 	wxButton *bt4 = new wxButton(pnl, OBJECT, "Objects");
+	wxButton *bt5 = new wxButton(pnl, OVERLAY, "Overlays");
+	wxButton *bt6 = new wxButton(pnl, MATERIAL, "Materials");
 
 	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onSprite));
@@ -272,6 +280,8 @@ Sidebar::Sidebar(wxWindow* parent)
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt3, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt4, 0, wxALIGN_CENTER | wxCENTER, 20);
+	buttons->Add(bt5, 0, wxALIGN_CENTER | wxCENTER, 20);
+	buttons->Add(bt6, 0, wxALIGN_CENTER | wxCENTER, 20);
 
 	pnl->SetSizer(buttons);
 
@@ -286,24 +296,44 @@ Sidebar::Sidebar(wxWindow* parent)
 
 void Sidebar::onSprite(wxCommandEvent& event)
 {
+	operation = "sprites";
 	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Sprite Control", wxDefaultPosition, wxSize(270, 200));
 	
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-	wxListBox *spriteBox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	hbox->Add(spriteBox, 3, wxEXPAND | wxALL, 20);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	wxDir* directory = new wxDir(currentPath + "//sprites");
+	if (directory->IsOpened() && directory->HasFiles())
+	{
+		wxArrayString* filenames = new wxArrayString();
+		directory->GetAllFiles(directory->GetName(), filenames);
+		for (int i = 0; i < filenames->GetCount(); i++)
+		{
+			wxString fn = wxFileNameFromPath(filenames->Item(i));
+			listbox->Append(fn.BeforeLast('.'));
+		}
+	}
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 
 	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
-	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
-	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
-	wxButton* clrBtn = new wxButton(btnPanel, CLEAR, wxT("Delete All"));
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
 
-	Connect(NEW_ITEM, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onNew));
-	Connect(DELETE_ITEM, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onDelete));
-	Connect(CLEAR, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Sidebar::onClear));
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
 
 	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
 	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
 	boxFrame->Show(true);
 }
 void Sidebar::onAudio(wxCommandEvent& event)
@@ -318,17 +348,41 @@ void Sidebar::onRoom(wxCommandEvent& event)
 {
 	
 }
-void Sidebar::onNew(wxCommandEvent& event)
+void Sidebar::onMaterial(wxCommandEvent& event)
 {
 
+}
+void Sidebar::onOverlay(wxCommandEvent& event)
+{
+
+}
+void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
+{
+	wxString str;
+	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New Sprite Name");
+	if (getTxt->ShowModal() == wxID_OK)
+	{
+		str = getTxt->GetValue();
+	}
+	if (str.Len() > 0)
+	{
+		listbox->Append(str);
+		wxSetWorkingDirectory(currentPath + "//" + operation);
+		wxFile* nf = new wxFile();
+		nf->Create(str + ".yaml");
+		wxSetWorkingDirectory(currentPath);
+	}
 }
 void Sidebar::onDelete(wxCommandEvent& event)
 {
-
-}
-void Sidebar::onClear(wxCommandEvent& event)
-{
-	
+	int sel = listbox->GetSelection();
+	if (sel != -1) {
+		wxSetWorkingDirectory(currentPath + "//" + operation);
+		wxString str = listbox->GetString(sel);
+		wxRemoveFile(str + ".yaml");
+		wxSetWorkingDirectory(currentPath);
+		listbox->Delete(sel);
+	}
 }
 
 //Editor Window
