@@ -379,6 +379,9 @@ namespace action_preset
 				errorMessage << "Actor Type " << typeName << " does not exist.";
 				throw ConfigurationError(errorMessage.str());
 			}
+
+			string fileName = node["file_name"].as<string>();
+			this->sound = new Sound(fileName);
 			//this->sound = new Sound(mapItem->second);
 
 			//this->startState = State(node);

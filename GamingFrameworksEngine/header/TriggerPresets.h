@@ -20,6 +20,7 @@ public:                                                             \
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
 #include "../header/ButtonStates.h"
+#include "../header/Audio.h"
 
 // ID structures //
 
@@ -147,6 +148,40 @@ struct ActorTypeWrapper
     }
 };
 
+struct AudioWrapper
+{
+	const Audio* type;
+
+	bool operator<(const AudioWrapper& other) const
+	{
+		return *type < *(other.type);
+	}
+
+	AudioWrapper(const Audio* type)
+	{
+		this->type = type;
+	}
+
+	AudioWrapper(const YAML::Node& config)
+	{
+		std::string typeName = config["target"].as<std::string>();
+		auto mapItem = Audio::audioMap.find(typeName);
+		if (mapItem == Audio::audioMap.end())
+		{
+			std::stringstream errorMessage;
+			errorMessage << "Audio " << typeName << " does not exist.";
+			throw ConfigurationError(errorMessage.str());
+		}
+		type = mapItem->second;
+	}
+
+	friend YAML::Emitter& operator<<(YAML::Emitter& out, const AudioWrapper& obj)
+	{
+		out << YAML::Key << "type" << YAML::Value << obj.type;
+		return out;
+	}
+};
+
 // All trigger presets are defined here
 namespace trigger_preset
 {
@@ -158,6 +193,9 @@ namespace trigger_preset
     CREATE_TRIGGER(Destroy, ActorTypeWrapper)
     CREATE_TRIGGER(Timer, Index)
     CREATE_TRIGGER(Custom, Index)
+	CREATE_TRIGGER(EnterRoom, AudioWrapper)
+	CREATE_TRIGGER(LeaveRoom, AudioWrapper)
+
 
     // abstract factory
     static Trigger* createTrigger(const std::string typeName, const YAML::Node& node)
@@ -194,6 +232,14 @@ namespace trigger_preset
         {
             return new Custom(node);
         }
+		else if (typeName == "EnterRoom")
+		{
+			return new EnterRoom(node);
+		}
+		else if (typeName == "LeaveRoom")
+		{
+			return new LeaveRoom(node);
+		}
         else
         {
             std::stringstream errorMessage;
