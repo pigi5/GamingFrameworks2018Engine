@@ -31,11 +31,12 @@ public:
     float imageSpeed;
     std::map<const std::string, int> attributes;
     // triggers/actions
-    std::map<const Trigger*, std::list<Action*>> actionMap;
+    std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap;
 
     ActorType(std::string);
     ActorType(const YAML::Node&, bool);
     ~ActorType();
     bool operator<(const ActorType& other) const;
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj);
+    friend Logger& operator<<(Logger& logger, const ActorType& obj);
 };

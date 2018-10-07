@@ -32,6 +32,44 @@ Logger& operator<<(Logger& logger, const std::string& message)
     return logger;
 }
 
+Logger& operator<<(Logger& logger, const long val)
+{
+    logger.stream << std::to_string(val);
+    return logger;
+}
+
+Logger& operator<<(Logger& logger, const int val)
+{
+    logger.stream << std::to_string(val);
+    return logger;
+}
+
+Logger& operator<<(Logger& logger, const short val)
+{
+    logger.stream << std::to_string(val);
+    return logger;
+}
+
+Logger& operator<<(Logger& logger, const double val)
+{
+    logger.stream << std::to_string(val);
+    return logger;
+}
+
+Logger& operator<<(Logger& logger, const float val)
+{
+    logger.stream << std::to_string(val);
+    return logger;
+}
+
+/*
+Logger& operator<<(Logger& logger, const bool val)
+{
+    logger.stream << (val ? "true" : "false");
+    return logger;
+}
+*/
+
 Logger& operator<<(Logger& logger, ostream_manipulator pf)
 {
    pf(logger.stream);

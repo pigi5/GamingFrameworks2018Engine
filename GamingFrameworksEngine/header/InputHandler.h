@@ -1,65 +1,48 @@
 #pragma once
 #include <map>
+#include <unordered_set>
 #include <SFML/Window.hpp>
 #include "TriggerPresets.h"
-#include "../header/ButtonStates.h"
+#include "ButtonStates.h"
+#include "Utils.h"
 
 class InputHandler {
 
 private:
-	// map key codes to their state 
-	std::map <short, sf::Keyboard::Key> keyMapping;
-	// Keep track of what id number to use.
-	short currId = 0;
-
-	std::set<sf::Keyboard::Key> heldKeys;
-
-	// make sure a given key is in the map, and if its not, add it
-	void checkInMap(sf::Keyboard::Key k) {
-		auto search = keyMapping.find(k);
-		if (search != keyMapping.end() && k != -1) {
-			keyMapping.insert(std::pair<short, sf::Keyboard::Key>(currId, k));
-			currId++;
-
-		}
-	}
+	std::unordered_set<sf::Keyboard::Key> heldKeys;
 
 public:
 
-	void handlePress(sf::Keyboard::Key k, ButtonState state) {
-		checkInMap(k);
+	void handlePress(sf::Keyboard::Key k, Room* room) {
 		heldKeys.insert(k);
-		ButtonInputType b;
-		b.id = keyMapping.find(k)->first;
-		b.state = state;
-		trigger_preset::ButtonInput trigger(&b);
+                    
+	    ButtonInputType b;
+	    b.id = k;
+	    b.state = ButtonState::PRESS;
+	    trigger_preset::ButtonInput trigger(&b);
+        
+        room->fireTrigger(trigger);
 	}
 
-	void handleRelease(sf::Keyboard::Key k, ButtonState state) {
+	void handleRelease(sf::Keyboard::Key k, Room* room) {
 		heldKeys.erase(k);
-		ButtonInputType b;
-		b.id = keyMapping.find(k)->first;
-		b.state = state;
-		trigger_preset::ButtonInput trigger(&b);
+                    
+	    ButtonInputType b;
+	    b.id = k;
+	    b.state = ButtonState::RELEASE;
+	    trigger_preset::ButtonInput trigger(&b);
+        
+        room->fireTrigger(trigger);
 	}
 
-	void handleHolds() {
+	void handleHolds(Room* room) {
 		for (sf::Keyboard::Key k : heldKeys) {
 			ButtonInputType b;
-			b.id = keyMapping.find(k)->first;
+			b.id = k;
 			b.state = ButtonState::HOLD;
 			trigger_preset::ButtonInput trigger(&b);
+        
+            room->fireTrigger(trigger);
 		}
-	}
-
-	void changeMapping(sf::Keyboard::Key k) {
-		auto search = keyMapping.find(k);
-		if (search != keyMapping.end() && k != -1) {
-			search->second = k;
-		}
-	}
-
-	std::map <short, sf::Keyboard::Key> getKeyMap() {
-		return keyMapping;
-	}
+    }
 };

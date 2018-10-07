@@ -4,6 +4,7 @@
 #include "Actor.h"
 #include "Overlay.h"
 #include "yaml-cpp/yaml.h"
+#include "Logger.h"
 
 // Similar to a stage.
 class Room
@@ -29,8 +30,9 @@ public:
 
     Room(std::string);
     Room(const YAML::Node&, bool);
-
+    
     friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
+    friend Logger& operator<<(Logger&, const Room&);
 
     ~Room();
 

@@ -12,7 +12,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     id = _id++;
     this->room = room;
     this->type = type;
-    engine_util::logger << *this << " created" << std::endl;
+
     if (type->xScale != 0 && type->yScale != 0)
     {
         float width = type->sprite->getRecommendedWidth() * type->xScale;
@@ -38,14 +38,16 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     }
     
     // fire create trigger
-    trigger_preset::Create trigger(&ActorTypeWrapper(type));
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Create trigger(&wrapper);
     fireTrigger(trigger);
 }
 
 Actor::~Actor()
 {
     // fire destroy trigger
-    trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Destroy trigger(&wrapper);
     fireTrigger(trigger);
 
     if (hitbox != NULL) 
@@ -66,7 +68,8 @@ void Actor::step()
 {
     imageFrame += imageSpeed;
     // fire step trigger
-    trigger_preset::Step trigger(&ActorTypeWrapper(type));
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Step trigger(&wrapper);
     fireTrigger(trigger);
 }
 
@@ -195,7 +198,8 @@ void Actor::offset(float xOffset, float yOffset)
 //   view: the view of the world
 void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
-    trigger_preset::Draw trigger(&ActorTypeWrapper(type));
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Draw trigger(&wrapper);
     fireTrigger(trigger);
 
     if (type->sprite != NULL)
@@ -206,12 +210,15 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 
 void Actor::fireTrigger(const Trigger& trigger)
 {
+    //engine_util::logger << *this << ": trigger - " << trigger << std::endl;
     const Trigger* ptr = &trigger;
-    auto actions = type->actionMap.find(ptr);
-    if (actions != type->actionMap.end())
+    try
     {
-        for (Action* action : actions->second)
+        // get action list for trigger if one exists
+        auto actions = type->actionMap.at(ptr);
+        for (Action* action : actions)
         {
+            //engine_util::logger << *this << ": action - " << *action << std::endl;
             action->run(this);
             // can't continue if deleted
             if (dynamic_cast<action_preset::Destroy*>(action))
@@ -219,13 +226,14 @@ void Actor::fireTrigger(const Trigger& trigger)
                 return;
             }
         }
-    }
+    } 
+    catch (const std::out_of_range& e) {}
 }
 
 void Actor::onCollision(Actor* other)
 {
-    engine_util::logger << *this << ": collision with " << *other << std::endl;
-    trigger_preset::Collision trigger(&ActorTypeWrapper(other->type));
+    ActorTypeWrapper wrapper(other->type);
+    trigger_preset::Collision trigger(&wrapper);
     fireTrigger(trigger);
 }
 

@@ -110,9 +110,30 @@ void Engine::run()
 
 		// Iterate steps at fixed rate until we can't do another
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
-		{
+        {
+            // input handling
+		    sf::Event event;
+		    while (window.pollEvent(event))
+		    {
+                // Check if window is closed
+			    if (event.type == sf::Event::Closed)
+                {
+				    window.close();
+                    go = false;
+			    }
+
+			    if (event.type == sf::Event::KeyPressed) {
+				    input.handlePress(event.key.code, currentRoom);
+				    //cout << "Handling button press" << event.key.code << endl;
+			    }
+			    if (event.type == sf::Event::KeyReleased) {
+				    input.handleRelease(event.key.code, currentRoom);
+				    //cout << "Handling button release" << event.key.code << endl;
+			    }
+		    }
+			input.handleHolds(currentRoom);
+
 			// Perform iterative game logic
-			input.handleHolds();
 			currentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
@@ -137,26 +158,5 @@ void Engine::run()
 
         // Refresh window
 		window.display();
-
-
-        // Check if window is closed
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-            {
-				window.close();
-                go = false;
-			}
-
-			if (event.type == sf::Event::KeyPressed) {
-				input.handlePress(event.key.code, ButtonState::PRESS);
-				//cout << "Handling button press" << event.key.code << endl;
-			}
-			if (event.type == sf::Event::KeyReleased) {
-				input.handleRelease(event.key.code, ButtonState::RELEASE);
-				//cout << "Handling button release" << event.key.code << endl;
-			}
-		}
     }
 }

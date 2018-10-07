@@ -3,6 +3,7 @@
 #include <vector>
 #include <SFML\Graphics.hpp>
 #include "yaml-cpp/yaml.h"
+#include "Logger.h"
 
 // Holds an animation and a hitbox for objects to use.
 class Sprite
@@ -28,4 +29,5 @@ public:
 
 	void draw(sf::RenderWindow* window, float index, float xPos, float yPos, float xScale, float yScale, float angle);
 	friend YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj);
+    friend Logger& operator<<(Logger&, const Sprite&);
 };

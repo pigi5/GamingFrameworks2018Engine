@@ -20,7 +20,7 @@ namespace action_preset
             return "ApplyForce";
         }
 
-        ApplyForce(float acceleration)
+        ApplyForce(float xAcceleration, float yAcceleration)
         {
             this->xAcceleration = xAcceleration;
             this->yAcceleration = yAcceleration;
@@ -42,7 +42,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             if (xAcceleration != 0)
             {
@@ -52,6 +52,76 @@ namespace action_preset
             {
                 actor->setYAcceleration(yAcceleration);
             }
+        }
+    };
+
+    class SetXSpeed : public Action
+    {
+    private:
+        float speed;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetXSpeed";
+        }
+
+        SetXSpeed(float speed)
+        {
+            this->speed = speed;
+        }
+
+        SetXSpeed(const YAML::Node& node) : Action(node)
+        {
+            speed = node["speed"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "speed" << YAML::Value << speed;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setXSpeed(speed);
+        }
+    };
+
+    class SetYSpeed : public Action
+    {
+    private:
+        float speed;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetXSpeed";
+        }
+
+        SetYSpeed(float speed)
+        {
+            this->speed = speed;
+        }
+
+        SetYSpeed(const YAML::Node& node) : Action(node)
+        {
+            speed = node["speed"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "speed" << YAML::Value << speed;
+	        return out;
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setYSpeed(speed);
         }
     };
     
@@ -94,7 +164,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             actor->setPosition(nearest.first->getState().xPosition, nearest.first->getState().yPosition);
@@ -145,7 +215,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             
@@ -201,7 +271,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->setPosition(xPosition, yPosition);
         }
@@ -241,7 +311,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->offset(xOffset, yOffset);
         }
@@ -290,7 +360,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
             actor->getRoom()->addActor(newActor);
@@ -313,7 +383,7 @@ namespace action_preset
 
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->getRoom()->deleteActor(actor);
         }
@@ -353,7 +423,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->setAttribute(key, value);
         }
@@ -393,7 +463,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->changeAttribute(key, offset);
         }
@@ -441,7 +511,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->getRoom()->startTimer(index, time);
         }
@@ -477,9 +547,10 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
-            trigger_preset::Custom trigger(&Index(index));
+            Index wrapper(index);
+            trigger_preset::Custom trigger(&wrapper);
             actor->getRoom()->fireTrigger(trigger);
         }
     };
@@ -490,6 +561,14 @@ namespace action_preset
         if (typeName == "ApplyForce")
         {
             return new ApplyForce(node);
+        }
+        else if (typeName == "SetXSpeed")
+        {
+            return new SetXSpeed(node);
+        }
+        else if (typeName == "SetYSpeed")
+        {
+            return new SetYSpeed(node);
         }
         else if (typeName == "MoveToNearest")
         {

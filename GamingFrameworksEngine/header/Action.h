@@ -2,6 +2,7 @@
 
 #include <string>
 #include "yaml-cpp/yaml.h"
+#include "Logger.h"
 
 class Actor;
 
@@ -41,13 +42,18 @@ public:
         conditionals.clear();
     }
     
-    virtual void run(Actor* actor);
+    virtual void run(Actor* actor) = 0;
 
     virtual bool checkConditionals(Actor* actor);
 
     virtual std::string getTypeName() const = 0;
 
     virtual YAML::Emitter& serialize(YAML::Emitter& out) const;
-
+    
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Action& obj);
+    friend Logger& operator<<(Logger& logger, const Action& obj)
+    {
+        logger << obj.getTypeName();
+        return logger;
+    }
 };

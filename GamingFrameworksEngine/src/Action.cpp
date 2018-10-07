@@ -86,14 +86,6 @@ Action::Action(const YAML::Node& node)
     }
 }
 
-void Action::run(Actor* actor)
-{
-    if (!checkConditionals(actor))
-    {
-        return;
-    }
-}
-
 // returns true if all conditionals are met, otherwise false
 bool Action::checkConditionals(Actor* actor)
 {

@@ -37,3 +37,9 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Material& obj)
     out << YAML::Key << "friction" << YAML::Value << obj.friction;
     return out;
 }
+
+Logger& operator<<(Logger& logger, const Material& obj) 
+{
+    logger << obj.name;
+    return logger;
+}

@@ -11,7 +11,11 @@ public:                                                             \
     _name(const YAML::Node& node) : TriggerType(new type(node)) {}; \
     YAML::Emitter& serialize(YAML::Emitter& out) const              \
     {                                                               \
-        return TriggerType::serialize(out, #_name);                 \
+        return TriggerType::serialize(out);                         \
+    }                                                               \
+    std::string getTypeName() const                                 \
+    {                                                               \
+        return #_name;                                              \
     }                                                               \
 };                                                                  \
 
@@ -83,6 +87,12 @@ struct ButtonInputType
         out << YAML::Key << "state" << YAML::Value << ButtonInputType::emitState(obj.state);
         return out;
     }
+    
+    friend Logger& operator<<(Logger& logger, const ButtonInputType& obj)
+    {
+        logger << "{id: " << obj.id << ", state: " << ButtonInputType::emitState(obj.state) << "}";
+        return logger;
+    }
 };
 
 
@@ -109,6 +119,12 @@ struct Index
     {
         out << YAML::Key << "index" << YAML::Value << obj.index;
         return out;
+    }
+    
+    friend Logger& operator<<(Logger& logger, const Index& obj)
+    {
+        logger << "{index: " << obj.index << "}";
+        return logger;
     }
 };
 
@@ -141,8 +157,14 @@ struct ActorTypeWrapper
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorTypeWrapper& obj)
     {
-        out << YAML::Key << "type" << YAML::Value << obj.type;
+        out << YAML::Key << "type" << YAML::Value << *obj.type;
         return out;
+    }
+    
+    friend Logger& operator<<(Logger& logger, const ActorTypeWrapper& obj)
+    {
+        logger << "{type: " << *obj.type << "}";
+        return logger;
     }
 };
 

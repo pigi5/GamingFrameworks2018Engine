@@ -110,8 +110,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         }
     }
 }
-    
-// TODO multiple of these i think
+
 YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj) 
 {
     out << YAML::Key << "name" << YAML::Value << obj.name;
@@ -143,6 +142,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     }
     out << YAML::EndSeq;
     return out;
+}
+
+Logger& operator<<(Logger& logger, const ActorType& obj) 
+{
+    logger << obj.name;
+    return logger;
 }
 
 ActorType::~ActorType()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include "Logger.h"
 
 // Base class for triggers to be treated polymorphically
 class Trigger 
@@ -8,9 +9,17 @@ class Trigger
 public:
     virtual bool operator<(const Trigger& other) const = 0;
     virtual YAML::Emitter& serialize(YAML::Emitter&) const = 0;
+    virtual Logger& serializeDebug(Logger&) const = 0;
+    virtual std::string getTypeName() const = 0;
+
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Trigger& obj)
     {
         return obj.serialize(out);
+    }
+
+    friend Logger& operator<<(Logger& logger, const Trigger& obj)
+    {
+        return obj.serializeDebug(logger);
     }
 };
 
@@ -38,11 +47,25 @@ public:
         return this < &other;
     }
 
-    YAML::Emitter& serialize(YAML::Emitter& out, std::string typeName) const
+    YAML::Emitter& serialize(YAML::Emitter& out) const
     {
-        out << YAML::Key << "type" << YAML::Value << typeName;
+        out << YAML::Key << "type" << YAML::Value << getTypeName();
         out << *id;
         return out;
+    }
+
+    Logger& serializeDebug(Logger& logger) const
+    {
+        logger << "trigger - " << getTypeName() << " - id - ";
+        if (id == NULL)
+        {
+            logger << "null";
+        }
+        else
+        {
+            logger << *id;
+        }
+        return logger;
     }
 };
 

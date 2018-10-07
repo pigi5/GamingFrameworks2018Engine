@@ -97,6 +97,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
     return out;
 }
 
+Logger& operator<<(Logger& logger, const Room& obj) 
+{
+    logger << obj.name;
+    return logger;
+}
+
 Room::~Room()
 {
     for (Actor* actor : actors)

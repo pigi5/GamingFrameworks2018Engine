@@ -78,7 +78,7 @@ void Sprite::draw(sf::RenderWindow* window, float index, float xPos, float yPos,
 	window->draw(s);
 }
 
-YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj)
 {
 	out << YAML::Key << "name" << YAML::Value << obj.name;
 	out << YAML::Key << "textures" << YAML::Value << YAML::BeginSeq;
@@ -87,4 +87,10 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
 	}
 	out << YAML::EndSeq;
 	return out;
+}
+
+Logger& operator<<(Logger& logger, const Sprite& obj) 
+{
+    logger << obj.name;
+    return logger;
 }

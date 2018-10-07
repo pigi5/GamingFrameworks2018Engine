@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include "yaml-cpp/yaml.h"
+#include "Logger.h"
 
 class Material
 {
@@ -19,4 +20,5 @@ public:
     Material(std::string);
     Material(const YAML::Node&, bool);
     friend YAML::Emitter& operator<<(YAML::Emitter&, const Material&);
+    friend Logger& operator<<(Logger&, const Material&);
 };

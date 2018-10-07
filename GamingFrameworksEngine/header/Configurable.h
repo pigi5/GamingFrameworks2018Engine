@@ -24,6 +24,7 @@ static void loadAll(std::string projectDir, bool shallow = false)
     } 
     if (dir != NULL) 
     {
+        engine_util::logger << "searching directory: " << directoryPath.str() << std::endl;
         // iterate all files in the given directory
         struct dirent* file;
         while ((file = readdir(dir)) != NULL)
@@ -32,7 +33,9 @@ static void loadAll(std::string projectDir, bool shallow = false)
             char* loc = strstr(file->d_name, ".yml");
             if (loc != NULL)
             {
-                // create new actor type
+                engine_util::logger << "reading file: " << file->d_name << std::endl;
+
+                // create new object
                 std::stringstream relativePath;
                 relativePath << directoryPath.str() << "/" << file->d_name;
                 YAML::Node config = YAML::LoadFile(relativePath.str());
@@ -46,6 +49,8 @@ static void loadAll(std::string projectDir, bool shallow = false)
                     errorMessage << "\" (referenced in " << file->d_name << ") is not unique.";
                     throw ConfigurationError(errorMessage.str());
                 }
+
+                engine_util::logger << "obj loaded: " << *object << std::endl;
             }
         }
         closedir(dir);
