@@ -4,7 +4,10 @@ material  : ~
 maxXSpeed : 2
 maxYSpeed : 10
 gravitous : true
-spriteName : plSprite
+sprite    : spr_player
+xScale    : 1
+yScale    : 1
+animationSpeed: 0.025
 attributes:
     jumpsLeft: 1
 triggers  : 
@@ -42,13 +45,6 @@ triggers  :
                 - attribute    : jumpsLeft
                   comparison   : gt
                   value        : 0
-    - type   : Create
-      target : player
-      actions:
-          - type         : MoveTo
-            xPosition    : 200
-            yPosition    : 200
-            conditionals : []
     - type   : Collision
       target : wall
       actions:

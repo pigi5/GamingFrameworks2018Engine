@@ -4,6 +4,7 @@
 #include "wx/dir.h"
 #include "wx/file.h"
 #include "../header/Engine.h"
+#include "../header/Utils.h"
 #include <direct.h>
 #include <iostream>
 
@@ -210,6 +211,12 @@ void MyFrame::loadConfig()
 		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
 		err->ShowModal();
 	}
+    catch (const std::exception &e)
+    {
+		std::cerr << e.what() << std::endl;
+		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
+		err->ShowModal();
+    }
 }
 
 void MyFrame::unloadConfig()

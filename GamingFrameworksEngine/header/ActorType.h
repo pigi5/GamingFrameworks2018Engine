@@ -26,6 +26,9 @@ public:
     float maxYSpeed;
     bool gravitous;
 	Sprite* sprite;
+    float xScale;
+    float yScale;
+    float imageSpeed;
     std::map<const std::string, int> attributes;
     // triggers/actions
     std::map<const Trigger*, std::list<Action*>> actionMap;

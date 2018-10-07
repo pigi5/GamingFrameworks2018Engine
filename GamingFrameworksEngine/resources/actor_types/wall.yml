@@ -1,10 +1,12 @@
 ---
-name      : wall
-spriteName: brick
-material  : ground
-maxXSpeed : -1
-maxYSpeed : -1
-gravitous : false
-sprite    : brick
-attributes: []
-triggers  : []
+name          : wall
+material      : ground
+maxXSpeed     : -1
+maxYSpeed     : -1
+gravitous     : false
+sprite        : spr_brick
+xScale        : 1
+yScale        : 1
+animationSpeed: 0
+attributes    : []
+triggers      : []

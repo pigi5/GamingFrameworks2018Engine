@@ -2,17 +2,27 @@
 #include <iostream>
 #include "../header/Actor.h"
 #include "../header/Constants.h"
-#include "../header/Utils.h"
 #include "../header/TriggerPresets.h"
 #include "../header/ActionPresets.h"
+#include "../header/Utils.h"
 
 Actor::Actor(Room* room, const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
-	this->imageFrame = 0;
     this->room = room;
     this->type = type;
+    engine_util::logger << *this << " created" << std::endl;
+    if (type->xScale != 0 && type->yScale != 0)
+    {
+        float width = type->sprite->getRecommendedWidth() * type->xScale;
+        float height = type->sprite->getRecommendedHeight() * type->yScale;
+
+        this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
+    }
+	this->imageFrame = 0.0f;
+    this->imageSpeed = type->imageSpeed;
+    this->imageAngle = 0.0f;
     // Set the default yAcceleration to gravity
     if (type->gravitous)
     {
@@ -21,13 +31,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     this->startState = startState;
     previousState = startState;
     nextState = startState;
-	if (type->sprite != NULL)
-	{
-        this->sprite = type->sprite;
-		//this->sprite = new Sprite();
-		//*this->sprite = *type->sprite;
-	}
-    // set default values
+    // set default attribute values
     for (auto pair : type->attributes)
     {
         attributes[pair.first] = pair.second;
@@ -44,10 +48,10 @@ Actor::~Actor()
     trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
-    //if (sprite != NULL) 
-    //{
-    //    delete sprite;
-    //}
+    if (hitbox != NULL) 
+    {
+        delete hitbox;
+    }
 }
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
@@ -60,6 +64,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
 
 void Actor::step()
 {
+    imageFrame += imageSpeed;
     // fire step trigger
     trigger_preset::Step trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
@@ -152,8 +157,8 @@ void Actor::move(const std::list<Actor*>& actors)
     // Move hitbox with actor
     if (isCollidable())
     {
-        sprite->getHitbox()->x = nextState.xPosition + xSpriteOffset;
-        sprite->getHitbox()->y = nextState.yPosition + ySpriteOffset;
+        hitbox->x = nextState.xPosition + xSpriteOffset;
+        hitbox->y = nextState.yPosition + ySpriteOffset;
     }
 
     // reset acceleration
@@ -177,11 +182,6 @@ void Actor::move(const std::list<Actor*>& actors)
 void Actor::interpolateState(float blend)
 {
 	currentState = nextState - nextState * blend + previousState * blend;
-    // Move shape with actor
-    if (sprite != NULL)
-    {
-	    sprite->setPosition(currentState.xPosition, currentState.yPosition);
-    }
 }
 
 void Actor::offset(float xOffset, float yOffset)
@@ -198,9 +198,9 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
     trigger_preset::Draw trigger(&ActorTypeWrapper(type));
     fireTrigger(trigger);
 
-    if (sprite != NULL)
+    if (type->sprite != NULL)
     {
-	    sprite->draw(window);
+	    type->sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, type->xScale, type->yScale, imageAngle);
     }
 }
 
@@ -224,6 +224,7 @@ void Actor::fireTrigger(const Trigger& trigger)
 
 void Actor::onCollision(Actor* other)
 {
+    engine_util::logger << *this << ": collision with " << *other << std::endl;
     trigger_preset::Collision trigger(&ActorTypeWrapper(other->type));
     fireTrigger(trigger);
 }
@@ -232,7 +233,7 @@ void Actor::onCollision(Actor* other)
 // returns: if the object has a hitbox
 bool Actor::isCollidable() const
 {
-    return sprite != NULL && sprite->getHitbox() != NULL;
+    return type->sprite != NULL && hitbox != NULL;
 }
 
 // Tests if this actor will collide with the given actor after its new position is
@@ -247,7 +248,7 @@ bool Actor::willCollide(const Actor& other) const
         return false;
     }
     
-    return sprite->getHitbox()->willCollide(other.getHitbox(), xSpeed, ySpeed);
+    return hitbox->willCollide(other.getHitbox(), xSpeed, ySpeed);
 }
 
 // Tests if this actor will collide with the given actor in the x-axis after its new 
@@ -262,7 +263,7 @@ bool Actor::willCollideX(const Actor& other) const
         return false;
     }
     
-    return sprite->getHitbox()->willCollideX(other.getHitbox(), xSpeed);
+    return hitbox->willCollideX(other.getHitbox(), xSpeed);
 }
 
 // Tests if this actor will collide with the given actor in the y-axis after its new 
@@ -277,7 +278,7 @@ bool Actor::willCollideY(const Actor& other) const
         return false;
     }
     
-    return sprite->getHitbox()->willCollideY(other.getHitbox(), ySpeed);
+    return hitbox->willCollideY(other.getHitbox(), ySpeed);
 }
 
 // Calculate the distance along the x-axis to the given object.
@@ -291,7 +292,7 @@ float Actor::getHitboxDistanceX(const Actor& other) const
         return -1.0f;
     }
     
-    return sprite->getHitbox()->getDistanceX(other.getHitbox());
+    return hitbox->getDistanceX(other.getHitbox());
 }
 
 // Calculate the distance along the y-axis to the given object.
@@ -305,7 +306,7 @@ float Actor::getHitboxDistanceY(const Actor& other) const
         return -1.0f;
     }
     
-    return sprite->getHitbox()->getDistanceY(other.getHitbox());
+    return hitbox->getDistanceY(other.getHitbox());
 }
 
 
@@ -328,7 +329,7 @@ State Actor::getState() const
 
 Hitbox* Actor::getHitbox() const
 {
-    return sprite->getHitbox();
+    return hitbox;
 }
 
 Room* Actor::getRoom() const
@@ -356,8 +357,8 @@ void Actor::setPosition(float xPosition, float yPosition)
     // Move hitbox with actor
     if (isCollidable())
     {
-        sprite->getHitbox()->x = nextState.xPosition + xSpriteOffset;
-        sprite->getHitbox()->y = nextState.yPosition + ySpriteOffset;
+        hitbox->x = nextState.xPosition + xSpriteOffset;
+        hitbox->y = nextState.yPosition + ySpriteOffset;
     }
 }
 
@@ -389,4 +390,11 @@ void Actor::setAttribute(std::string key, int value)
 void Actor::changeAttribute(std::string key, int value)
 {
     attributes[key] += value;
+}
+
+
+Logger& operator<<(Logger& logger, const Actor& obj)
+{
+    logger << obj.type->name << " " << std::to_string(obj.id);
+    return logger;
 }

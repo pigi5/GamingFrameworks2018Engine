@@ -12,6 +12,7 @@
 #include "../header/Text.h"
 #include "../header/Configurable.h"
 #include "../header/Sprite.h"
+#include "../header/Utils.h"
 
 Engine::Engine()
 {
@@ -21,6 +22,8 @@ Engine::Engine()
 // Runs the game loop until complete.
 void Engine::run()
 {
+    engine_util::logger << "Running game " << std::endl;
+
 	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
 	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
     bool go = true;
@@ -42,6 +45,7 @@ void Engine::run()
 
     if (currentRoom == NULL)
     {
+		window.close();
         throw ConfigurationError("No default room declared.");
     }
 

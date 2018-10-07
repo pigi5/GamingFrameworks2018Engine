@@ -8,7 +8,8 @@
 #include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
-//#include "Room.h"
+#include "Hitbox.h"
+#include "Logger.h"
 
 class Room;
 
@@ -83,6 +84,7 @@ protected:
     Room* room;
 
     // physics
+    Hitbox* hitbox;
     float xAcceleration;
     float yAcceleration;
     float xSpeed;
@@ -93,9 +95,8 @@ protected:
     State previousState;
 
     // drawing
-	Sprite* sprite;
     float imageSpeed;
-    int imageFrame;
+    float imageFrame;
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
@@ -151,4 +152,6 @@ public:
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);
+
+    friend Logger& operator<<(Logger&, const Actor&);
 };
