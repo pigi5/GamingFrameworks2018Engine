@@ -40,7 +40,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(xAcceleration) + " - " + std::to_string(yAcceleration);
         }
@@ -87,7 +87,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(speed);
         }
@@ -127,7 +127,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(speed);
         }
@@ -177,7 +177,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + targetType->toString();
         }
@@ -233,7 +233,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + targetType->toString() + " - " + std::to_string(speed);
         }
@@ -294,7 +294,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(xPosition) + " - " + std::to_string(yPosition);
         }
@@ -339,7 +339,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(xOffset) + " - " + std::to_string(yOffset);
         }
@@ -393,7 +393,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + actorType->toString() + " - " + startState.toString();
         }
@@ -421,7 +421,7 @@ namespace action_preset
         {
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName();
         }
@@ -466,7 +466,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + key + " - " + std::to_string(value);
         }
@@ -511,7 +511,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + key + " - " + std::to_string(offset);
         }
@@ -564,7 +564,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(index) + " - " + std::to_string(time);
         }
@@ -605,7 +605,7 @@ namespace action_preset
 	        return out;
         }
         
-        const std::string& toString() const
+        const std::string toString() const
         {
             return getTypeName() + " - " + std::to_string(index);
         }

@@ -94,7 +94,7 @@ struct ButtonInputType
         return logger;
     }
     
-    const std::string& toString() const
+    const std::string toString() const
     {
         std::string repr = std::to_string(id) + " - " + ButtonInputType::emitState(state);
         return repr;
@@ -133,7 +133,7 @@ struct Index
         return logger;
     }
     
-    const std::string& toString() const
+    const std::string toString() const
     {
         std::string repr = std::to_string(index);
         return repr;
@@ -179,7 +179,7 @@ struct ActorTypeWrapper
         return logger;
     }
     
-    const std::string& toString() const
+    const std::string toString() const
     {
         return type->toString();
     }

@@ -11,7 +11,7 @@ public:
     virtual YAML::Emitter& serialize(YAML::Emitter&) const = 0;
     virtual Logger& serializeDebug(Logger&) const = 0;
     virtual std::string getTypeName() const = 0;
-    virtual const std::string& toString() const = 0;
+    virtual const std::string toString() const = 0;
 
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Trigger& obj)
     {
@@ -68,7 +68,7 @@ public:
         return logger;
     }
 
-    const std::string& toString() const
+    const std::string toString() const
     {
         return getTypeName() + " - " + id->toString();
     }
