@@ -1,5 +1,5 @@
-# GamingFrameworks2018Engine
-Game Engine for Dr. Fendt's Fall 2018 Gaming Frameworks
+# RAGE
+Really Awesome Game Engine created for Dr. Fendt's Fall 2018 Gaming Frameworks
 
 # Configuring SFML
 SFML is a library used throughout our application.  
