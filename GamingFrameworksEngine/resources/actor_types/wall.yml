@@ -5,7 +5,7 @@ maxXSpeed     : -1
 maxYSpeed     : -1
 gravitous     : false
 sprite        : spr_brick
-xScale        : 1
+xScale        : 10
 yScale        : 1
 animationSpeed: 0
 attributes    : []

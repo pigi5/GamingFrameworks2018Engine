@@ -93,6 +93,12 @@ struct ButtonInputType
         logger << "{id: " << obj.id << ", state: " << ButtonInputType::emitState(obj.state) << "}";
         return logger;
     }
+    
+    const std::string& toString() const
+    {
+        std::string repr = std::to_string(id) + " - " + ButtonInputType::emitState(state);
+        return repr;
+    }
 };
 
 
@@ -125,6 +131,12 @@ struct Index
     {
         logger << "{index: " << obj.index << "}";
         return logger;
+    }
+    
+    const std::string& toString() const
+    {
+        std::string repr = std::to_string(index);
+        return repr;
     }
 };
 
@@ -165,6 +177,11 @@ struct ActorTypeWrapper
     {
         logger << "{type: " << *obj.type << "}";
         return logger;
+    }
+    
+    const std::string& toString() const
+    {
+        return type->toString();
     }
 };
 

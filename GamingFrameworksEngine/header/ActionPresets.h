@@ -39,6 +39,11 @@ namespace action_preset
 	        out << YAML::Key << "yAcceleration" << YAML::Value << yAcceleration;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xAcceleration) + " - " + std::to_string(yAcceleration);
+        }
     
         void run(Actor* actor)
         {
@@ -81,6 +86,11 @@ namespace action_preset
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(speed);
+        }
     
         void run(Actor* actor)
         {
@@ -115,6 +125,11 @@ namespace action_preset
 	        Action::serialize(out);
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(speed);
         }
     
         void run(Actor* actor)
@@ -160,6 +175,11 @@ namespace action_preset
 	        Action::serialize(out);
 	        out << YAML::Key << "target" << YAML::Value << targetType->name;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + targetType->toString();
         }
     
         void run(Actor* actor)
@@ -211,6 +231,11 @@ namespace action_preset
 	        out << YAML::Key << "target" << YAML::Value << targetType->name;
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + targetType->toString() + " - " + std::to_string(speed);
         }
     
         void run(Actor* actor)
@@ -268,6 +293,11 @@ namespace action_preset
 	        out << YAML::Key << "yPosition" << YAML::Value << yPosition;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xPosition) + " - " + std::to_string(yPosition);
+        }
     
         void run(Actor* actor)
         {
@@ -307,6 +337,11 @@ namespace action_preset
 	        out << YAML::Key << "xOffset" << YAML::Value << xOffset;
 	        out << YAML::Key << "yOffset" << YAML::Value << yOffset;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xOffset) + " - " + std::to_string(yOffset);
         }
     
         void run(Actor* actor)
@@ -357,6 +392,11 @@ namespace action_preset
 	        out << startState;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + actorType->toString() + " - " + startState.toString();
+        }
     
         void run(Actor* actor)
         {
@@ -379,6 +419,11 @@ namespace action_preset
 
         Destroy(const YAML::Node& node) : Action(node)
         {
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName();
         }
 
         void run(Actor* actor)
@@ -420,6 +465,11 @@ namespace action_preset
 	        out << YAML::Key << "value" << YAML::Value << value;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + key + " - " + std::to_string(value);
+        }
     
         void run(Actor* actor)
         {
@@ -459,6 +509,11 @@ namespace action_preset
 	        out << YAML::Key << "attribute" << YAML::Value << key;
 	        out << YAML::Key << "offset" << YAML::Value << offset;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + key + " - " + std::to_string(offset);
         }
     
         void run(Actor* actor)
@@ -508,6 +563,11 @@ namespace action_preset
 	        out << YAML::Key << "time" << YAML::Value << time;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(index) + " - " + std::to_string(time);
+        }
     
         void run(Actor* actor)
         {
@@ -543,6 +603,11 @@ namespace action_preset
 	        Action::serialize(out);
 	        out << YAML::Key << "index" << YAML::Value << index;
 	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(index);
         }
     
         void run(Actor* actor)

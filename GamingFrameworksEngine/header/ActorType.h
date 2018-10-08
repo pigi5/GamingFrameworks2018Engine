@@ -39,4 +39,5 @@ public:
     bool operator<(const ActorType& other) const;
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj);
     friend Logger& operator<<(Logger& logger, const ActorType& obj);
+    const std::string& toString() const;
 };

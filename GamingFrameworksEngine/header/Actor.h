@@ -70,6 +70,11 @@ struct State
         out << YAML::Key << "yPosition" << YAML::Value << obj.yPosition;
         return out;
     }
+    
+    const std::string& toString() const
+    {
+        return std::to_string(xPosition) + " - " + std::to_string(yPosition);
+    }
 };
 
 

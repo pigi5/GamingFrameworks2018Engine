@@ -47,7 +47,7 @@ triggers  :
       actions: 
           - type         : ApplyForce
             xAcceleration: 0
-            yAcceleration: -1
+            yAcceleration: -2
             conditionals :
                 - attribute    : jumpsLeft
                   comparison   : gt

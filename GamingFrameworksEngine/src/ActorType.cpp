@@ -166,3 +166,8 @@ bool ActorType::operator<(const ActorType& other) const
 {
     return name < other.name;
 }
+
+const std::string& ActorType::toString() const
+{
+    return name;
+}
