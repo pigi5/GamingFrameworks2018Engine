@@ -12,6 +12,7 @@ string operation;
 wxListBox* listbox;
 wxString currentPath;
 string selObject;
+string selTrigger;
 
 
 // ID for the menu commands
@@ -31,8 +32,7 @@ enum
 	EDIT_ITEM = 12,
 	DELETE_ITEM = 13,
 	CLEAR = 14,
-	PLAY = 15,
-	ID_LISTBOX = 16
+	PLAY = 15
 };
 
 // ----------------------------------------------------------------------------
@@ -108,10 +108,15 @@ public:
 	Editor(wxWindow* parent);
 	virtual ~Editor() {};
 
-	void reset();
+	void resetTrigger();
+	void resetAction();
+	void resetCon();
+	
 	void onNew(wxCommandEvent& event);
 	void onEdit(wxCommandEvent& event);
 	void onDelete(wxCommandEvent& event);
+
+	void onBox1Select(wxCommandEvent& event);
 
 	wxListBox* lb1;
 	wxListBox* lb2;
@@ -338,7 +343,7 @@ void MySplitterWindow::OnChange()
 {
 	MyFrame* f = (MyFrame*)m_frame;
 	Editor* e = (Editor*)f->m_right;
-	e->reset();
+	e->resetTrigger();
 }
 
 //Sidebar Window
@@ -413,6 +418,8 @@ void Sidebar::onSprite(wxCommandEvent& event)
 	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
 	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
 
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
+
 	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	btnPanel->SetSizer(gbox);
@@ -447,6 +454,8 @@ void Sidebar::onAudio(wxCommandEvent& event)
 	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
 	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
 
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
+
 	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	btnPanel->SetSizer(gbox);
@@ -467,7 +476,7 @@ void Sidebar::onObject(wxCommandEvent& event)
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-	listbox = new wxListBox(panel, ID_LISTBOX, wxPoint(-1, -1), wxSize(-1, -1));
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	
 	for (const auto& pair : ActorType::objectMap)
 	{
@@ -523,6 +532,8 @@ void Sidebar::onRoom(wxCommandEvent& event)
 	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
 	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
 
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
+
 	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	btnPanel->SetSizer(gbox);
@@ -560,6 +571,8 @@ void Sidebar::onMaterial(wxCommandEvent& event)
 	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
 	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
 
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
+
 	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	btnPanel->SetSizer(gbox);
@@ -580,7 +593,7 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-	listbox = new wxListBox(panel, ID_LISTBOX, wxPoint(-1, -1), wxSize(-1, -1));
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	
 	for (const auto& pair : OverlayType::objectMap)
 	{
@@ -596,6 +609,8 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
 	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
 	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
 
 	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
 	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -709,6 +724,8 @@ Editor::Editor(wxWindow* parent)
 	lb3 = new wxListBox(pnl3, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	lb4 = new wxListBox(pnl4, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 
+	lb1->Bind(wxEVT_LISTBOX, &Editor::onBox1Select, this);
+
 	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
 	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
 	bx3->Add(lb3, 3, wxEXPAND | wxALL, 2);
@@ -793,14 +810,50 @@ Editor::Editor(wxWindow* parent)
 	this->SetSizer(vszr);
 }
 
-void Editor::reset()
+void Editor::resetTrigger()
 {
 	lb1->Clear();
 	lb2->Clear();
 	lb3->Clear();
 	lb4->Clear();
-	lb1->Append("hello");
+	if (operation == "actor_types")
+	{
+		ActorType* at = ActorType::objectMap.at(selObject);
+		std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+		for (const auto& pair : actionMap)
+		{
+			lb1->Append(pair.first->getTypeName() + " - ");
+		}
+		std::map<const std::string, int> attributes = at->attributes;
+		for (const auto& pair : attributes)
+		{
+			lb4->Append(pair.first);
+		}
+	}
 }
+void Editor::resetAction()
+{
+	lb2->Clear();
+	lb3->Clear();
+	ActorType* at = ActorType::objectMap.at(selObject);
+	std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+	bool found = false;
+	for (const auto& pair : actionMap)
+	{
+		if (pair.first->getTypeName() == selTrigger && !found)
+		{
+			for (auto const& i : pair.second) {
+				lb2->Append(i->getTypeName());
+			}
+			found = true;
+		}
+	}
+}
+void Editor::resetCon()
+{
+
+}
+
 void Editor::onNew(wxCommandEvent& event)
 {
 
@@ -812,4 +865,15 @@ void Editor::onEdit(wxCommandEvent& event)
 void Editor::onDelete(wxCommandEvent& event)
 {
 
+}
+
+void Editor::onBox1Select(wxCommandEvent& event)
+{
+	int sel = lb1->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb1->GetString(sel).BeforeFirst(' ');
+		selTrigger = str.ToStdString();
+		resetAction();
+	}
 }
