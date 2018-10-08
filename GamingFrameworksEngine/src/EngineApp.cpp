@@ -822,7 +822,12 @@ void Editor::resetTrigger()
 		std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
 		for (const auto& pair : actionMap)
 		{
-			lb1->Append(pair.first->getTypeName());
+			lb1->Append(pair.first->getTypeName() + " - ");
+		}
+		std::map<const std::string, int> attributes = at->attributes;
+		for (const auto& pair : attributes)
+		{
+			lb4->Append(pair.first);
 		}
 	}
 }
@@ -830,7 +835,19 @@ void Editor::resetAction()
 {
 	lb2->Clear();
 	lb3->Clear();
-	
+	ActorType* at = ActorType::objectMap.at(selObject);
+	std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+	bool found = false;
+	for (const auto& pair : actionMap)
+	{
+		if (pair.first->getTypeName() == selTrigger && !found)
+		{
+			for (auto const& i : pair.second) {
+				lb2->Append(i->getTypeName());
+			}
+			found = true;
+		}
+	}
 }
 void Editor::resetCon()
 {
@@ -855,7 +872,7 @@ void Editor::onBox1Select(wxCommandEvent& event)
 	int sel = lb1->GetSelection();
 	if (sel != -1)
 	{
-		wxString str = lb1->GetString(sel);
+		wxString str = lb1->GetString(sel).BeforeFirst(' ');
 		selTrigger = str.ToStdString();
 		resetAction();
 	}
