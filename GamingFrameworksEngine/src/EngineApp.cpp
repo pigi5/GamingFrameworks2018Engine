@@ -13,6 +13,7 @@ wxListBox* listbox;
 wxString currentPath;
 string selObject;
 string selTrigger;
+string selAction;
 
 
 // ID for the menu commands
@@ -117,6 +118,7 @@ public:
 	void onDelete(wxCommandEvent& event);
 
 	void onBox1Select(wxCommandEvent& event);
+	void onBox2Select(wxCommandEvent& event);
 
 	wxListBox* lb1;
 	wxListBox* lb2;
@@ -725,6 +727,7 @@ Editor::Editor(wxWindow* parent)
 	lb4 = new wxListBox(pnl4, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 
 	lb1->Bind(wxEVT_LISTBOX, &Editor::onBox1Select, this);
+	lb2->Bind(wxEVT_LISTBOX, &Editor::onBox2Select, this);
 
 	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
 	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
@@ -822,12 +825,14 @@ void Editor::resetTrigger()
 		std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
 		for (const auto& pair : actionMap)
 		{
-			lb1->Append(pair.first->getTypeName() + " - ");
+			string str = pair.first->toString();
+			lb1->Append(str);
 		}
 		std::unordered_map<std::string, int> attributes = at->attributes;
 		for (const auto& pair : attributes)
 		{
-			lb4->Append(pair.first);
+			string str = pair.first + " - " + to_string(pair.second);
+			lb4->Append(str);
 		}
 	}
 }
@@ -840,10 +845,10 @@ void Editor::resetAction()
 	bool found = false;
 	for (const auto& pair : actionMap)
 	{
-		if (pair.first->getTypeName() == selTrigger && !found)
+		if (pair.first->toString() == selTrigger && !found)
 		{
 			for (auto const& i : pair.second) {
-				lb2->Append(i->getTypeName());
+				lb2->Append(i->toString());
 			}
 			found = true;
 		}
@@ -851,7 +856,37 @@ void Editor::resetAction()
 }
 void Editor::resetCon()
 {
-
+	lb3->Clear();
+	ActorType* at = ActorType::objectMap.at(selObject);
+	std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+	bool found = false;
+	for (const auto& pair : actionMap)
+	{
+		if (pair.first->toString() == selTrigger && !found)
+		{
+			for (auto const& i : pair.second) 
+			{
+				if (i->toString() == selAction && !found)
+				{
+					for (auto const& j : i->conditionals)
+					{
+						string str;
+						switch (j->comparison)
+						{
+						case EQUAL: str = j->key + " = " + to_string(j->value); break;
+						case NOT_EQUAL: str = j->key + " =/= " + to_string(j->value); break;
+						case LESS_THAN: str = j->key + " < " + to_string(j->value); break;
+						case LESS_THAN_EQUAL: str = j->key + " <= " + to_string(j->value); break;
+						case GREATER_THAN: str = j->key + " > " + to_string(j->value); break;
+						case GREATER_THAN_EQUAL: str = j->key + " >= " + to_string(j->value); break;
+						}
+						lb3->Append(str);
+					}
+					found = true;
+				}
+			}
+		}
+	}
 }
 
 void Editor::onNew(wxCommandEvent& event)
@@ -872,8 +907,19 @@ void Editor::onBox1Select(wxCommandEvent& event)
 	int sel = lb1->GetSelection();
 	if (sel != -1)
 	{
-		wxString str = lb1->GetString(sel).BeforeFirst(' ');
+		wxString str = lb1->GetString(sel);
 		selTrigger = str.ToStdString();
 		resetAction();
+	}
+}
+
+void Editor::onBox2Select(wxCommandEvent& event)
+{
+	int sel = lb2->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb2->GetString(sel);
+		selAction = str.ToStdString();
+		resetCon();
 	}
 }
