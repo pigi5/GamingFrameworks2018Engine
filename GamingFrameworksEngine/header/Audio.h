@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SFML\Audio.hpp>
+#include <SFML/Audio.hpp>
 #include <map>
 #include <iostream>
 #include "yaml-cpp/yaml.h"
@@ -8,8 +8,6 @@
 #include "../header/Trigger.h"
 #include "../header/Action.h"
 #include "../header/dirent.h"
-#include "../header/TriggerPresets.h"
-#include "../header/ActionPresets.h"
 
 class Audio
 {
@@ -19,9 +17,6 @@ public:
 	static const std::string DIR_NAME;
 
 	static std::map<const std::string, Audio*> audioMap;
-	
-	//triggers/actions
-	std::map<const Trigger*, std::list<Action*>> actionMap;
 
 	static void createAudio(std::string);
 

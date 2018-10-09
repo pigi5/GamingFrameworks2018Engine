@@ -11,7 +11,7 @@ private:
 public:
 
 	Sound();
-	Sound(string fileName);
+	Sound(std::string fileName);
 	~Sound();
 
 	bool loadSound();

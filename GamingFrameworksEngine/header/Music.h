@@ -9,13 +9,13 @@ private:
 
 public:
 	Music();
-	Music(string fileName);
+	Music(std::string fileName);
 	~Music();
 
 	int playMusic();
 	void stopMusic();
 
-	string getFileName();
+	std::string getFileName();
 
 	Music& operator=(Music other);
 

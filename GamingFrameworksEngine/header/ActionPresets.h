@@ -671,7 +671,7 @@ namespace action_preset
 		{
 			return new CallCustom(node);
 		}
-		else if (typeName == "PlaySound")
+		/*else if (typeName == "PlaySound")
 		{
 			return new PlaySound(node);
 		}
@@ -682,7 +682,7 @@ namespace action_preset
 		else if (typeName == "StopMusic")
 		{
 			return new StopMusic(node);
-		}
+		}*/
         else
         {
             std::stringstream errorMessage;

@@ -1,11 +1,12 @@
 #include "../header/Music.h"
 
+
 Music::Music()
 {
 
 }
 
-Music::Music(string fileName)
+Music::Music(std::string fileName)
 {
 	this->fileName = fileName;
 }
@@ -31,7 +32,7 @@ void Music::stopMusic()
 	this->music.stop();
 }
 
-string Music::getFileName() {
+std::string Music::getFileName() {
 	return this->fileName;
 }
 

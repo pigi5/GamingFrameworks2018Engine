@@ -5,7 +5,7 @@ Sound::Sound()
 
 }
 
-Sound::Sound(string fileName)
+Sound::Sound(std::string fileName)
 {
 	this->fileName = fileName;
 }
