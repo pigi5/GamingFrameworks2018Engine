@@ -19,9 +19,7 @@ void Room::createRoom(std::string name)
     if (!objectMap.emplace(newType->name, newType).second)
     {
         // if key already existed, throw error
-        std::stringstream errorMessage;
-        errorMessage << "Room name \"" << newType->name << "\" is not unique.";
-        throw ConfigurationError(errorMessage.str());
+        throw ConfigurationError("Room name \"" + newType->name + "\" is not unique.");
     }
 }
 
@@ -44,9 +42,7 @@ Room::Room(const YAML::Node& config, bool shallow)
         auto mapItem = ActorType::objectMap.find(typeName);
         if (mapItem == ActorType::objectMap.end())
         {
-            std::stringstream errorMessage;
-            errorMessage << "Actor Type " << typeName << " does not exist.";
-            throw ConfigurationError(errorMessage.str());
+            throw ConfigurationError("Actor Type " + typeName + " does not exist.");
         }
 
         State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
@@ -61,9 +57,7 @@ Room::Room(const YAML::Node& config, bool shallow)
         auto mapItem = OverlayType::objectMap.find(typeName);
         if (mapItem == OverlayType::objectMap.end())
         {
-            std::stringstream errorMessage;
-            errorMessage << "Overlay Type " << typeName << " does not exist.";
-            throw ConfigurationError(errorMessage.str());
+            throw ConfigurationError("Overlay Type " + typeName + " does not exist.");
         }
 
         State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());

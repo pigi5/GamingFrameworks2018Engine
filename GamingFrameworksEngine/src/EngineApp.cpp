@@ -841,7 +841,7 @@ void Editor::resetAction()
 	lb2->Clear();
 	lb3->Clear();
 	ActorType* at = ActorType::objectMap.at(selObject);
-	std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+	auto actionMap = at->actionMap;
 	bool found = false;
 	for (const auto& pair : actionMap)
 	{
@@ -858,7 +858,7 @@ void Editor::resetCon()
 {
 	lb3->Clear();
 	ActorType* at = ActorType::objectMap.at(selObject);
-	std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+	auto actionMap = at->actionMap;
 	bool found = false;
 	for (const auto& pair : actionMap)
 	{
