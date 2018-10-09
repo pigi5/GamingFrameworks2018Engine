@@ -1,7 +1,7 @@
 #pragma once
 
 #include <list>
-#include <map>
+#include <unordered_map>
 #include "ActorType.h"
 #include "Sprite.h"
 #include "Shape.h"
@@ -109,7 +109,7 @@ protected:
     // Type data
     const ActorType* type;
 
-    std::map<const std::string, int> attributes;
+    std::unordered_map<std::string, int> attributes;
 
 public:
     Actor(Room* room, const ActorType* type, State& startState);
@@ -129,7 +129,7 @@ public:
 	void draw(sf::RenderWindow*, sf::View*);
 
     // Performs actions given a trigger
-    void fireTrigger(const Trigger&);
+    void fireTrigger(Trigger* trigger);
     
     // Collision functions
     void onCollision(Actor*);

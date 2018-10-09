@@ -6,8 +6,7 @@
 #include "../header/ActionPresets.h"
 
 const std::string OverlayType::DIR_NAME = "overlay_types";
-
-std::map<const std::string, OverlayType*> OverlayType::objectMap;
+std::unordered_map<std::string, OverlayType*> OverlayType::objectMap;
 
 void OverlayType::createOverlayType(std::string name)
 {

@@ -40,7 +40,7 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     // fire create trigger
     ActorTypeWrapper wrapper(type);
     trigger_preset::Create trigger(&wrapper);
-    fireTrigger(trigger);
+    fireTrigger(&trigger);
 }
 
 Actor::~Actor()
@@ -48,7 +48,7 @@ Actor::~Actor()
     // fire destroy trigger
     ActorTypeWrapper wrapper(type);
     trigger_preset::Destroy trigger(&wrapper);
-    fireTrigger(trigger);
+    fireTrigger(&trigger);
 
     if (hitbox != NULL) 
     {
@@ -70,7 +70,7 @@ void Actor::step()
     // fire step trigger
     ActorTypeWrapper wrapper(type);
     trigger_preset::Step trigger(&wrapper);
-    fireTrigger(trigger);
+    fireTrigger(&trigger);
 }
 
 // Moves the object based on its physics attributes and performs collision detection
@@ -200,7 +200,7 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
     ActorTypeWrapper wrapper(type);
     trigger_preset::Draw trigger(&wrapper);
-    fireTrigger(trigger);
+    fireTrigger(&trigger);
 
     if (type->sprite != NULL)
     {
@@ -208,17 +208,16 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
     }
 }
 
-void Actor::fireTrigger(const Trigger& trigger)
+void Actor::fireTrigger(Trigger* trigger)
 {
-    //engine_util::logger << *this << ": trigger - " << trigger << std::endl;
-    const Trigger* ptr = &trigger;
     try
     {
+        engine_util::logger << *this << ": trigger - " << *trigger << " - " << std::to_string(trigger->hashCode()) << std::endl;
         // get action list for trigger if one exists
-        auto actions = type->actionMap.at(ptr);
+        auto actions = type->actionMap.at(trigger);
         for (Action* action : actions)
         {
-            //engine_util::logger << *this << ": action - " << *action << std::endl;
+            engine_util::logger << *this << ": action - " << *action << std::endl;
             action->run(this);
             // can't continue if deleted
             if (dynamic_cast<action_preset::Destroy*>(action))
@@ -234,7 +233,7 @@ void Actor::onCollision(Actor* other)
 {
     ActorTypeWrapper wrapper(other->type);
     trigger_preset::Collision trigger(&wrapper);
-    fireTrigger(trigger);
+    fireTrigger(&trigger);
 }
 
 // Tests if the actor has a hitbox.

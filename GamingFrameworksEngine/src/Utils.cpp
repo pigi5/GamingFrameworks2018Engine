@@ -1,6 +1,7 @@
 #include <cmath>
 #include <utility>
 #include "../header/Utils.h"
+#include "../header/Actor.h"
 
 Logger engine_util::logger("debug.log");
 

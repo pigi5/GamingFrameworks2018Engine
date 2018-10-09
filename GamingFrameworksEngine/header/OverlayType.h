@@ -1,6 +1,7 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
+#include <string>
 #include <list>
 #include <iostream>
 #include "../header/Configurable.h"
@@ -16,7 +17,7 @@ private:
 
 public:
     static const std::string DIR_NAME;
-    static std::map<const std::string, OverlayType*> objectMap;
+    static std::unordered_map<std::string, OverlayType*> objectMap;
 
     static void createOverlayType(std::string);
 

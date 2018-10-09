@@ -1,6 +1,7 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
+#include <string>
 #include <string>
 #include <iostream>
 #include "yaml-cpp/yaml.h"
@@ -10,7 +11,7 @@ class Material
 {
 public:
     static const std::string DIR_NAME;
-    static std::map<const std::string, Material*> objectMap;
+    static std::unordered_map<std::string, Material*> objectMap;
 
     std::string name;
     float friction;

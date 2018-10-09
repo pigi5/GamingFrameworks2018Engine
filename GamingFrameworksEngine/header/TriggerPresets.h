@@ -23,18 +23,24 @@ public:                                                             \
 #include "Actor.h"
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
-#include "../header/ButtonStates.h"
+#include "ButtonStates.h"
+#include "MouseStates.h"
 
 // ID structures //
 
 struct ButtonInputType 
 {
 	short id;
-	ButtonState state = ButtonState::RELEASE;
+	ButtonState::ButtonState state;
 
 	bool operator<(const ButtonInputType& other) const
 	{
 		return id * 3 + state < other.id * 3 + other.state;
+	}
+
+	size_t hashCode() const
+	{
+		return id * 3 + state;
 	}
 
     ButtonInputType() {}
@@ -45,34 +51,32 @@ struct ButtonInputType
         state = ButtonInputType::parseState(config["state"].as<std::string>());
     }
     
-    static ButtonState parseState(std::string state)
+    static ButtonState::ButtonState parseState(std::string state)
     {
-		ButtonState bs;
         if (state != "up" && state != "down" && state != "hold")
         {
             throw ConfigurationError("Button Input Type state must be \"down\", \"up\" or \"hold\"");
         }
 		if (state == "up")
-			bs = ButtonState::RELEASE;
+			return ButtonState::RELEASE;
 		else if (state == "down")
-			bs = ButtonState::PRESS;
+			return ButtonState::PRESS;
 		else
-			bs = ButtonState::HOLD;
-        return bs;
+			return ButtonState::HOLD;
     }
     
-    static std::string emitState(ButtonState bs)
+    static std::string emitState(ButtonState::ButtonState bs)
     {
 		string state = "";
 		switch (bs)
 		{
-		case PRESS:
+		case ButtonState::PRESS:
 			state = "down";
 			break;
-		case RELEASE:
+		case ButtonState::RELEASE:
 			state = "up";
 			break;
-		case HOLD:
+		case ButtonState::HOLD:
 			state = "hold";
 			break;
 		default:
@@ -101,6 +105,93 @@ struct ButtonInputType
     }
 };
 
+struct MouseInputType 
+{
+	MouseState::MouseState state;
+    
+	bool operator<(const MouseInputType& other) const
+	{
+		return state < other.state;
+	}
+
+	size_t hashCode() const
+	{
+		return state;
+	}
+
+    MouseInputType() {}
+
+    MouseInputType(const YAML::Node& config)
+    {
+        state = MouseInputType::parseState(config["state"].as<std::string>());
+    }
+    
+    static MouseState::MouseState parseState(std::string state)
+    {
+        if (state != "up" && state != "down" && state != "down on" && state != "up on")
+        {
+            throw ConfigurationError("Mouse Input Type state must be \"down\", \"up\", \"down on\", or \"up on\"");
+        }
+		if (state == "up")
+        {
+			return MouseState::RELEASE;
+        }
+		else if (state == "down")
+        {
+			return MouseState::PRESS;
+        }
+		else if (state == "up on")
+        {
+			return MouseState::RELEASE_ON;
+        }
+		else
+        {
+			return MouseState::PRESS_ON;
+        }
+    }
+    
+    static std::string emitState(MouseState::MouseState bs)
+    {
+		string state = "";
+		switch (bs)
+		{
+        case MouseState::PRESS:
+			state = "down";
+			break;
+		case MouseState::RELEASE:
+			state = "up";
+			break;
+		case MouseState::PRESS_ON:
+			state = "down on";
+			break;
+		case MouseState::RELEASE_ON:
+			state = "up on";
+			break;
+		default:
+			break;
+		}
+        return state;
+    }
+    
+    friend YAML::Emitter& operator<<(YAML::Emitter& out, const MouseInputType& obj)
+    {
+        out << YAML::Key << "state" << YAML::Value << MouseInputType::emitState(obj.state);
+        return out;
+    }
+    
+    friend Logger& operator<<(Logger& logger, const MouseInputType& obj)
+    {
+        logger << "{state: " << MouseInputType::emitState(obj.state) << "}";
+        return logger;
+    }
+    
+    const std::string& toString() const
+    {
+        std::string repr = MouseInputType::emitState(state);
+        return repr;
+    }
+};
+
 
 struct Index 
 {
@@ -109,6 +200,11 @@ struct Index
 	bool operator<(const Index& other) const
 	{
 		return index < other.index;
+	}
+
+	size_t hashCode() const
+	{
+		return index;
 	}
 
     Index(int index) 
@@ -147,6 +243,11 @@ struct ActorTypeWrapper
 	bool operator<(const ActorTypeWrapper& other) const
 	{
 		return *type < *(other.type);
+	}
+
+	size_t hashCode() const
+	{
+		return type->hashCode();
 	}
 
     ActorTypeWrapper(const ActorType* type) 
@@ -190,6 +291,7 @@ namespace trigger_preset
 {
     CREATE_TRIGGER(Collision, ActorTypeWrapper)
     CREATE_TRIGGER(ButtonInput, ButtonInputType)
+    CREATE_TRIGGER(MouseInput, MouseInputType)
     CREATE_TRIGGER(Create, ActorTypeWrapper)
     CREATE_TRIGGER(Step, ActorTypeWrapper)
     CREATE_TRIGGER(Draw, ActorTypeWrapper)
@@ -207,6 +309,10 @@ namespace trigger_preset
         else if (typeName == "ButtonInput")
         {
             return new ButtonInput(node);
+        }
+        else if (typeName == "MouseInput")
+        {
+            return new MouseInput(node);
         }
         else if (typeName == "Create")
         {

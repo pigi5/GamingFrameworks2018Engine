@@ -6,8 +6,7 @@
 #include "../header/ActionPresets.h"
 
 const std::string ActorType::DIR_NAME = "actor_types";
-
-std::map<const std::string, ActorType*> ActorType::objectMap;
+std::unordered_map<std::string, ActorType*> ActorType::objectMap;
 
 void ActorType::createActorType(std::string name)
 {
@@ -165,6 +164,12 @@ ActorType::~ActorType()
 bool ActorType::operator<(const ActorType& other) const
 {
     return name < other.name;
+}
+
+size_t ActorType::hashCode() const
+{
+    static hash<std::string> hasher;
+    return hasher(name);
 }
 
 const std::string& ActorType::toString() const

@@ -3,7 +3,7 @@
 #include "../header/ConfigurationError.h"
 
 const std::string Sprite::DIR_NAME = "sprites";
-std::map<const std::string, Sprite*> Sprite::objectMap;
+std::unordered_map<std::string, Sprite*> Sprite::objectMap;
 
 void Sprite::createSprite(std::string name)
 {

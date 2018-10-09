@@ -10,7 +10,7 @@
 template <typename T>
 static void loadAll(std::string projectDir, bool shallow = false)
 {
-    std::map<const std::string, T*> objectMap;
+    std::map<std::string, T*> objectMap;
 
     std::stringstream directoryPath;
     directoryPath << projectDir << "/" << T::DIR_NAME;
@@ -63,9 +63,10 @@ static void loadAll(std::string projectDir, bool shallow = false)
         throw ConfigurationError(errorMessage.str());
     }
 
-    // via https://stackoverflow.com/questions/3639741/merge-two-stl-maps
-    objectMap.insert(T::objectMap.begin(), T::objectMap.end());
-    std::swap(objectMap, T::objectMap);
+    for (const auto& obj : objectMap)
+    {
+        T::objectMap[obj.first] = obj.second;
+    }
 }
 
 // must be called to avoid memory leak of actor type pointers

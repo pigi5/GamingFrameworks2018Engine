@@ -2,8 +2,7 @@
 #include "../header/Configurable.h"
 
 const std::string Material::DIR_NAME = "materials";
-
-std::map<const std::string, Material*> Material::objectMap;
+std::unordered_map<std::string, Material*> Material::objectMap;
 
 void Material::createMaterial(std::string name)
 {

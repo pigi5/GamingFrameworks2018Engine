@@ -819,12 +819,12 @@ void Editor::resetTrigger()
 	if (operation == "actor_types")
 	{
 		ActorType* at = ActorType::objectMap.at(selObject);
-		std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+		std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
 		for (const auto& pair : actionMap)
 		{
 			lb1->Append(pair.first->getTypeName() + " - ");
 		}
-		std::map<const std::string, int> attributes = at->attributes;
+		std::unordered_map<std::string, int> attributes = at->attributes;
 		for (const auto& pair : attributes)
 		{
 			lb4->Append(pair.first);
@@ -836,7 +836,7 @@ void Editor::resetAction()
 	lb2->Clear();
 	lb3->Clear();
 	ActorType* at = ActorType::objectMap.at(selObject);
-	std::map<const Trigger*, std::list<Action*>, TriggerComparator> actionMap = at->actionMap;
+	std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
 	bool found = false;
 	for (const auto& pair : actionMap)
 	{

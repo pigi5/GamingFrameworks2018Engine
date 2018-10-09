@@ -21,7 +21,7 @@ public:
 	    b.state = ButtonState::PRESS;
 	    trigger_preset::ButtonInput trigger(&b);
         
-        room->fireTrigger(trigger);
+        room->fireTrigger(&trigger);
 	}
 
 	void handleRelease(sf::Keyboard::Key k, Room* room) {
@@ -32,7 +32,7 @@ public:
 	    b.state = ButtonState::RELEASE;
 	    trigger_preset::ButtonInput trigger(&b);
         
-        room->fireTrigger(trigger);
+        room->fireTrigger(&trigger);
 	}
 
 	void handleHolds(Room* room) {
@@ -42,7 +42,7 @@ public:
 			b.state = ButtonState::HOLD;
 			trigger_preset::ButtonInput trigger(&b);
         
-            room->fireTrigger(trigger);
+            room->fireTrigger(&trigger);
 		}
     }
 };

@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Actor.h"
+#include <list>
 #include "Logger.h"
+
+class Actor;
 
 namespace engine_util
 {

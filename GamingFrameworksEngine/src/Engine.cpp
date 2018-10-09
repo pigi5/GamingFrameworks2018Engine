@@ -34,16 +34,17 @@ void Engine::run()
     Room* localCurrentRoom;
 
     // find default room
-    for (const auto& pair : Room::objectMap)
+    for (auto it = Room::objectMap.begin(); it != Room::objectMap.end(); ++it)
     {
-        if (pair.second->is_default)
+        if (it->second->is_default)
         {
-            currentRoom = pair.second;
+            currentRoomIterator = it;
+            currentRoomIterator->second->setEngine(this);
             break;
         }
     }
 
-    if (currentRoom == NULL)
+    if (currentRoomIterator->second == NULL)
     {
 		window.close();
         throw ConfigurationError("No default room declared.");
@@ -72,7 +73,7 @@ void Engine::run()
     // Run the game loop
     while (go) 
     {
-        localCurrentRoom = currentRoom;
+        localCurrentRoom = currentRoomIterator->second;
 
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
@@ -123,18 +124,18 @@ void Engine::run()
 			    }
 
 			    if (event.type == sf::Event::KeyPressed) {
-				    input.handlePress(event.key.code, currentRoom);
+				    input.handlePress(event.key.code, localCurrentRoom);
 				    //cout << "Handling button press" << event.key.code << endl;
 			    }
 			    if (event.type == sf::Event::KeyReleased) {
-				    input.handleRelease(event.key.code, currentRoom);
+				    input.handleRelease(event.key.code, localCurrentRoom);
 				    //cout << "Handling button release" << event.key.code << endl;
 			    }
 		    }
-			input.handleHolds(currentRoom);
+			input.handleHolds(localCurrentRoom);
 
 			// Perform iterative game logic
-			currentRoom->step();
+			localCurrentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
 
@@ -142,21 +143,61 @@ void Engine::run()
 		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
-		currentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
+		localCurrentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
 		window.clear(sf::Color::Black);
 
         // Draw world
 		window.setView(camera);
-		currentRoom->draw(&window, &camera);
+		localCurrentRoom->draw(&window, &camera);
 
         // Draw GUI
 		window.setView(fixed);
-        currentRoom->drawHUD(&window, &fixed);
+        localCurrentRoom->drawHUD(&window, &fixed);
 		frameCounter.draw(&window);
 
         // Refresh window
 		window.display();
     }
+}
+
+void Engine::changeRoom(int offset)
+{
+    if (offset < 0)
+    {
+        for (int i = 0; i > offset; i--)
+        {
+            if (currentRoomIterator == Room::objectMap.begin())
+            {
+                throw ConfigurationError("Can't go before first room.");
+            }
+            currentRoomIterator--;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < offset; i++)
+        {
+            if (currentRoomIterator == Room::objectMap.end())
+            {
+                throw ConfigurationError("Can't go past last room.");
+            }
+            currentRoomIterator++;
+        }
+    }
+    
+    currentRoomIterator->second->setEngine(this);
+}
+
+void Engine::setRoom(std::string name)
+{
+    currentRoomIterator = Room::objectMap.find(name);
+
+    if (currentRoomIterator == Room::objectMap.end())
+    {
+        throw ConfigurationError("Room " + name + " does not exist.");
+    }
+    
+    currentRoomIterator->second->setEngine(this);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+#include <string>
 #include <vector>
 #include <SFML\Graphics.hpp>
 #include "yaml-cpp/yaml.h"
@@ -15,7 +17,7 @@ private:
 
 public:
 	static const std::string DIR_NAME;
-	static std::map<const std::string, Sprite*> objectMap;
+	static std::unordered_map<std::string, Sprite*> objectMap;
 	static void createSprite(std::string);
 
 	std::string name;

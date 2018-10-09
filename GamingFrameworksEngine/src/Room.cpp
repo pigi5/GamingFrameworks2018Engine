@@ -4,8 +4,7 @@
 #include "../header/Configurable.h"
 
 const std::string Room::DIR_NAME = "rooms";
-
-std::map<const std::string, Room*> Room::objectMap;
+std::map<std::string, Room*> Room::objectMap;
 
 void Room::createRoom(std::string name)
 {
@@ -135,7 +134,9 @@ void Room::step()
             timers[i] -= engine_constant::PHYSICS_DELTA_TIME;
             if (timers[i] <= 0)
             {
-                fireTrigger(trigger_preset::Timer(&Index(i)));
+                Index wrapper(i);
+                trigger_preset::Timer trigger(&wrapper);
+                fireTrigger(&trigger);
             }
         }
     }
@@ -193,7 +194,7 @@ void Room::drawHUD(sf::RenderWindow* window, sf::View* view)
     }
 }
 
-void Room::fireTrigger(const Trigger& trigger)
+void Room::fireTrigger(Trigger* trigger)
 {
     for (Actor* actor : actors)
     {
@@ -244,4 +245,14 @@ std::ostream& operator<<(std::ostream& output, const Room& object)
         output << " actor: " << actor->getType() << ", ";
     }
     return output;
+}
+
+void Room::setEngine(Engine* engine)
+{
+    this->engine = engine;
+}
+
+Engine* Room::getEngine() const
+{
+    return engine;
 }

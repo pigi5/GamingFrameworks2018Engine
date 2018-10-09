@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include "Action.h"
+#include "Engine.h"
 #include "Room.h"
 #include "Actor.h"
 #include "Utils.h"
@@ -616,7 +617,89 @@ namespace action_preset
 
             Index wrapper(index);
             trigger_preset::Custom trigger(&wrapper);
-            actor->getRoom()->fireTrigger(trigger);
+            actor->getRoom()->fireTrigger(&trigger);
+        }
+    };
+    
+    // change room index
+    class ChangeRoom : public Action
+    {
+    private:
+        int offset;
+    public:
+        std::string getTypeName() const
+        {
+            return "ChangeRoom";
+        }
+
+        ChangeRoom(int offset)
+        {
+            this->offset = offset;
+        }
+
+        ChangeRoom(const YAML::Node& node) : Action(node)
+        {
+            this->offset = node["offset"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "offset" << YAML::Value << offset;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(offset);
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->getRoom()->getEngine()->changeRoom(offset);
+        }
+    };
+    
+    // set room index
+    class SetRoom : public Action
+    {
+    private:
+        std::string name;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetRoom";
+        }
+
+        SetRoom(int index)
+        {
+            this->name = name;
+        }
+
+        SetRoom(const YAML::Node& node) : Action(node)
+        {
+            this->name = node["target"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "target" << YAML::Value << name;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + name;
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->getRoom()->getEngine()->setRoom(name);
         }
     };
 
@@ -674,6 +757,14 @@ namespace action_preset
         else if (typeName == "CallCustom")
         {
             return new CallCustom(node);
+        }
+        else if (typeName == "ChangeRoom")
+        {
+            return new ChangeRoom(node);
+        }
+        else if (typeName == "SetRoom")
+        {
+            return new SetRoom(node);
         }
         else
         {
