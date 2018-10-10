@@ -296,7 +296,7 @@ void MyFrame::OnNew(wxCommandEvent& event)
 	}
 	if (f != wxEmptyString)
 	{
-		f;
+		this->SetLabel(f);
 		wxMkdir(f);
 		currentPath = p + "//" + f;
 		if (wxSetWorkingDirectory(currentPath))
@@ -322,6 +322,7 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 	if (openProjDialog->ShowModal() == wxID_OK) {
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
+		this->SetLabel(fileName.AfterLast('\\'));
 	}
 
 	loadConfig();
@@ -802,10 +803,20 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	bx1->Add(bpnl1, 1, wxEXPAND | wxRIGHT, 2);
-	bx2->Add(bpnl2, 1, wxEXPAND | wxRIGHT, 2);
-	bx3->Add(bpnl3, 1, wxEXPAND | wxRIGHT, 2);
-	bx4->Add(bpnl4, 1, wxEXPAND | wxRIGHT, 2);
+	wxStaticText *st1 = new wxStaticText(pnl1, wxID_ANY, "Triggers", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st2 = new wxStaticText(pnl2, wxID_ANY, "Actions", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st3 = new wxStaticText(pnl3, wxID_ANY, "Conditionals", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st4 = new wxStaticText(pnl4, wxID_ANY, "Attributes", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+
+	bx1->Add(st1, 0, wxCENTRE | wxTOP, 0);
+	bx2->Add(st2, 0, wxCENTRE | wxTOP, 0);
+	bx3->Add(st3, 0, wxCENTRE | wxTOP, 0);
+	bx4->Add(st4, 0, wxCENTRE | wxTOP, 0);
+
+	bx1->Add(bpnl1, 1, wxEXPAND | wxTOP, 2);
+	bx2->Add(bpnl2, 1, wxEXPAND | wxTOP, 2);
+	bx3->Add(bpnl3, 1, wxEXPAND | wxTOP, 2);
+	bx4->Add(bpnl4, 1, wxEXPAND | wxTOP, 2);
 
 	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
 	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
@@ -940,19 +951,49 @@ void Editor::onEdit3(wxCommandEvent& event)
 }
 void Editor::onDelete3(wxCommandEvent& event)
 {
-
+	int sel = lb3->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb3->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (const auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (auto const& i : pair.second)
+				{
+					if (i->toString() == selAction && !found)
+					{
+						for (auto const& j : i->conditionals)
+						{
+							if (j->key == str.ToStdString() && !found)
+							{
+								
+								found = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void Editor::onNew4(wxCommandEvent& event)
 {
 	wxString str;
 	wxTextEntryDialog* getNewAttr = new wxTextEntryDialog(this, "Enter New Attribute Name");
-	if (getNewAttr->ShowModal() == wxID_OK)
+	if (selObject != "")
 	{
-		str = getNewAttr->GetValue();
-		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<std::string, int> attr = at->attributes;
-		attr.emplace(str.ToStdString(), 0);
+		if (getNewAttr->ShowModal() == wxID_OK)
+		{
+			str = getNewAttr->GetValue();
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<std::string, int> attr = at->attributes;
+			attr.emplace(str.ToStdString(), 0);
+		}
 	}
 }
 void Editor::onEdit4(wxCommandEvent& event)
@@ -960,18 +1001,18 @@ void Editor::onEdit4(wxCommandEvent& event)
 	wxString str;
 	long toEdit;
 	wxTextEntryDialog* editAttr = new wxTextEntryDialog(this, "Edit Attribute Value");
-	if (editAttr->ShowModal() == wxID_OK)
-	{
-		str = editAttr->GetValue();
-		str.ToLong(&toEdit);
-	}
 	int sel = lb4->GetSelection();
 	if (sel != -1)
 	{
-		str = lb4->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<std::string, int> attr = at->attributes;
-		attr.insert(pair<string, int>(str.ToStdString(), toEdit));
+		if (editAttr->ShowModal() == wxID_OK)
+		{
+			str = editAttr->GetValue();
+			str.ToLong(&toEdit);
+			str = lb4->GetString(sel);
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<std::string, int> attr = at->attributes;
+			attr.insert(pair<string, int>(str.ToStdString(), toEdit));
+		}
 	}
 }
 void Editor::onDelete4(wxCommandEvent& event)
@@ -981,7 +1022,7 @@ void Editor::onDelete4(wxCommandEvent& event)
 	{
 		wxString str = lb4->GetString(sel);
 		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<std::string, int> attr;
+		std::unordered_map<std::string, int> attr = at->attributes;
 		attr.erase(str.ToStdString());
 		lb4->Delete(sel);
 	}
