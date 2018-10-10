@@ -709,18 +709,18 @@ Editor::Editor(wxWindow* parent)
 	SetScrollbars(20, 20, 5, 5);
 	wxPanel* panel = new wxPanel(this, wxID_ANY);
 	wxPanel *pnl1, *pnl2, *pnl3, *pnl4;
-	wxBoxSizer *vszr = new wxBoxSizer(wxVERTICAL);
-	wxGridSizer* obGrid = new wxGridSizer(2, 2, 5, 5);
+	wxBoxSizer *vszr = new wxBoxSizer(wxHORIZONTAL);
+	wxGridSizer* obGrid = new wxGridSizer(2, 2, 2, 2);
 
 	pnl1 = new wxPanel(panel, wxID_ANY);
 	pnl2 = new wxPanel(panel, wxID_ANY);
 	pnl3 = new wxPanel(panel, wxID_ANY);
 	pnl4 = new wxPanel(panel, wxID_ANY);
 
-	wxBoxSizer* bx1 = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer* bx2 = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer* bx3 = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer* bx4 = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* bx1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* bx2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* bx3 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* bx4 = new wxBoxSizer(wxVERTICAL);
 	lb1 = new wxListBox(pnl1, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	lb2 = new wxListBox(pnl2, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	lb3 = new wxListBox(pnl3, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
@@ -729,20 +729,15 @@ Editor::Editor(wxWindow* parent)
 	lb1->Bind(wxEVT_LISTBOX, &Editor::onBox1Select, this);
 	lb2->Bind(wxEVT_LISTBOX, &Editor::onBox2Select, this);
 
-	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
-	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
-	bx3->Add(lb3, 3, wxEXPAND | wxALL, 2);
-	bx4->Add(lb4, 3, wxEXPAND | wxALL, 2);
-
 	wxPanel *bpnl1 = new wxPanel(pnl1, wxID_ANY);
 	wxPanel *bpnl2 = new wxPanel(pnl2, wxID_ANY);
 	wxPanel *bpnl3 = new wxPanel(pnl3, wxID_ANY);
 	wxPanel *bpnl4 = new wxPanel(pnl4, wxID_ANY);
 
-	wxGridSizer* gdbox1 = new wxGridSizer(3, 1, 5, 5);
-	wxGridSizer* gdbox2 = new wxGridSizer(3, 1, 5, 5);
-	wxGridSizer* gdbox3 = new wxGridSizer(3, 1, 5, 5);
-	wxGridSizer* gdbox4 = new wxGridSizer(3, 1, 5, 5);
+	wxGridSizer* gdbox1 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer* gdbox2 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer* gdbox3 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer* gdbox4 = new wxGridSizer(1, 3, 2, 2);
 
 	wxButton* newBtn1 = new wxButton(bpnl1, NEW_ITEM, wxT("New"));
 	wxButton* editBtn1 = new wxButton(bpnl1, EDIT_ITEM, wxT("Edit"));
@@ -792,10 +787,15 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	bx1->Add(bpnl1, 2, wxEXPAND | wxRIGHT, 2);
-	bx2->Add(bpnl2, 2, wxEXPAND | wxRIGHT, 2);
-	bx3->Add(bpnl3, 2, wxEXPAND | wxRIGHT, 2);
-	bx4->Add(bpnl4, 2, wxEXPAND | wxRIGHT, 2);
+	bx1->Add(bpnl1, 1, wxEXPAND | wxRIGHT, 2);
+	bx2->Add(bpnl2, 1, wxEXPAND | wxRIGHT, 2);
+	bx3->Add(bpnl3, 1, wxEXPAND | wxRIGHT, 2);
+	bx4->Add(bpnl4, 1, wxEXPAND | wxRIGHT, 2);
+
+	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
+	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
+	bx3->Add(lb3, 3, wxEXPAND | wxALL, 2);
+	bx4->Add(lb4, 3, wxEXPAND | wxALL, 2);
 
 	pnl1->SetSizer(bx1);
 	pnl2->SetSizer(bx2);
