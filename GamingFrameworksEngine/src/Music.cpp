@@ -6,6 +6,12 @@ Music::Music()
 
 }
 
+Music::Music(Audio* audio)
+{
+	this->name = audio->name;
+	this->fileName = audio->fileName;
+}
+
 Music::Music(std::string fileName)
 {
 	this->fileName = fileName;

@@ -710,33 +710,40 @@ namespace action_preset
 	class PlaySound : public Action
 	{
 	private:
+		Audio* audio;
 		Sound* sound;
 	public:
-		PlaySound(Sound* sound) 
+		const std::string& toString() const
 		{
-			this->sound = sound;
-			if (this->sound->loadSound())
+			return getTypeName() + " - " + sound->name + " - " + sound->fileName;
+		}
+
+		PlaySound(Audio* audio)
+		{
+			if (audio->audioType == "sound")
 			{
-				this->sound->playSound();
+				this->audio = audio;
+				this->sound = new Sound(audio);
+			}
+			else
+			{
+				//error throw here
 			}
 		}
 
 		PlaySound(const YAML::Node& node)
 		{
-			std::string typeName = node["name"].as<std::string>();
-			auto mapItem = ActorType::objectMap.find(typeName);
-			if (mapItem == ActorType::objectMap.end())
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
 			{
 				std::stringstream errorMessage;
-				errorMessage << "Actor Type " << typeName << " does not exist.";
+				errorMessage << "Audio " << name << " does not exist.";
 				throw ConfigurationError(errorMessage.str());
 			}
 
 			string fileName = node["file_name"].as<string>();
 			this->sound = new Sound(fileName);
-			//this->sound = new Sound(mapItem->second);
-
-			//this->startState = State(node);
 		}
 
 		std::string getTypeName() const
@@ -746,13 +753,18 @@ namespace action_preset
 
 		YAML::Emitter& serialize(YAML::Emitter& out) const
 		{
-			
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << sound->name;
+			out << YAML::Key << "file_name" << YAML::Value << sound->fileName;
 			return out;
 		}
 
 		void run(Actor* actor)
 		{
-			this->sound->playSound();
+			if (this->sound->loadSound())
+			{
+				this->sound->playSound();
+			}
 		}
 	};
 
@@ -760,27 +772,31 @@ namespace action_preset
 	class PlayMusic : public Action
 	{
 	private:
+		Audio* audio;
 		Music* music;
 	public:
-		PlayMusic(Music* music)
+		PlayMusic(Audio* audio)
 		{
-			this->music = music;
-			this->music->playMusic();
+			if (audio->audioType == "music")
+			{
+				this->audio = audio;
+				this->music = new Music(audio);
+			}
 		}
 
 		PlayMusic(const YAML::Node& node)
 		{
-			std::string typeName = node["name"].as<std::string>();
-			auto mapItem = ActorType::objectMap.find(typeName);
-			if (mapItem == ActorType::objectMap.end())
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
 			{
 				std::stringstream errorMessage;
-				errorMessage << "Actor Type " << typeName << " does not exist.";
+				errorMessage << "Audio " << name << " does not exist.";
 				throw ConfigurationError(errorMessage.str());
 			}
-			//this->sound = new Sound(mapItem->second);
 
-			//this->startState = State(node);
+			string fileName = node["file_name"].as<string>();
+			this->music = new Music(fileName);
 		}
 
 		std::string getTypeName() const
@@ -790,7 +806,15 @@ namespace action_preset
 
 		YAML::Emitter& serialize(YAML::Emitter& out) const
 		{
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << music->name;
+			out << YAML::Key << "file_name" << YAML::Value << music->fileName;
 			return out;
+		}
+
+		const std::string& toString() const
+		{
+			return getTypeName() + " - " + music->name + " - " + music->fileName;
 		}
 
 		void run(Actor* actor)
@@ -804,27 +828,31 @@ namespace action_preset
 	class StopMusic : public Action
 	{
 	private:
+		Audio* audio;
 		Music* music;
 	public:
 		StopMusic(Music* music)
 		{
-			this->music = music;
-			this->music->stopMusic();
+			if (audio->audioType == "music")
+			{
+				this->audio = audio;
+				this->music = new Music(audio);
+			}
 		}
 
 		StopMusic(const YAML::Node& node)
 		{
-			std::string typeName = node["name"].as<std::string>();
-			auto mapItem = ActorType::objectMap.find(typeName);
-			if (mapItem == ActorType::objectMap.end())
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
 			{
 				std::stringstream errorMessage;
-				errorMessage << "Actor Type " << typeName << " does not exist.";
+				errorMessage << "Audio " << name << " does not exist.";
 				throw ConfigurationError(errorMessage.str());
 			}
-			//this->sound = new Sound(mapItem->second);
 
-			//this->startState = State(node);
+			string fileName = node["file_name"].as<string>();
+			this->music = new Music(fileName);
 		}
 
 		std::string getTypeName() const
@@ -834,7 +862,15 @@ namespace action_preset
 
 		YAML::Emitter& serialize(YAML::Emitter& out) const
 		{
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << music->name;
+			out << YAML::Key << "file_name" << YAML::Value << music->fileName;
 			return out;
+		}
+
+		const std::string& toString() const
+		{
+			return getTypeName() + " - " + music->name + " - " + music->fileName;
 		}
 
 		void run(Actor* actor)
@@ -898,7 +934,7 @@ namespace action_preset
 		{
 			return new CallCustom(node);
 		}
-		/*else if (typeName == "PlaySound")
+		else if (typeName == "PlaySound")
 		{
 			return new PlaySound(node);
 		}
@@ -909,7 +945,7 @@ namespace action_preset
 		else if (typeName == "StopMusic")
 		{
 			return new StopMusic(node);
-		}*/
+		}
         else if (typeName == "ChangeRoom")
         {
             return new ChangeRoom(node);

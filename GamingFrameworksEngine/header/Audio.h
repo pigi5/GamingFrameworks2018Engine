@@ -1,13 +1,10 @@
 #pragma once
 
 #include <SFML/Audio.hpp>
-#include <map>
+#include <unordered_map>
 #include <iostream>
 #include "yaml-cpp/yaml.h"
-#include "../header/Configurable.h"
-#include "../header/Trigger.h"
-#include "../header/Action.h"
-#include "../header/dirent.h"
+#include "Logger.h"
 
 class Audio
 {
@@ -16,7 +13,7 @@ private:
 public:
 	static const std::string DIR_NAME;
 
-	static std::map<const std::string, Audio*> audioMap;
+	static std::unordered_map<std::string, Audio*> objectMap;
 
 	static void createAudio(std::string);
 
@@ -30,4 +27,5 @@ public:
 	~Audio();
 	bool operator<(const Audio& other) const;
 	friend YAML::Emitter& operator<<(YAML::Emitter& out, const Audio& obj);
+	friend Logger& operator<<(Logger&, const Audio&);
 };

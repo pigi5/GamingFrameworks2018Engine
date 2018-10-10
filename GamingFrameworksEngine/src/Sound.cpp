@@ -10,6 +10,12 @@ Sound::Sound(std::string fileName)
 	this->fileName = fileName;
 }
 
+Sound::Sound(Audio* audio)
+{
+	this->fileName = audio->fileName;
+	this->name = audio->name;
+}
+
 Sound::~Sound()
 {
 

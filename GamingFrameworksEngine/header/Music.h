@@ -2,13 +2,14 @@
 
 #include "Audio.h"
 
-class Music : Audio
+class Music : public Audio
 {
 private:
 	sf::Music music;
 
 public:
 	Music();
+	Music(Audio* audio);
 	Music(std::string fileName);
 	~Music();
 
