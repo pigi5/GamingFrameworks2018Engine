@@ -216,6 +216,7 @@ void MyFrame::loadConfig()
     {
 	    loadAll<Material>(currentPath.ToStdString());
 	    loadAll<Sprite>(currentPath.ToStdString());
+		loadAll<Audio>(currentPath.ToStdString());
 	    // load shallow first so we can have all the name references
 	    loadAll<ActorType>(currentPath.ToStdString(), true);
 	    loadAll<ActorType>(currentPath.ToStdString());
@@ -244,6 +245,7 @@ void MyFrame::unloadConfig()
 	unloadAll<OverlayType>();
 	unloadAll<ActorType>();
 	unloadAll<Sprite>();
+	unloadAll<Audio>();
 	unloadAll<Material>();
 }
 
@@ -251,6 +253,7 @@ void MyFrame::saveConfig()
 {
 	saveAll<Material>(currentPath.ToStdString());
 	saveAll<Sprite>(currentPath.ToStdString());
+	saveAll<Audio>(currentPath.ToStdString());
 	saveAll<ActorType>(currentPath.ToStdString());
 	saveAll<OverlayType>(currentPath.ToStdString());
 	saveAll<Room>(currentPath.ToStdString());

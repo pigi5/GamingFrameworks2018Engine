@@ -2,20 +2,21 @@
 
 #include "Audio.h"
 
-class Music : Audio
+class Music : public Audio
 {
 private:
 	sf::Music music;
 
 public:
 	Music();
-	Music(string fileName);
+	Music(Audio* audio);
+	Music(std::string fileName);
 	~Music();
 
 	int playMusic();
 	void stopMusic();
 
-	string getFileName();
+	std::string getFileName();
 
 	Music& operator=(Music other);
 

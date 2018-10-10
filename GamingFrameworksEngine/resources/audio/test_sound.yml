@@ -1,0 +1,4 @@
+---
+name       : test_sound
+file_name  : "resources\\audio\\demoSound.wav"
+audio_type : sound

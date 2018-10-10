@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include "ActorType.h"
 #include "Sprite.h"
+#include "Audio.h"
 #include "Shape.h"
 #include "Material.h"
 #include "Trigger.h"

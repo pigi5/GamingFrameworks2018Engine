@@ -2,6 +2,9 @@
 
 #include <cmath>
 #include "Action.h"
+#include "Audio.h"
+#include "Music.h"
+#include "Sound.h"
 #include "Engine.h"
 #include "Room.h"
 #include "Actor.h"
@@ -703,6 +706,179 @@ namespace action_preset
         }
     };
 
+	//play sound
+	class PlaySound : public Action
+	{
+	private:
+		Audio* audio;
+		Sound* sound;
+	public:
+		const std::string& toString() const
+		{
+			return getTypeName() + " - " + sound->name + " - " + sound->fileName;
+		}
+
+		PlaySound(Audio* audio)
+		{
+			if (audio->audioType == "sound")
+			{
+				this->audio = audio;
+				this->sound = new Sound(audio);
+			}
+			else
+			{
+				//error throw here
+			}
+		}
+
+		PlaySound(const YAML::Node& node)
+		{
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Audio " << name << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+
+			string fileName = node["file_name"].as<string>();
+			this->sound = new Sound(fileName);
+		}
+
+		std::string getTypeName() const
+		{
+			return "PlaySound";
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << sound->name;
+			out << YAML::Key << "file_name" << YAML::Value << sound->fileName;
+			return out;
+		}
+
+		void run(Actor* actor)
+		{
+			if (this->sound->loadSound())
+			{
+				this->sound->playSound();
+			}
+		}
+	};
+
+	//play music
+	class PlayMusic : public Action
+	{
+	private:
+		Audio* audio;
+		Music* music;
+	public:
+		PlayMusic(Audio* audio)
+		{
+			if (audio->audioType == "music")
+			{
+				this->audio = audio;
+				this->music = new Music(audio);
+			}
+		}
+
+		PlayMusic(const YAML::Node& node)
+		{
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Audio " << name << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+
+			string fileName = node["file_name"].as<string>();
+			this->music = new Music(fileName);
+		}
+
+		std::string getTypeName() const
+		{
+			return "PlayMusic";
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << music->name;
+			out << YAML::Key << "file_name" << YAML::Value << music->fileName;
+			return out;
+		}
+
+		const std::string& toString() const
+		{
+			return getTypeName() + " - " + music->name + " - " + music->fileName;
+		}
+
+		void run(Actor* actor)
+		{
+			this->music->playMusic();
+		}
+
+	};
+
+	//stop music
+	class StopMusic : public Action
+	{
+	private:
+		Audio* audio;
+		Music* music;
+	public:
+		StopMusic(Music* music)
+		{
+			if (audio->audioType == "music")
+			{
+				this->audio = audio;
+				this->music = new Music(audio);
+			}
+		}
+
+		StopMusic(const YAML::Node& node)
+		{
+			std::string name = node["name"].as<std::string>();
+			auto mapItem = Audio::objectMap.find(name);
+			if (mapItem == Audio::objectMap.end())
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Audio " << name << " does not exist.";
+				throw ConfigurationError(errorMessage.str());
+			}
+
+			string fileName = node["file_name"].as<string>();
+			this->music = new Music(fileName);
+		}
+
+		std::string getTypeName() const
+		{
+			return "StopMusic";
+		}
+
+		YAML::Emitter& serialize(YAML::Emitter& out) const
+		{
+			Action::serialize(out);
+			out << YAML::Key << "name" << YAML::Value << music->name;
+			out << YAML::Key << "file_name" << YAML::Value << music->fileName;
+			return out;
+		}
+
+		const std::string& toString() const
+		{
+			return getTypeName() + " - " + music->name + " - " + music->fileName;
+		}
+
+		void run(Actor* actor)
+		{
+			this->music->stopMusic();
+		}
+	};
+
     // abstract factory (**add new actions here**)
     static Action* createAction(const std::string typeName, const YAML::Node& node)
     {
@@ -754,10 +930,22 @@ namespace action_preset
         {
             return new SetTimer(node);
         }
-        else if (typeName == "CallCustom")
-        {
-            return new CallCustom(node);
-        }
+		else if (typeName == "CallCustom")
+		{
+			return new CallCustom(node);
+		}
+		else if (typeName == "PlaySound")
+		{
+			return new PlaySound(node);
+		}
+		else if (typeName == "PlayMusic")
+		{
+			return new PlayMusic(node);
+		}
+		else if (typeName == "StopMusic")
+		{
+			return new StopMusic(node);
+		}
         else if (typeName == "ChangeRoom")
         {
             return new ChangeRoom(node);
