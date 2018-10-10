@@ -2,8 +2,7 @@
 #include "../header/Configurable.h"
 
 const std::string Material::DIR_NAME = "materials";
-
-std::map<const std::string, Material*> Material::objectMap;
+std::unordered_map<std::string, Material*> Material::objectMap;
 
 void Material::createMaterial(std::string name)
 {
@@ -36,4 +35,10 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Material& obj)
     out << YAML::Key << "name" << YAML::Value << obj.name;
     out << YAML::Key << "friction" << YAML::Value << obj.friction;
     return out;
+}
+
+Logger& operator<<(Logger& logger, const Material& obj) 
+{
+    logger << obj.name;
+    return logger;
 }

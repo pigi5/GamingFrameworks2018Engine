@@ -1,3 +1,6 @@
 #pragma once
 
-enum ButtonState {PRESS, RELEASE, HOLD};
+namespace ButtonState
+{
+    enum ButtonState {PRESS, RELEASE, HOLD};
+}

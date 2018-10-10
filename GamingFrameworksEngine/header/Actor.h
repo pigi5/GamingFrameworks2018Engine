@@ -1,14 +1,15 @@
 #pragma once
 
 #include <list>
-#include <map>
+#include <unordered_map>
 #include "ActorType.h"
 #include "Sprite.h"
 #include "Shape.h"
 #include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
-//#include "Room.h"
+#include "Hitbox.h"
+#include "Logger.h"
 
 class Room;
 
@@ -69,6 +70,11 @@ struct State
         out << YAML::Key << "yPosition" << YAML::Value << obj.yPosition;
         return out;
     }
+    
+    const std::string& toString() const
+    {
+        return std::to_string(xPosition) + " - " + std::to_string(yPosition);
+    }
 };
 
 
@@ -83,6 +89,7 @@ protected:
     Room* room;
 
     // physics
+    Hitbox* hitbox;
     float xAcceleration;
     float yAcceleration;
     float xSpeed;
@@ -93,10 +100,8 @@ protected:
     State previousState;
 
     // drawing
-	Sprite* sprite;
-    Hitbox* hitbox;
     float imageSpeed;
-    int imageFrame;
+    float imageFrame;
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
@@ -104,7 +109,7 @@ protected:
     // Type data
     const ActorType* type;
 
-    std::map<const std::string, int> attributes;
+    std::unordered_map<std::string, int> attributes;
 
 public:
     Actor(Room* room, const ActorType* type, State& startState);
@@ -124,7 +129,7 @@ public:
 	void draw(sf::RenderWindow*, sf::View*);
 
     // Performs actions given a trigger
-    void fireTrigger(const Trigger&);
+    void fireTrigger(Trigger* trigger);
     
     // Collision functions
     void onCollision(Actor*);
@@ -152,4 +157,6 @@ public:
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);
+
+    friend Logger& operator<<(Logger&, const Actor&);
 };

@@ -10,6 +10,8 @@ public:
     float height;
 
     Hitbox(float, float, float, float);
+
+    Hitbox& operator=(const Hitbox& other);
     
     // Collision functions
     bool collides(const Hitbox*) const;

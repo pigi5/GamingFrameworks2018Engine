@@ -6,8 +6,7 @@
 #include "../header/ActionPresets.h"
 
 const std::string ActorType::DIR_NAME = "actor_types";
-
-std::map<const std::string, ActorType*> ActorType::objectMap;
+std::unordered_map<std::string, ActorType*> ActorType::objectMap;
 
 void ActorType::createActorType(std::string name)
 {
@@ -27,8 +26,10 @@ ActorType::ActorType(std::string name)
 {
     this->name = name;
     material = NULL;
-    maxXSpeed = -1;
-    maxYSpeed = -1;
+    maxXSpeed = -1.0f;
+    maxYSpeed = -1.0f;
+    xScale = 1.0f;
+    yScale = 1.0f;
     gravitous = true;
 }
 
@@ -56,9 +57,9 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
 
-		YAML::Node spriteNode = config["spriteName"];
+		YAML::Node spriteNode = config["sprite"];
 		if (!spriteNode.IsNull()) {
-			 string spriteName = spriteNode.as<std::string>();
+			string spriteName = spriteNode.as<std::string>();
 			auto checkName = Sprite::objectMap.find(spriteName);
 			if (checkName == Sprite::objectMap.end())
 			{
@@ -67,8 +68,11 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 				throw ConfigurationError(errorMessage.str());
 			}
 			sprite = checkName->second;
-
 		}
+
+        xScale = config["xScale"].as<float>();
+        yScale = config["yScale"].as<float>();
+        imageSpeed = config["animationSpeed"].as<float>();
         
         YAML::Node attrsNode = config["attributes"];
         for (auto attribute : attrsNode)
@@ -105,8 +109,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         }
     }
 }
-    
-// TODO multiple of these i think
+
 YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj) 
 {
     out << YAML::Key << "name" << YAML::Value << obj.name;
@@ -114,6 +117,9 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
     out << YAML::Key << "sprite" << YAML::Value << obj.sprite->name;
+    out << YAML::Key << "xScale" << YAML::Value << obj.xScale;
+    out << YAML::Key << "yScale" << YAML::Value << obj.yScale;
+    out << YAML::Key << "animationSpeed" << YAML::Value << obj.imageSpeed;
     out << YAML::Key << "attributes" << YAML::Value << YAML::BeginMap;
     for (auto pair : obj.attributes)
     {
@@ -137,6 +143,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     return out;
 }
 
+Logger& operator<<(Logger& logger, const ActorType& obj) 
+{
+    logger << obj.name;
+    return logger;
+}
+
 ActorType::~ActorType()
 {
     for (const auto& pair : actionMap)
@@ -152,4 +164,15 @@ ActorType::~ActorType()
 bool ActorType::operator<(const ActorType& other) const
 {
     return name < other.name;
+}
+
+size_t ActorType::hashCode() const
+{
+    static hash<std::string> hasher;
+    return hasher(name);
+}
+
+const std::string& ActorType::toString() const
+{
+    return name;
 }

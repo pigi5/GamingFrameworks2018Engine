@@ -2,17 +2,27 @@
 #include <iostream>
 #include "../header/Actor.h"
 #include "../header/Constants.h"
-#include "../header/Utils.h"
 #include "../header/TriggerPresets.h"
 #include "../header/ActionPresets.h"
+#include "../header/Utils.h"
 
 Actor::Actor(Room* room, const ActorType* type, State& startState)
 {
     static int _id = 0;
     id = _id++;
-	this->imageFrame = 0;
     this->room = room;
     this->type = type;
+
+    if (type->xScale != 0 && type->yScale != 0)
+    {
+        float width = type->sprite->getRecommendedWidth() * type->xScale;
+        float height = type->sprite->getRecommendedHeight() * type->yScale;
+
+        this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
+    }
+	this->imageFrame = 0.0f;
+    this->imageSpeed = type->imageSpeed;
+    this->imageAngle = 0.0f;
     // Set the default yAcceleration to gravity
     if (type->gravitous)
     {
@@ -21,32 +31,25 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     this->startState = startState;
     previousState = startState;
     nextState = startState;
-	if (type->sprite != NULL)
-	{
-		this->sprite = new Sprite();
-		*this->sprite = *type->sprite;
-	}
-    // set default values
+    // set default attribute values
     for (auto pair : type->attributes)
     {
         attributes[pair.first] = pair.second;
     }
     
     // fire create trigger
-    trigger_preset::Create trigger(&ActorTypeWrapper(type));
-    fireTrigger(trigger);
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Create trigger(&wrapper);
+    fireTrigger(&trigger);
 }
 
 Actor::~Actor()
 {
     // fire destroy trigger
-    trigger_preset::Destroy trigger(&ActorTypeWrapper(type));
-    fireTrigger(trigger);
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Destroy trigger(&wrapper);
+    fireTrigger(&trigger);
 
-    if (sprite != NULL) 
-    {
-        delete sprite;
-    }
     if (hitbox != NULL) 
     {
         delete hitbox;
@@ -63,9 +66,11 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
 
 void Actor::step()
 {
+    imageFrame += imageSpeed;
     // fire step trigger
-    trigger_preset::Step trigger(&ActorTypeWrapper(type));
-    fireTrigger(trigger);
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Step trigger(&wrapper);
+    fireTrigger(&trigger);
 }
 
 // Moves the object based on its physics attributes and performs collision detection
@@ -180,11 +185,6 @@ void Actor::move(const std::list<Actor*>& actors)
 void Actor::interpolateState(float blend)
 {
 	currentState = nextState - nextState * blend + previousState * blend;
-    // Move shape with actor
-    if (sprite != NULL)
-    {
-	    sprite->setPosition(currentState.xPosition, currentState.yPosition);
-    }
 }
 
 void Actor::offset(float xOffset, float yOffset)
@@ -198,23 +198,26 @@ void Actor::offset(float xOffset, float yOffset)
 //   view: the view of the world
 void Actor::draw(sf::RenderWindow* window, sf::View* view)
 {
-    trigger_preset::Draw trigger(&ActorTypeWrapper(type));
-    fireTrigger(trigger);
+    ActorTypeWrapper wrapper(type);
+    trigger_preset::Draw trigger(&wrapper);
+    fireTrigger(&trigger);
 
-    if (sprite != NULL)
+    if (type->sprite != NULL)
     {
-	    sprite->draw(window);
+	    type->sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, type->xScale, type->yScale, imageAngle);
     }
 }
 
-void Actor::fireTrigger(const Trigger& trigger)
+void Actor::fireTrigger(Trigger* trigger)
 {
-    const Trigger* ptr = &trigger;
-    auto actions = type->actionMap.find(ptr);
-    if (actions != type->actionMap.end())
+    try
     {
-        for (Action* action : actions->second)
+        engine_util::logger << *this << ": trigger - " << *trigger << " - " << std::to_string(trigger->hashCode()) << std::endl;
+        // get action list for trigger if one exists
+        auto actions = type->actionMap.at(trigger);
+        for (Action* action : actions)
         {
+            engine_util::logger << *this << ": action - " << *action << std::endl;
             action->run(this);
             // can't continue if deleted
             if (dynamic_cast<action_preset::Destroy*>(action))
@@ -222,20 +225,22 @@ void Actor::fireTrigger(const Trigger& trigger)
                 return;
             }
         }
-    }
+    } 
+    catch (const std::out_of_range& e) {}
 }
 
 void Actor::onCollision(Actor* other)
 {
-    trigger_preset::Collision trigger(&ActorTypeWrapper(other->type));
-    fireTrigger(trigger);
+    ActorTypeWrapper wrapper(other->type);
+    trigger_preset::Collision trigger(&wrapper);
+    fireTrigger(&trigger);
 }
 
 // Tests if the actor has a hitbox.
 // returns: if the object has a hitbox
 bool Actor::isCollidable() const
 {
-    return hitbox != NULL;
+    return type->sprite != NULL && hitbox != NULL;
 }
 
 // Tests if this actor will collide with the given actor after its new position is
@@ -392,4 +397,11 @@ void Actor::setAttribute(std::string key, int value)
 void Actor::changeAttribute(std::string key, int value)
 {
     attributes[key] += value;
+}
+
+
+Logger& operator<<(Logger& logger, const Actor& obj)
+{
+    logger << obj.type->name << " " << std::to_string(obj.id);
+    return logger;
 }

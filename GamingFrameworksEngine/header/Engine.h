@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 #include "Room.h"
 
 // Singleton pattern via Martin York - https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
@@ -14,14 +14,16 @@ public:
         return instance;
     }
 private:
-    Room* currentRoom;
+    std::map<std::string, Room*>::iterator currentRoomIterator;
 	sf::RenderWindow window;
     Engine();
 
-    
 public:
     // Runs the main game loop
     void run();
+
+    void changeRoom(int);
+    void setRoom(std::string);
 
     // Functions that should not exist in the Singleton pattern
     Engine(Engine const&) = delete;

@@ -5,6 +5,7 @@
 #include "Audio.h"
 #include "Music.h"
 #include "Sound.h"
+#include "Engine.h"
 #include "Room.h"
 #include "Actor.h"
 #include "Utils.h"
@@ -23,7 +24,7 @@ namespace action_preset
             return "ApplyForce";
         }
 
-        ApplyForce(float acceleration)
+        ApplyForce(float xAcceleration, float yAcceleration)
         {
             this->xAcceleration = xAcceleration;
             this->yAcceleration = yAcceleration;
@@ -42,10 +43,15 @@ namespace action_preset
 	        out << YAML::Key << "yAcceleration" << YAML::Value << yAcceleration;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xAcceleration) + " - " + std::to_string(yAcceleration);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             if (xAcceleration != 0)
             {
@@ -55,6 +61,86 @@ namespace action_preset
             {
                 actor->setYAcceleration(yAcceleration);
             }
+        }
+    };
+
+    class SetXSpeed : public Action
+    {
+    private:
+        float speed;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetXSpeed";
+        }
+
+        SetXSpeed(float speed)
+        {
+            this->speed = speed;
+        }
+
+        SetXSpeed(const YAML::Node& node) : Action(node)
+        {
+            speed = node["speed"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "speed" << YAML::Value << speed;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(speed);
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setXSpeed(speed);
+        }
+    };
+
+    class SetYSpeed : public Action
+    {
+    private:
+        float speed;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetXSpeed";
+        }
+
+        SetYSpeed(float speed)
+        {
+            this->speed = speed;
+        }
+
+        SetYSpeed(const YAML::Node& node) : Action(node)
+        {
+            speed = node["speed"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "speed" << YAML::Value << speed;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(speed);
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setYSpeed(speed);
         }
     };
     
@@ -94,10 +180,15 @@ namespace action_preset
 	        out << YAML::Key << "target" << YAML::Value << targetType->name;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + targetType->toString();
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             actor->setPosition(nearest.first->getState().xPosition, nearest.first->getState().yPosition);
@@ -145,10 +236,15 @@ namespace action_preset
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + targetType->toString() + " - " + std::to_string(speed);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             
@@ -201,10 +297,15 @@ namespace action_preset
 	        out << YAML::Key << "yPosition" << YAML::Value << yPosition;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xPosition) + " - " + std::to_string(yPosition);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->setPosition(xPosition, yPosition);
         }
@@ -241,10 +342,15 @@ namespace action_preset
 	        out << YAML::Key << "yOffset" << YAML::Value << yOffset;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(xOffset) + " - " + std::to_string(yOffset);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->offset(xOffset, yOffset);
         }
@@ -290,10 +396,15 @@ namespace action_preset
 	        out << startState;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + actorType->toString() + " - " + startState.toString();
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
             actor->getRoom()->addActor(newActor);
@@ -313,10 +424,15 @@ namespace action_preset
         Destroy(const YAML::Node& node) : Action(node)
         {
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName();
+        }
 
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->getRoom()->deleteActor(actor);
         }
@@ -353,10 +469,15 @@ namespace action_preset
 	        out << YAML::Key << "value" << YAML::Value << value;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + key + " - " + std::to_string(value);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->setAttribute(key, value);
         }
@@ -393,10 +514,15 @@ namespace action_preset
 	        out << YAML::Key << "offset" << YAML::Value << offset;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + key + " - " + std::to_string(offset);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->changeAttribute(key, offset);
         }
@@ -441,10 +567,15 @@ namespace action_preset
 	        out << YAML::Key << "time" << YAML::Value << time;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(index) + " - " + std::to_string(time);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
             actor->getRoom()->startTimer(index, time);
         }
@@ -477,13 +608,101 @@ namespace action_preset
 	        out << YAML::Key << "index" << YAML::Value << index;
 	        return out;
         }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(index);
+        }
     
         void run(Actor* actor)
         {
-            Action::run(actor);
+            if (!checkConditionals(actor)) return;
 
-            trigger_preset::Custom trigger(&Index(index));
-            actor->getRoom()->fireTrigger(trigger);
+            Index wrapper(index);
+            trigger_preset::Custom trigger(&wrapper);
+            actor->getRoom()->fireTrigger(&trigger);
+        }
+    };
+    
+    // change room index
+    class ChangeRoom : public Action
+    {
+    private:
+        int offset;
+    public:
+        std::string getTypeName() const
+        {
+            return "ChangeRoom";
+        }
+
+        ChangeRoom(int offset)
+        {
+            this->offset = offset;
+        }
+
+        ChangeRoom(const YAML::Node& node) : Action(node)
+        {
+            this->offset = node["offset"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "offset" << YAML::Value << offset;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + std::to_string(offset);
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->getRoom()->getEngine()->changeRoom(offset);
+        }
+    };
+    
+    // set room index
+    class SetRoom : public Action
+    {
+    private:
+        std::string name;
+    public:
+        std::string getTypeName() const
+        {
+            return "SetRoom";
+        }
+
+        SetRoom(int index)
+        {
+            this->name = name;
+        }
+
+        SetRoom(const YAML::Node& node) : Action(node)
+        {
+            this->name = node["target"].as<int>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "target" << YAML::Value << name;
+	        return out;
+        }
+        
+        const std::string& toString() const
+        {
+            return getTypeName() + " - " + name;
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->getRoom()->getEngine()->setRoom(name);
         }
     };
 
@@ -631,6 +850,14 @@ namespace action_preset
         {
             return new ApplyForce(node);
         }
+        else if (typeName == "SetXSpeed")
+        {
+            return new SetXSpeed(node);
+        }
+        else if (typeName == "SetYSpeed")
+        {
+            return new SetYSpeed(node);
+        }
         else if (typeName == "MoveToNearest")
         {
             return new MoveToNearest(node);
@@ -683,6 +910,14 @@ namespace action_preset
 		{
 			return new StopMusic(node);
 		}*/
+        else if (typeName == "ChangeRoom")
+        {
+            return new ChangeRoom(node);
+        }
+        else if (typeName == "SetRoom")
+        {
+            return new SetRoom(node);
+        }
         else
         {
             std::stringstream errorMessage;

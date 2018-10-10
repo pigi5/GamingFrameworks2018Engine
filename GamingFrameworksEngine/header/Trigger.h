@@ -1,6 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <string>
+#include "Logger.h"
+#include "Utils.h"
 
 // Base class for triggers to be treated polymorphically
 class Trigger 
@@ -8,9 +11,19 @@ class Trigger
 public:
     virtual bool operator<(const Trigger& other) const = 0;
     virtual YAML::Emitter& serialize(YAML::Emitter&) const = 0;
+    virtual Logger& serializeDebug(Logger&) const = 0;
+    virtual std::string getTypeName() const = 0;
+    virtual const std::string& toString() const = 0;
+    virtual size_t hashCode() const = 0;
+
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Trigger& obj)
     {
         return obj.serialize(out);
+    }
+
+    friend Logger& operator<<(Logger& logger, const Trigger& obj)
+    {
+        return obj.serializeDebug(logger);
     }
 };
 
@@ -20,9 +33,8 @@ public:
 template <typename T>
 class TriggerType : public Trigger
 {
-private:
-    const T* id;
 public:
+    const T* id;
     TriggerType(const T* id)
     {
         this->id = id;
@@ -37,21 +49,55 @@ public:
         }
         return this < &other;
     }
-
-    YAML::Emitter& serialize(YAML::Emitter& out, std::string typeName) const
+    
+    size_t hashCode() const
     {
-        out << YAML::Key << "type" << YAML::Value << typeName;
+        return id->hashCode();
+    }
+
+    YAML::Emitter& serialize(YAML::Emitter& out) const
+    {
+        out << YAML::Key << "type" << YAML::Value << getTypeName();
         out << *id;
         return out;
+    }
+
+    Logger& serializeDebug(Logger& logger) const
+    {
+        logger << "trigger - " << getTypeName() << " - id - ";
+        if (id == NULL)
+        {
+            logger << "null";
+        }
+        else
+        {
+            logger << *id;
+        }
+        return logger;
+    }
+
+    const std::string& toString() const
+    {
+        return getTypeName() + " - " + id->toString();
+    }
+};
+
+// Hashes Trigger pointers (by deferencing them)
+// This is useful for stl collections that need a hash for Trigger pointers
+struct TriggerHash
+{
+    size_t operator()(Trigger* obj) const 
+    {
+        return obj->hashCode();
     }
 };
 
 // Compares Trigger pointers (by deferencing them)
-// This is useful for stl collections that need a less-than operator for Trigger pointers
-struct TriggerComparator : std::binary_function<const Trigger*, const Trigger*, bool>
+// This is useful for stl collections that need an == for Trigger pointers
+struct TriggerEquals : public std::binary_function<Trigger*, Trigger*, bool>
 {
-    bool operator() (const Trigger* a, const Trigger* b) const 
+    bool operator()(Trigger* a, Trigger* b) const 
     {
-        return *a < *b;
+        return a->hashCode() == b->hashCode();
     }
 };

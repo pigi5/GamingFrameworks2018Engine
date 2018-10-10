@@ -1,8 +1,9 @@
+#include <cmath>
 #include "../header/Sprite.h"
 #include "../header/ConfigurationError.h"
 
 const std::string Sprite::DIR_NAME = "sprites";
-std::map<const std::string, Sprite*> Sprite::objectMap;
+std::unordered_map<std::string, Sprite*> Sprite::objectMap;
 
 void Sprite::createSprite(std::string name)
 {
@@ -19,36 +20,16 @@ void Sprite::createSprite(std::string name)
 	}
 }
 
-Sprite::Sprite()
+Sprite::Sprite(std::string name) 
 {
-	this->xPos = 0;
-	this->yPos = 0;
-	this->name = "";
-}
-
-Sprite::Sprite(std::string name) {
-	this->xPos = 0;
-	this->yPos = 0;
 	this->name = name;
-}
-
-Sprite::Sprite(int xPos, int yPos)
-{
-	this->xPos = xPos;
-	this->yPos = yPos;
-	this->name = "";
 }
 
 Sprite::Sprite(const YAML::Node& config, bool shallow)
 {
-	this->xPos = 0;
-	this->yPos = 0;
 	name = config["name"].as<std::string>();
 	if (!shallow) {
-		xSize = config["xSize"].as<int>();
-		ySize = config["ySize"].as<int>();
-
-		YAML::Node txtrNode = config["textures"];
+        YAML::Node txtrNode = config["textures"];
 		sf::Texture* t;
 		for (auto texture : txtrNode)
 		{
@@ -58,7 +39,9 @@ Sprite::Sprite(const YAML::Node& config, bool shallow)
 			bool loaded = t->loadFromFile(filename);
 			if (!loaded)
 			{
-				// TODO handle this error
+                std::stringstream errorMessage;
+                errorMessage << "Texture " << filename << " could not be loaded.";
+                throw ConfigurationError(errorMessage.str());
 			}
 			textures.push_back(t);
 		}
@@ -76,94 +59,38 @@ Sprite::~Sprite()
     textures.clear();
 }
 
-Hitbox* Sprite::getHitbox() const
+float Sprite::getRecommendedWidth()
 {
-    return hitbox;
+    return textures[0]->getSize().x;
 }
 
-void Sprite::changeTexture(int pos, string filename)
+float Sprite::getRecommendedHeight()
 {
-	if (pos < textures.size()) {
-		sf::Texture* t;
-		t = new sf::Texture();
-		bool loaded = t->loadFromFile(filename);
-		if (!loaded)
-		{
-			// TODO handle this error
-		}
-		textures.push_back(t);
-	}
+    return textures[0]->getSize().y;
 }
 
-void Sprite::setPosition(int xPos, int yPos) {
-	this->xPos = xPos;
-	this->yPos = yPos;
-	s.setPosition(xPos, yPos);
-}
-void Sprite::move(int dx, int dy) {
-	this->xPos += dx;
-	this->yPos += dy;
-	s.move(dx, dy);
-}
-void Sprite::rotate(int angle) {
-	s.rotate(angle);
-}
-void Sprite::setName(string name)
+void Sprite::draw(sf::RenderWindow* window, float index, float xPos, float yPos, float xScale, float yScale, float angle) 
 {
-	this->name = name;
-}
-void Sprite::setSize(int xSize, int ySize) {
-	this->xSize = xSize;
-	this->ySize = ySize;
-	s.setScale(xSize, ySize);
-}
-
-void Sprite::setSprite(int pos)
-{
-	if (pos < textures.size())
-	{
-		s.setTexture(*textures[pos]);
-	}
-}
-
-void Sprite::addTexture(string filename) {
-	sf::Texture* t;
-	t = new sf::Texture();
-	bool loaded = t->loadFromFile(filename);
-	if (!loaded)
-	{
-		// TODO handle this error
-	}
-	textures.push_back(t);
-}
-
-void Sprite::setPartialTexture(string filename, int xSize, int ySize) {
-	sf::IntRect r;
-	sf::Texture* t;
-	t = new sf::Texture();
-	r = sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(xSize, ySize));
-	bool loaded = t->loadFromFile(filename, r);
-	if (!loaded)
-	{
-		// TODO handle this error
-	}
-	textures.push_back(t);
-}
-
-
-void Sprite::draw(sf::RenderWindow* window) {
+    s.setTexture(*textures[fmod(index, textures.size())]);
+    s.setPosition(xPos, yPos);
+	s.setScale(xScale, yScale);
+	s.setRotation(angle);
 	window->draw(s);
 }
 
-YAML::Emitter & operator<<(YAML::Emitter & out, const Sprite & obj)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj)
 {
 	out << YAML::Key << "name" << YAML::Value << obj.name;
-	out << YAML::Key << "xSize" << YAML::Value << obj.xSize;
-	out << YAML::Key << "ySize" << YAML::Value << obj.ySize;
 	out << YAML::Key << "textures" << YAML::Value << YAML::BeginSeq;
 	for (auto s : obj.textrFiles) {
 		out << s;
 	}
 	out << YAML::EndSeq;
 	return out;
+}
+
+Logger& operator<<(Logger& logger, const Sprite& obj) 
+{
+    logger << obj.name;
+    return logger;
 }

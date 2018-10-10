@@ -4,33 +4,50 @@ material  : ~
 maxXSpeed : 2
 maxYSpeed : 10
 gravitous : true
-spriteName : plSprite
+sprite    : spr_player
+xScale    : 1
+yScale    : 1
+animationSpeed: 0.025
 attributes:
     jumpsLeft: 1
 triggers  : 
     - type   : ButtonInput
-      id     : 1
+      id     : 71
       state  : down
       actions: 
+          - type         : SetXSpeed
+            speed        : 0
+            conditionals : []
+    - type   : ButtonInput
+      id     : 71
+      state  : hold
+      actions: 
           - type         : ApplyForce
-            xAcceleration: -5
+            xAcceleration: -0.1
             yAcceleration: 0
             conditionals : []
     - type   : ButtonInput
-      id     : 2
+      id     : 72
       state  : down
       actions: 
+          - type         : SetXSpeed
+            speed        : 0
+            conditionals : []
+    - type   : ButtonInput
+      id     : 72
+      state  : hold
+      actions:
           - type         : ApplyForce
-            xAcceleration: 5
+            xAcceleration: 0.1
             yAcceleration: 0
             conditionals : []
     - type   : ButtonInput
-      id     : 3
+      id     : 73
       state  : down
       actions: 
           - type         : ApplyForce
             xAcceleration: 0
-            yAcceleration: 5
+            yAcceleration: -2
             conditionals :
                 - attribute    : jumpsLeft
                   comparison   : gt
@@ -42,13 +59,6 @@ triggers  :
                 - attribute    : jumpsLeft
                   comparison   : gt
                   value        : 0
-    - type   : Create
-      target : player
-      actions:
-          - type         : MoveTo
-            xPosition    : 200
-            yPosition    : 200
-            conditionals : []
     - type   : Collision
       target : wall
       actions:

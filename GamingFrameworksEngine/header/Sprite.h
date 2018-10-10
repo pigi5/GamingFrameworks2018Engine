@@ -1,47 +1,35 @@
 #pragma once
 
+#include <unordered_map>
+#include <string>
 #include <vector>
 #include <SFML\Graphics.hpp>
-#include "Hitbox.h"
 #include "yaml-cpp/yaml.h"
-
-using namespace std;
+#include "Logger.h"
 
 // Holds an animation and a hitbox for objects to use.
 class Sprite
 {
-private:
-	Hitbox* hitbox;
-	
+private:	
 	sf::Sprite s;
-	vector<sf::Texture*> textures;
-	vector<string> textrFiles;
-	int xSize, ySize;
-	int xPos, yPos;
+	std::vector<sf::Texture*> textures;
+	std::vector<std::string> textrFiles;
 
 public:
 	static const std::string DIR_NAME;
-	string name;
-	static std::map<const std::string, Sprite*> objectMap;
+	static std::unordered_map<std::string, Sprite*> objectMap;
 	static void createSprite(std::string);
 
-	Sprite();
-	Sprite(string name);
-    Sprite(int xPos, int yPos);
+	std::string name;
+
+	Sprite(std::string name);
 	Sprite(const YAML::Node&, bool);
     ~Sprite();
 
-    Hitbox* getHitbox() const;
+    float getRecommendedWidth();
+    float getRecommendedHeight();
 
-	void changeTexture(int pos, string filename);
-	void setPosition(int xPos, int yPos);
-	void setSprite(int pos);
-	void move(int dx, int dy);
-	void rotate(int angle);
-	void setName(string name);
-	void setSize(int sizeX, int sizeY);
-	void addTexture(string filename);
-	void setPartialTexture(string filename, int xSize, int ySize);
-	void draw(sf::RenderWindow* window);
+	void draw(sf::RenderWindow* window, float index, float xPos, float yPos, float xScale, float yScale, float angle);
 	friend YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj);
+    friend Logger& operator<<(Logger&, const Sprite&);
 };

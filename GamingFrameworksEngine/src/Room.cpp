@@ -4,8 +4,7 @@
 #include "../header/Configurable.h"
 
 const std::string Room::DIR_NAME = "rooms";
-
-std::map<const std::string, Room*> Room::objectMap;
+std::map<std::string, Room*> Room::objectMap;
 
 void Room::createRoom(std::string name)
 {
@@ -20,9 +19,7 @@ void Room::createRoom(std::string name)
     if (!objectMap.emplace(newType->name, newType).second)
     {
         // if key already existed, throw error
-        std::stringstream errorMessage;
-        errorMessage << "Room name \"" << newType->name << "\" is not unique.";
-        throw ConfigurationError(errorMessage.str());
+        throw ConfigurationError("Room name \"" + newType->name + "\" is not unique.");
     }
 }
 
@@ -45,9 +42,7 @@ Room::Room(const YAML::Node& config, bool shallow)
         auto mapItem = ActorType::objectMap.find(typeName);
         if (mapItem == ActorType::objectMap.end())
         {
-            std::stringstream errorMessage;
-            errorMessage << "Actor Type " << typeName << " does not exist.";
-            throw ConfigurationError(errorMessage.str());
+            throw ConfigurationError("Actor Type " + typeName + " does not exist.");
         }
 
         State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
@@ -62,9 +57,7 @@ Room::Room(const YAML::Node& config, bool shallow)
         auto mapItem = OverlayType::objectMap.find(typeName);
         if (mapItem == OverlayType::objectMap.end())
         {
-            std::stringstream errorMessage;
-            errorMessage << "Overlay Type " << typeName << " does not exist.";
-            throw ConfigurationError(errorMessage.str());
+            throw ConfigurationError("Overlay Type " + typeName + " does not exist.");
         }
 
         State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
@@ -95,6 +88,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
     }
     out << YAML::EndSeq;
     return out;
+}
+
+Logger& operator<<(Logger& logger, const Room& obj) 
+{
+    logger << obj.name;
+    return logger;
 }
 
 Room::~Room()
@@ -129,7 +128,9 @@ void Room::step()
             timers[i] -= engine_constant::PHYSICS_DELTA_TIME;
             if (timers[i] <= 0)
             {
-                fireTrigger(trigger_preset::Timer(&Index(i)));
+                Index wrapper(i);
+                trigger_preset::Timer trigger(&wrapper);
+                fireTrigger(&trigger);
             }
         }
     }
@@ -187,7 +188,7 @@ void Room::drawHUD(sf::RenderWindow* window, sf::View* view)
     }
 }
 
-void Room::fireTrigger(const Trigger& trigger)
+void Room::fireTrigger(Trigger* trigger)
 {
     for (Actor* actor : actors)
     {
@@ -238,4 +239,14 @@ std::ostream& operator<<(std::ostream& output, const Room& object)
         output << " actor: " << actor->getType() << ", ";
     }
     return output;
+}
+
+void Room::setEngine(Engine* engine)
+{
+    this->engine = engine;
+}
+
+Engine* Room::getEngine() const
+{
+    return engine;
 }

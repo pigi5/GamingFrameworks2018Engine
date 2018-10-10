@@ -12,6 +12,7 @@
 #include "../header/Text.h"
 #include "../header/Configurable.h"
 #include "../header/Sprite.h"
+#include "../header/Utils.h"
 
 Engine::Engine()
 {
@@ -21,6 +22,8 @@ Engine::Engine()
 // Runs the game loop until complete.
 void Engine::run()
 {
+    engine_util::logger << "Running game " << std::endl;
+
 	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
 	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
     bool go = true;
@@ -31,17 +34,19 @@ void Engine::run()
     Room* localCurrentRoom;
 
     // find default room
-    for (const auto& pair : Room::objectMap)
+    for (auto it = Room::objectMap.begin(); it != Room::objectMap.end(); ++it)
     {
-        if (pair.second->is_default)
+        if (it->second->is_default)
         {
-            currentRoom = pair.second;
+            currentRoomIterator = it;
+            currentRoomIterator->second->setEngine(this);
             break;
         }
     }
 
-    if (currentRoom == NULL)
+    if (currentRoomIterator->second == NULL)
     {
+		window.close();
         throw ConfigurationError("No default room declared.");
     }
 
@@ -68,7 +73,7 @@ void Engine::run()
     // Run the game loop
     while (go) 
     {
-        localCurrentRoom = currentRoom;
+        localCurrentRoom = currentRoomIterator->second;
 
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
@@ -106,10 +111,31 @@ void Engine::run()
 
 		// Iterate steps at fixed rate until we can't do another
 		while (accumulator >= engine_constant::PHYSICS_DELTA_TIME)
-		{
+        {
+            // input handling
+		    sf::Event event;
+		    while (window.pollEvent(event))
+		    {
+                // Check if window is closed
+			    if (event.type == sf::Event::Closed)
+                {
+				    window.close();
+                    go = false;
+			    }
+
+			    if (event.type == sf::Event::KeyPressed) {
+				    input.handlePress(event.key.code, localCurrentRoom);
+				    //cout << "Handling button press" << event.key.code << endl;
+			    }
+			    if (event.type == sf::Event::KeyReleased) {
+				    input.handleRelease(event.key.code, localCurrentRoom);
+				    //cout << "Handling button release" << event.key.code << endl;
+			    }
+		    }
+			input.handleHolds(localCurrentRoom);
+
 			// Perform iterative game logic
-			input.handleHolds();
-			currentRoom->step();
+			localCurrentRoom->step();
 			accumulator -= engine_constant::PHYSICS_DELTA_TIME;
 		}
 
@@ -117,42 +143,61 @@ void Engine::run()
 		// NOTE: technically this makes the simulation lag by one PHYSICS_DELTA_TIME
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
-		currentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
+		localCurrentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
 
         // Clear window
 		window.clear(sf::Color::Black);
 
         // Draw world
 		window.setView(camera);
-		currentRoom->draw(&window, &camera);
+		localCurrentRoom->draw(&window, &camera);
 
         // Draw GUI
 		window.setView(fixed);
-        currentRoom->drawHUD(&window, &fixed);
+        localCurrentRoom->drawHUD(&window, &fixed);
 		frameCounter.draw(&window);
 
         // Refresh window
 		window.display();
-
-
-        // Check if window is closed
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-            {
-				window.close();
-                go = false;
-			}
-
-			if (event.type == sf::Event::KeyPressed) {
-				input.handlePress(event.key.code, ButtonState::PRESS);
-				//cout << "Handling button press" << event.key.code << endl;
-			}
-			if (event.type == sf::Event::KeyReleased) {
-				input.handleRelease(event.key.code, ButtonState::RELEASE);
-				//cout << "Handling button release" << event.key.code << endl;
-			}
-		}
     }
+}
+
+void Engine::changeRoom(int offset)
+{
+    if (offset < 0)
+    {
+        for (int i = 0; i > offset; i--)
+        {
+            if (currentRoomIterator == Room::objectMap.begin())
+            {
+                throw ConfigurationError("Can't go before first room.");
+            }
+            currentRoomIterator--;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < offset; i++)
+        {
+            if (currentRoomIterator == Room::objectMap.end())
+            {
+                throw ConfigurationError("Can't go past last room.");
+            }
+            currentRoomIterator++;
+        }
+    }
+    
+    currentRoomIterator->second->setEngine(this);
+}
+
+void Engine::setRoom(std::string name)
+{
+    currentRoomIterator = Room::objectMap.find(name);
+
+    if (currentRoomIterator == Room::objectMap.end())
+    {
+        throw ConfigurationError("Room " + name + " does not exist.");
+    }
+    
+    currentRoomIterator->second->setEngine(this);
 }

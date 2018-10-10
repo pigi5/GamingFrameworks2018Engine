@@ -4,6 +4,9 @@
 #include "Actor.h"
 #include "Overlay.h"
 #include "yaml-cpp/yaml.h"
+#include "Logger.h"
+
+class Engine;
 
 // Similar to a stage.
 class Room
@@ -18,9 +21,11 @@ private:
     std::list<Actor*> overlayDeleteQueue;
 
     float timers[NUM_TIMERS];
+
+    Engine* engine;
 public:
     static const std::string DIR_NAME;
-    static std::map<const std::string, Room*> objectMap;
+    static std::map<std::string, Room*> objectMap;
     
     std::string name;
     bool is_default;
@@ -29,8 +34,9 @@ public:
 
     Room(std::string);
     Room(const YAML::Node&, bool);
-
+    
     friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
+    friend Logger& operator<<(Logger&, const Room&);
 
     ~Room();
 
@@ -39,7 +45,7 @@ public:
     void draw(sf::RenderWindow* window, sf::View* view);
     void drawHUD(sf::RenderWindow* window, sf::View* view);
     
-    void fireTrigger(const Trigger&);
+    void fireTrigger(Trigger* trigger);
     
     void addActor(Actor*);
     void deleteActor(Actor*);
@@ -51,4 +57,7 @@ public:
     std::list<Actor*> getActors() const;
 
     friend std::ostream& operator<<(std::ostream&, const Room&);
+    
+    void setEngine(Engine*);
+    Engine* getEngine() const;
 };

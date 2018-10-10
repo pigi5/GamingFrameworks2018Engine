@@ -1,6 +1,9 @@
 #include <cmath>
 #include <utility>
 #include "../header/Utils.h"
+#include "../header/Actor.h"
+
+Logger engine_util::logger("debug.log");
 
 // determines the distance between two actors
 float engine_util::distance(Actor* actor1, Actor* actor2)

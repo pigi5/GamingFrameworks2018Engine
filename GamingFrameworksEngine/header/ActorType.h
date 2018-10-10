@@ -1,6 +1,7 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
+#include <string>
 #include <list>
 #include <iostream>
 #include "../header/Configurable.h"
@@ -16,7 +17,7 @@ private:
 
 public:
     static const std::string DIR_NAME;
-    static std::map<const std::string, ActorType*> objectMap;
+    static std::unordered_map<std::string, ActorType*> objectMap;
 
     static void createActorType(std::string);
     
@@ -26,13 +27,19 @@ public:
     float maxYSpeed;
     bool gravitous;
 	Sprite* sprite;
-    std::map<const std::string, int> attributes;
+    float xScale;
+    float yScale;
+    float imageSpeed;
+    std::unordered_map<std::string, int> attributes;
     // triggers/actions
-    std::map<const Trigger*, std::list<Action*>> actionMap;
+    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap;
 
     ActorType(std::string);
     ActorType(const YAML::Node&, bool);
     ~ActorType();
     bool operator<(const ActorType& other) const;
+    size_t hashCode() const;
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj);
+    friend Logger& operator<<(Logger& logger, const ActorType& obj);
+    const std::string& toString() const;
 };
