@@ -49,23 +49,6 @@ triggers:
         xAcceleration: -0.1
         yAcceleration: 0
   - type: ButtonInput
-    id: 72
-    state: down
-    actions:
-      - type: SetXSpeed
-        conditionals:
-          []
-        speed: 0
-  - type: ButtonInput
-    id: 72
-    state: hold
-    actions:
-      - type: ApplyForce
-        conditionals:
-          []
-        xAcceleration: 0.1
-        yAcceleration: 0
-  - type: ButtonInput
     id: 73
     state: down
     actions:
