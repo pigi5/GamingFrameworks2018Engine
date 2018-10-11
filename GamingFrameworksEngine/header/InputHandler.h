@@ -45,4 +45,20 @@ public:
             room->fireTrigger(&trigger);
 		}
     }
+
+	void handleMousePress(int x, int y, Room* room) {
+		MouseInputType m;
+		m.state = MouseState::PRESS;
+		trigger_preset::MouseInput trigger(&m);
+
+		room->fireTrigger(&trigger);
+	}
+
+	void handleMouseRelease(int x, int y, Room* room) {
+		MouseInputType m;
+		m.state = MouseState::RELEASE;
+		trigger_preset::MouseInput trigger(&m);
+
+		room->fireTrigger(&trigger);
+	}
 };

@@ -123,14 +123,32 @@ void Engine::run()
                     go = false;
 			    }
 
-			    if (event.type == sf::Event::KeyPressed) {
+			    if (event.type == sf::Event::KeyPressed) 
+				{
 				    input.handlePress(event.key.code, localCurrentRoom);
 				    //cout << "Handling button press" << event.key.code << endl;
 			    }
-			    if (event.type == sf::Event::KeyReleased) {
+			    if (event.type == sf::Event::KeyReleased) 
+				{
 				    input.handleRelease(event.key.code, localCurrentRoom);
 				    //cout << "Handling button release" << event.key.code << endl;
 			    }
+
+				if (event.type == sf::Event::MouseButtonPressed) 
+				{
+					if (event.mouseButton.button == sf::Mouse::Left)
+					{
+						input.handleMousePress(event.mouseButton.x, event.mouseButton.y, localCurrentRoom);
+					}
+				}
+
+				if (event.type == sf::Event::MouseButtonReleased)
+				{
+					if (event.mouseButton.button == sf::Mouse::Left)
+					{
+						input.handleMouseRelease(event.mouseButton.x, event.mouseButton.y, localCurrentRoom);
+					}
+				}
 		    }
 			input.handleHolds(localCurrentRoom);
 
