@@ -311,8 +311,8 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
 	}
-
-	loadConfig();
+    
+	reloadConfig();
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {

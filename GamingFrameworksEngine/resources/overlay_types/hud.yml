@@ -1,14 +1,14 @@
 ---
-name    : hud
-spriteName : ~
+name: hud
 material: ~
 maxXSpeed: -1
 maxYSpeed: -1
 gravitous: false
-sprite        : ~
-xScale        : 0
-yScale        : 0
+sprite: ~
+xScale: 0
+yScale: 0
 animationSpeed: 0
-attributes: []
-triggers  : []
-
+attributes:
+  {}
+triggers:
+  []

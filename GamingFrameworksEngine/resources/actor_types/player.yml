@@ -1,68 +1,73 @@
 ---
-name      : player
-material  : ~
-maxXSpeed : 2
-maxYSpeed : 10
-gravitous : true
-sprite    : spr_player
-xScale    : 1
-yScale    : 1
+name: player
+material: ~
+maxXSpeed: 2
+maxYSpeed: 10
+gravitous: true
+sprite: spr_player
+xScale: 1
+yScale: 1
 animationSpeed: 0.025
 attributes:
-    jumpsLeft: 1
-triggers  : 
-    - type   : ButtonInput
-      id     : 71
-      state  : down
-      actions: 
-          - type         : SetXSpeed
-            speed        : 0
-            conditionals : []
-    - type   : ButtonInput
-      id     : 71
-      state  : hold
-      actions: 
-          - type         : ApplyForce
-            xAcceleration: -0.1
-            yAcceleration: 0
-            conditionals : []
-    - type   : ButtonInput
-      id     : 72
-      state  : down
-      actions: 
-          - type         : SetXSpeed
-            speed        : 0
-            conditionals : []
-    - type   : ButtonInput
-      id     : 72
-      state  : hold
-      actions:
-          - type         : ApplyForce
-            xAcceleration: 0.1
-            yAcceleration: 0
-            conditionals : []
-    - type   : ButtonInput
-      id     : 73
-      state  : down
-      actions: 
-          - type         : ApplyForce
-            xAcceleration: 0
-            yAcceleration: -2
-            conditionals :
-                - attribute    : jumpsLeft
-                  comparison   : gt
-                  value        : 0
-          - type         : AttributeChange
-            attribute    : jumpsLeft
-            offset       : -1
-            conditionals:
-                - attribute    : jumpsLeft
-                  comparison   : gt
-                  value        : 0
-    - type   : Collision
-      target : wall
-      actions:
-          - type         : AttributeSet
-            attribute    : jumpsLeft
-            value        : 1
-            conditionals : []
+  jumpsLeft: 1
+triggers:
+  - type: Collision
+    target: wall
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: jumpsLeft
+        value: 1
+  - type: ButtonInput
+    id: 71
+    state: down
+    actions:
+      - type: SetXSpeed
+        conditionals:
+          []
+        speed: 0
+  - type: ButtonInput
+    id: 71
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: -0.1
+        yAcceleration: 0
+  - type: ButtonInput
+    id: 72
+    state: down
+    actions:
+      - type: SetXSpeed
+        conditionals:
+          []
+        speed: 0
+  - type: ButtonInput
+    id: 72
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: 0.1
+        yAcceleration: 0
+  - type: ButtonInput
+    id: 73
+    state: down
+    actions:
+      - type: ApplyForce
+        conditionals:
+          - comparison: gt
+            attribute: jumpsLeft
+            value: 0
+        xAcceleration: 0
+        yAcceleration: -2
+      - type: AttributeChange
+        conditionals:
+          - comparison: gt
+            attribute: jumpsLeft
+            value: 0
+        attribute: jumpsLeft
+        offset: -1
