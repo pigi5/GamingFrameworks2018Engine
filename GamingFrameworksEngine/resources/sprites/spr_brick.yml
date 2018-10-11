@@ -1,3 +1,4 @@
-name : spr_brick
-textures :
-    - "resources\\sprites\\img_brick.png"
+---
+name: spr_brick
+textures:
+  - resources\sprites\img_brick.png

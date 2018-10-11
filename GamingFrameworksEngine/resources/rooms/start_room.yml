@@ -1,14 +1,14 @@
 ---
-name    : starting_room
-default : true
-actors  :
-    - type  : player
-      startX: 200
-      startY: 200
-    - type  : wall
-      startX: 200
-      startY: 400
-overlays: 
-    - type  : hud
-      startX: 50
-      startY: 50
+name: start_room
+default: true
+actors:
+  - type: player
+    startX: 200
+    startY: 200
+  - type: wall
+    startX: 200
+    startY: 400
+overlays:
+  - type: hud
+    startX: 50
+    startY: 50

@@ -3,7 +3,6 @@
 
 
 const std::string Audio::DIR_NAME = "audio";
-
 std::unordered_map<std::string, Audio*> Audio::objectMap;
 
 void Audio::createAudio(std::string name)
@@ -42,7 +41,6 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Audio& obj)
 	out << YAML::Key << "name" << YAML::Value << obj.name;
 	out << YAML::Key << "file_name" << YAML::Value << obj.fileName;
 	out << YAML::Key << "audio_type" << YAML::Value << obj.audioType;
-	out << YAML::EndSeq;
 	return out;
 }
 

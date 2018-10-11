@@ -113,10 +113,25 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj) 
 {
     out << YAML::Key << "name" << YAML::Value << obj.name;
-    out << YAML::Key << "material" << YAML::Value << obj.material->name;
+    if (obj.material == NULL) 
+    {
+        out << YAML::Key << "material" << YAML::Value << YAML::Null;
+    }
+    else 
+    {
+        out << YAML::Key << "material" << YAML::Value << obj.material->name;
+    }
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
+    out << YAML::Key << "maxYSpeed" << YAML::Value << obj.maxYSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
-    out << YAML::Key << "sprite" << YAML::Value << obj.sprite->name;
+    if (obj.sprite == NULL) 
+    {
+        out << YAML::Key << "sprite" << YAML::Value << YAML::Null;
+    }
+    else 
+    {
+        out << YAML::Key << "sprite" << YAML::Value << obj.sprite->name;
+    }
     out << YAML::Key << "xScale" << YAML::Value << obj.xScale;
     out << YAML::Key << "yScale" << YAML::Value << obj.yScale;
     out << YAML::Key << "animationSpeed" << YAML::Value << obj.imageSpeed;
@@ -134,7 +149,9 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
         out << YAML::Key << "actions" << YAML::Value << YAML::BeginSeq;
         for (Action* action : pair.second)
         {
+            out << YAML::BeginMap;
             out << *action;
+            out << YAML::EndMap;
         }
         out << YAML::EndSeq;
         out << YAML::EndMap;

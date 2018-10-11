@@ -270,7 +270,7 @@ struct ActorTypeWrapper
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorTypeWrapper& obj)
     {
-        out << YAML::Key << "type" << YAML::Value << *obj.type;
+        out << YAML::Key << "target" << YAML::Value << obj.type->name;
         return out;
     }
     

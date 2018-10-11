@@ -324,8 +324,8 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		currentPath = fileName;
 		this->SetLabel(fileName.AfterLast('\\'));
 	}
-
-	loadConfig();
+    
+	reloadConfig();
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {

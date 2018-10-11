@@ -91,13 +91,10 @@ static void saveAll(std::string projectDir)
     {
         // write object to YAML emitter
         YAML::Emitter emitter;
-        emitter << *(pair.second);
-
-        std::stringstream relativePath;
-        relativePath << directoryPath.str() << "/" << pair.first;
+        emitter << YAML::BeginDoc << YAML::BeginMap << *(pair.second) << YAML::EndMap;
 
         // write YAML to file
-        std::ofstream fout(relativePath.str());
+        std::ofstream fout(directoryPath.str() + "/" + pair.first + ".yml");
         fout << emitter.c_str();
         fout.close();
     }
