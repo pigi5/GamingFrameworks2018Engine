@@ -925,7 +925,23 @@ void Editor::onEdit1(wxCommandEvent& event)
 }
 void Editor::onDelete1(wxCommandEvent& event)
 {
-
+	int sel = lb1->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb1->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+		bool found = false;
+		for (const auto& pair : actionMap)
+		{
+			if (pair.first->toString() == str.ToStdString() && !found)
+			{
+				actionMap.erase(pair.first);
+				lb1->Delete(sel);
+				found = true;
+			}
+		}
+	}
 }
 
 void Editor::onNew2(wxCommandEvent& event)
@@ -938,7 +954,29 @@ void Editor::onEdit2(wxCommandEvent& event)
 }
 void Editor::onDelete2(wxCommandEvent& event)
 {
-
+	int sel = lb2->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb2->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (std::list<Action*>::iterator it = pair.second.begin(); it != pair.second.end() && !found; ++it) {
+					Action* a = *it;
+					if (a->toString() == str.ToStdString())
+					{
+						pair.second.erase(it);
+						lb2->Delete(sel);
+						found = true;
+					}
+				}
+			}
+		}
+	}
 }
 
 void Editor::onNew3(wxCommandEvent& event)
@@ -947,7 +985,7 @@ void Editor::onNew3(wxCommandEvent& event)
 }
 void Editor::onEdit3(wxCommandEvent& event)
 {
-
+	
 }
 void Editor::onDelete3(wxCommandEvent& event)
 {
@@ -966,11 +1004,12 @@ void Editor::onDelete3(wxCommandEvent& event)
 				{
 					if (i->toString() == selAction && !found)
 					{
-						for (auto const& j : i->conditionals)
-						{
-							if (j->key == str.ToStdString() && !found)
+						for (std::list<Conditional*>::iterator it = i->conditionals.begin(); it != i->conditionals.end() && !found; ++it) {
+							Conditional* cnd = *it;
+							if (cnd->key == str.ToStdString())
 							{
-								
+								i->conditionals.erase(it);
+								lb3->Delete(sel);
 								found = true;
 							}
 						}
