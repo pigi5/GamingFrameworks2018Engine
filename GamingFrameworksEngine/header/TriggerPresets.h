@@ -100,7 +100,7 @@ struct ButtonInputType
     
     const std::string toString() const
     {
-        std::string repr = std::to_string(id) + " - " + ButtonInputType::emitState(state);
+        std::string repr = "id: " + std::to_string(id) + ", state: " + ButtonInputType::emitState(state);
         return repr;
     }
 };
@@ -187,7 +187,7 @@ struct MouseInputType
     
     const std::string toString() const
     {
-        std::string repr = MouseInputType::emitState(state);
+        std::string repr = "state: " + MouseInputType::emitState(state);
         return repr;
     }
 };
@@ -231,7 +231,7 @@ struct Index
     
     const std::string toString() const
     {
-        std::string repr = std::to_string(index);
+        std::string repr = "index: " + std::to_string(index);
         return repr;
     }
 };
@@ -276,13 +276,13 @@ struct ActorTypeWrapper
     
     friend Logger& operator<<(Logger& logger, const ActorTypeWrapper& obj)
     {
-        logger << "{type: " << *obj.type << "}";
+        logger << "{target: " << *obj.type << "}";
         return logger;
     }
     
     const std::string toString() const
     {
-        return type->toString();
+        return "target: " + type->name;
     }
 };
 

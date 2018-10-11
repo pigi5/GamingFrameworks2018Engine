@@ -11,14 +11,6 @@ animationSpeed: 0.025
 attributes:
   jumpsLeft: 1
 triggers:
-  - type: Collision
-    target: wall
-    actions:
-      - type: AttributeSet
-        conditionals:
-          []
-        attribute: jumpsLeft
-        value: 1
   - type: ButtonInput
     id: 71
     state: down
@@ -27,6 +19,14 @@ triggers:
         conditionals:
           []
         speed: 0
+  - type: Collision
+    target: wall
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: jumpsLeft
+        value: 1
   - type: ButtonInput
     id: 71
     state: hold

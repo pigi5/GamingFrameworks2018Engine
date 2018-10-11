@@ -46,7 +46,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(xAcceleration) + " - " + std::to_string(yAcceleration);
+            return getTypeName() + ": {xAcceleration: " + std::to_string(xAcceleration) + ", yAcceleration: " + std::to_string(yAcceleration) + "}";
         }
     
         void run(Actor* actor)
@@ -93,7 +93,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(speed);
+            return getTypeName() + ": {speed: " + std::to_string(speed) + "}";
         }
     
         void run(Actor* actor)
@@ -133,7 +133,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(speed);
+            return getTypeName() + ": {speed: " + std::to_string(speed) + "}";
         }
     
         void run(Actor* actor)
@@ -183,7 +183,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + targetType->toString();
+            return getTypeName() + ": {target: " + targetType->toString() + "}";
         }
     
         void run(Actor* actor)
@@ -239,7 +239,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + targetType->toString() + " - " + std::to_string(speed);
+            return getTypeName() + ": {target: " + targetType->toString() + ", speed: " + std::to_string(speed) + "}";
         }
     
         void run(Actor* actor)
@@ -300,7 +300,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(xPosition) + " - " + std::to_string(yPosition);
+            return getTypeName() + ": {xPosition: " + std::to_string(xPosition) + ", yPosition: " + std::to_string(yPosition) + "}";
         }
     
         void run(Actor* actor)
@@ -345,7 +345,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(xOffset) + " - " + std::to_string(yOffset);
+            return getTypeName() + ": {xOffset: " + std::to_string(xOffset) + ", yOffset: " + std::to_string(yOffset) + "}";
         }
     
         void run(Actor* actor)
@@ -399,7 +399,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + actorType->toString() + " - " + startState.toString();
+            return getTypeName() + ": {target: " + actorType->toString() + ", state: {" + startState.toString() + "}";
         }
     
         void run(Actor* actor)
@@ -472,7 +472,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + key + " - " + std::to_string(value);
+            return getTypeName() + ": {attribute: " + key + ", value: " + std::to_string(value) + "}";
         }
     
         void run(Actor* actor)
@@ -517,7 +517,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + key + " - " + std::to_string(offset);
+            return getTypeName() + ": {attribute: " + key + ", offset: " + std::to_string(offset) + "}";
         }
     
         void run(Actor* actor)
@@ -570,7 +570,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(index) + " - " + std::to_string(time);
+            return getTypeName() + ": {index: " + std::to_string(index) + ", time: " + std::to_string(time) + "}";
         }
     
         void run(Actor* actor)
@@ -611,7 +611,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(index);
+            return getTypeName() + ": {index: " + std::to_string(index) + "}";
         }
     
         void run(Actor* actor)
@@ -654,7 +654,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + std::to_string(offset);
+            return getTypeName() + ": {offset: " + std::to_string(offset) + "}";
         }
     
         void run(Actor* actor)
@@ -695,7 +695,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + " - " + name;
+            return getTypeName() + ": {name: " + name + "}";
         }
     
         void run(Actor* actor)
@@ -715,7 +715,7 @@ namespace action_preset
 	public:
 		const std::string toString() const
 		{
-			return getTypeName() + " - " + sound->name + " - " + sound->fileName;
+			return getTypeName() + ": {name: " + sound->name + ", file: " + sound->fileName + "}";
 		}
 
 		PlaySound(Audio* audio)
@@ -814,7 +814,7 @@ namespace action_preset
 
 		const std::string toString() const
 		{
-			return getTypeName() + " - " + music->name + " - " + music->fileName;
+			return getTypeName() + ": {name: " + music->name + ", file: " + music->fileName + "}";
 		}
 
 		void run(Actor* actor)
@@ -870,7 +870,7 @@ namespace action_preset
 
 		const std::string toString() const
 		{
-			return getTypeName() + " - " + music->name + " - " + music->fileName;
+			return getTypeName() + ": {name: " + music->name + ", file: " + music->fileName + "}";
 		}
 
 		void run(Actor* actor)

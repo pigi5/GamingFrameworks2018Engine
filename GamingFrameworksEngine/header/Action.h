@@ -19,6 +19,8 @@ public:
     int value;
 
     Conditional(const YAML::Node& node);
+
+    const std::string toString() const;
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj);
 };

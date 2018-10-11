@@ -74,7 +74,7 @@ struct State
     
     const std::string& toString() const
     {
-        return std::to_string(xPosition) + " - " + std::to_string(yPosition);
+        return "xPosition: " + std::to_string(xPosition) + ", yPosition: " + std::to_string(yPosition);
     }
 };
 

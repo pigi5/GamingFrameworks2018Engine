@@ -78,7 +78,7 @@ public:
 
     const std::string toString() const
     {
-        return getTypeName() + " - " + id->toString();
+        return getTypeName() + ": {" + id->toString() + "}";
     }
 };
 

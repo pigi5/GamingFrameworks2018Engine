@@ -34,31 +34,30 @@ Comparison createComparison(std::string name)
     throw ConfigurationError(errorMessage.str());
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const Comparison& obj)
+const std::string getComparisonString(const Comparison& obj)
 {
     switch (obj)
     {
     case EQUAL:
-        out << "eq";
-        break;
+        return "eq";
     case NOT_EQUAL:
-        out << "ne";
-        break;
+        return "ne";
     case LESS_THAN:
-        out << "lt";
-        break;
+        return "lt";
     case LESS_THAN_EQUAL:
-        out << "le";
-        break;
+        return "le";
     case GREATER_THAN:
-        out << "gt";
-        break;
+        return "gt";
     case GREATER_THAN_EQUAL:
-        out << "ge";
-        break;
+        return "ge";
     default:
         throw ConfigurationError("Comparision emitter not implemented.");
     }
+}
+
+YAML::Emitter& operator<<(YAML::Emitter& out, const Comparison& obj)
+{
+    out << getComparisonString(obj);
     return out;
 }
 
@@ -75,6 +74,11 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj)
     out << YAML::Key << "attribute" << YAML::Value << obj.key;
     out << YAML::Key << "value" << YAML::Value << obj.value;
     return out;
+}
+    
+const std::string Conditional::toString() const
+{
+    return "comparison: " + getComparisonString(comparison) + ", attribute: " + key + ", value: " + std::to_string(value);
 }
 
 Action::Action(const YAML::Node& node)

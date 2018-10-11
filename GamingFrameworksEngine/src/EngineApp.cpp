@@ -857,7 +857,7 @@ void Editor::resetTrigger()
 		std::unordered_map<std::string, int> attributes = at->attributes;
 		for (const auto& pair : attributes)
 		{
-			string str = pair.first + " - " + to_string(pair.second);
+			string str = pair.first + ": {default: " + to_string(pair.second) + "}";
 			lb4->Append(str);
 		}
 	}
