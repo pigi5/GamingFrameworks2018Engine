@@ -1151,6 +1151,8 @@ void Editor::onNew4(wxCommandEvent& event)
 			ActorType* at = ActorType::objectMap.at(selObject);
 			std::unordered_map<std::string, int>* attr = &at->attributes;
 			attr->emplace(str.ToStdString(), 0);
+			string ret = str.ToStdString() + ": {default: " + to_string(attr->at(str.ToStdString())) + "}";
+			lb4->Append(ret);
 		}
 	}
 }
@@ -1169,7 +1171,10 @@ void Editor::onEdit4(wxCommandEvent& event)
 			str = lb4->GetString(sel);
 			ActorType* at = ActorType::objectMap.at(selObject);
 			std::unordered_map<std::string, int>* attr = &at->attributes;
-			attr->insert(pair<string, int>(str.ToStdString(), toEdit));
+			attr->erase((str.BeforeFirst(':')).ToStdString());
+			attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
+			string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
+			lb4->SetString(sel, ret);
 		}
 	}
 }
@@ -1181,7 +1186,7 @@ void Editor::onDelete4(wxCommandEvent& event)
 		wxString str = lb4->GetString(sel);
 		ActorType* at = ActorType::objectMap.at(selObject);
 		std::unordered_map<std::string, int>* attr = &at->attributes;
-		attr->erase(str.ToStdString());
+		attr->erase((str.BeforeFirst(':')).ToStdString());
 		lb4->Delete(sel);
 	}
 }
