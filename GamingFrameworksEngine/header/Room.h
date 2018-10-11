@@ -46,6 +46,9 @@ public:
     void drawHUD(sf::RenderWindow* window, sf::View* view);
     
     void fireTrigger(Trigger* trigger);
+
+	void allMousePress(int, int, Trigger* trigger);
+	void allMouseRelease(int, int, Trigger* trigger);
     
     void addActor(Actor*);
     void deleteActor(Actor*);
@@ -60,4 +63,6 @@ public:
     
     void setEngine(Engine*);
     Engine* getEngine() const;
+
+
 };

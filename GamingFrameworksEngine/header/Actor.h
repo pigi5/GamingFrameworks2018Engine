@@ -160,4 +160,8 @@ public:
     void changeAttribute(std::string, int);
 
     friend Logger& operator<<(Logger&, const Actor&);
+
+	// Mouse Functions
+	void checkPressOn(int, int);
+	void checkReleaseOn(int, int);
 };

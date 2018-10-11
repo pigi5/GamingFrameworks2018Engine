@@ -51,7 +51,7 @@ public:
 		m.state = MouseState::PRESS;
 		trigger_preset::MouseInput trigger(&m);
 
-		room->fireTrigger(&trigger);
+		room->allMousePress(x, y, &trigger);
 	}
 
 	void handleMouseRelease(int x, int y, Room* room) {
@@ -59,6 +59,6 @@ public:
 		m.state = MouseState::RELEASE;
 		trigger_preset::MouseInput trigger(&m);
 
-		room->fireTrigger(&trigger);
+		room->allMouseRelease(x, y, &trigger);
 	}
 };

@@ -250,3 +250,21 @@ Engine* Room::getEngine() const
 {
     return engine;
 }
+
+void Room::allMousePress(int x, int y, Trigger* trigger)
+{
+	for (Actor* actor : actors)
+	{
+		actor->fireTrigger(trigger);
+		actor->checkPressOn(x, y);
+	}
+}
+
+void Room::allMouseRelease(int x, int y, Trigger* trigger)
+{
+	for (Actor* actor : actors)
+	{
+		actor->fireTrigger(trigger);
+		actor->checkReleaseOn(x, y);
+	}
+}

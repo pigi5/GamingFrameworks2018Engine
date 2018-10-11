@@ -405,9 +405,19 @@ void Actor::changeAttribute(std::string key, int value)
     attributes[key] += value;
 }
 
-
 Logger& operator<<(Logger& logger, const Actor& obj)
 {
     logger << obj.type->name << " " << std::to_string(obj.id);
     return logger;
+}
+
+// Mouse Functions
+
+void Actor::checkPressOn(int x, int y)
+{
+
+}
+
+void Actor::checkReleaseOn(int x, int y)
+{
 }
