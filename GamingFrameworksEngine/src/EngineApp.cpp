@@ -896,17 +896,7 @@ void Editor::resetCon()
 				{
 					for (auto const& j : i->conditionals)
 					{
-						string str;
-						switch (j->comparison)
-						{
-						case EQUAL: str = j->key + " = " + to_string(j->value); break;
-						case NOT_EQUAL: str = j->key + " =/= " + to_string(j->value); break;
-						case LESS_THAN: str = j->key + " < " + to_string(j->value); break;
-						case LESS_THAN_EQUAL: str = j->key + " <= " + to_string(j->value); break;
-						case GREATER_THAN: str = j->key + " > " + to_string(j->value); break;
-						case GREATER_THAN_EQUAL: str = j->key + " >= " + to_string(j->value); break;
-						}
-						lb3->Append(str);
+						lb3->Append(j->toString());
 					}
 					found = true;
 				}

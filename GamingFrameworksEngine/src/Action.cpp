@@ -51,7 +51,28 @@ const std::string getComparisonString(const Comparison& obj)
     case GREATER_THAN_EQUAL:
         return "ge";
     default:
-        throw ConfigurationError("Comparision emitter not implemented.");
+        throw ConfigurationError("Comparision string not implemented.");
+    }
+}
+
+const std::string getComparisonSymbol(const Comparison& obj)
+{
+    switch (obj)
+    {
+    case EQUAL:
+        return "=";
+    case NOT_EQUAL:
+        return "=/=";
+    case LESS_THAN:
+        return "<";
+    case LESS_THAN_EQUAL:
+        return "<=";
+    case GREATER_THAN:
+        return ">";
+    case GREATER_THAN_EQUAL:
+        return ">=";
+    default:
+        throw ConfigurationError("Comparision symbol not implemented.");
     }
 }
 
@@ -78,7 +99,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj)
     
 const std::string Conditional::toString() const
 {
-    return "comparison: " + getComparisonString(comparison) + ", attribute: " + key + ", value: " + std::to_string(value);
+    return key + " " + getComparisonSymbol(comparison) + " " + std::to_string(value);
 }
 
 Action::Action(const YAML::Node& node)
