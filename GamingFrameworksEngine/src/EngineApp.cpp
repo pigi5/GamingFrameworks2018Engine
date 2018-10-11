@@ -983,12 +983,10 @@ void Editor::onNew1(wxCommandEvent& event)
 		wxString fileName;
 		if (openSprDialog->ShowModal() == wxID_OK) {
 			fileName = openSprDialog->GetPath();
-			currentPath = fileName;
 			this->SetLabel(fileName.AfterLast('\\'));
 		}
 		Sprite* spr = Sprite::objectMap.at(selObject);
-		vector<string>* files = &spr->textrFiles;
-		files->push_back(fileName.ToStdString());
+	    spr->textrFiles.push_back(fileName.ToStdString());
 		lb1->Append(fileName.AfterLast('\\'));
 	}
 }

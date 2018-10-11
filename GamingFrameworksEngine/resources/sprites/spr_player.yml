@@ -3,3 +3,4 @@ name: spr_player
 textures:
   - resources\sprites\img_player.png
   - resources\sprites\img_player2.png
+  - C:\Users\fordh\Documents\College\Computer Science\GamingFrameworks\GamingFrameworksEngine\GamingFrameworksEngine\resources\sprites\img_brick.png
