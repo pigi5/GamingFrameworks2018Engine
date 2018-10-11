@@ -1,6 +1,7 @@
 #include <cmath>
 #include "../header/Sprite.h"
 #include "../header/ConfigurationError.h"
+#include "../header/Utils.h"
 
 const std::string Sprite::DIR_NAME = "sprites";
 std::unordered_map<std::string, Sprite*> Sprite::objectMap;
@@ -80,6 +81,7 @@ void Sprite::draw(sf::RenderWindow* window, float index, float xPos, float yPos,
 
 YAML::Emitter& operator<<(YAML::Emitter& out, const Sprite& obj)
 {
+    engine_util::logger << "sprite saved: " << obj.name;
 	out << YAML::Key << "name" << YAML::Value << obj.name;
 	out << YAML::Key << "textures" << YAML::Value << YAML::BeginSeq;
 	for (auto s : obj.textrFiles) {

@@ -983,13 +983,10 @@ void Editor::onNew1(wxCommandEvent& event)
 		wxString fileName;
 		if (openSprDialog->ShowModal() == wxID_OK) {
 			fileName = openSprDialog->GetPath();
-			currentPath = fileName;
-			this->SetLabel(fileName.AfterLast('\\'));
+			Sprite* spr = Sprite::objectMap.at(selObject);
+			spr->textrFiles.push_back(fileName.ToStdString());
+			lb1->Append(fileName.AfterLast('\\'));
 		}
-		Sprite* spr = Sprite::objectMap.at(selObject);
-		vector<string>* files = &spr->textrFiles;
-		files->push_back(fileName.ToStdString());
-		lb1->Append(fileName.AfterLast('\\'));
 	}
 }
 void Editor::onEdit1(wxCommandEvent& event)
@@ -1038,7 +1035,8 @@ void Editor::onDelete1(wxCommandEvent& event)
 			bool found = false;
 			for (int i = 0; i < files->size() && !found; i++)
 			{
-				if (files->at(i) == str)
+				wxString file = files->at(i);
+				if (file.AfterLast('\\') == str)
 				{
 					files->erase(files->begin() + i);
 					lb1->Delete(sel);
