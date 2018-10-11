@@ -46,7 +46,13 @@ Room::Room(const YAML::Node& config, bool shallow)
         }
 
         State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
-        actors.push_back(new Actor(this, mapItem->second, startState));
+
+        Actor* newActor = new Actor(this, mapItem->second, startState);
+        if (actor["follow"].as<bool>())
+        {
+            followedActor = newActor;
+        }
+        actors.push_back(newActor);
     }
 
     YAML::Node overlaysNode = config["overlays"];
@@ -228,6 +234,11 @@ void Room::startTimer(int index, float time)
 std::list<Actor*> Room::getActors() const
 {
     return actors;
+}
+
+Actor* Room::getFollowedActor() const
+{
+    return followedActor;
 }
 
 std::ostream& operator<<(std::ostream& output, const Room& object)

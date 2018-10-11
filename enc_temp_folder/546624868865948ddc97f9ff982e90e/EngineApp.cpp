@@ -340,7 +340,6 @@ void MyFrame::OnSave(wxCommandEvent& event)
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
-    saveConfig();
 	reloadConfig();
 	try
 	{

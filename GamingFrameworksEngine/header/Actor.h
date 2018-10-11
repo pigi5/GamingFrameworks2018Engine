@@ -144,7 +144,8 @@ public:
     // Getters
 	const ActorType* getType() const;
 	int getId() const;
-    State getState() const;
+    State getNextState() const;
+    State getCurrentState() const;
     Hitbox* getHitbox() const;
     Room* getRoom() const;
     int getAttribute(std::string) const;

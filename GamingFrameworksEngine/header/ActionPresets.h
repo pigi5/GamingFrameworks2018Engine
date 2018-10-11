@@ -191,7 +191,7 @@ namespace action_preset
             if (!checkConditionals(actor)) return;
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
-            actor->setPosition(nearest.first->getState().xPosition, nearest.first->getState().yPosition);
+            actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
         }
     };
     
@@ -248,7 +248,7 @@ namespace action_preset
 
             auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
             
-            State distanceVector = nearest.first->getState() - actor->getState();
+            State distanceVector = nearest.first->getNextState() - actor->getNextState();
             // special case to avoid divide-by-zero
             if (distanceVector.xPosition == 0)
             {

@@ -335,9 +335,14 @@ int Actor::getId() const
 	return id;
 }
 
-State Actor::getState() const
+State Actor::getNextState() const
 {
     return nextState;
+}
+
+State Actor::getCurrentState() const
+{
+    return currentState;
 }
 
 Hitbox* Actor::getHitbox() const
