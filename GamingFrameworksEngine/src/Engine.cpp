@@ -138,7 +138,8 @@ void Engine::run()
 				{
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
-						input.handleMousePress(event.mouseButton.x, event.mouseButton.y, localCurrentRoom);
+						// Location clicking is currently wrong
+						input.handleMousePress(event.mouseButton.x + camera.getCenter().x, event.mouseButton.y + camera.getCenter().y, localCurrentRoom);
 					}
 				}
 
@@ -146,7 +147,8 @@ void Engine::run()
 				{
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
-						input.handleMouseRelease(event.mouseButton.x, event.mouseButton.y, localCurrentRoom);
+						// Location clicking is currently wrong
+						input.handleMouseRelease(event.mouseButton.x + camera.getCenter().x, event.mouseButton.y + camera.getCenter().y, localCurrentRoom);
 					}
 				}
 		    }

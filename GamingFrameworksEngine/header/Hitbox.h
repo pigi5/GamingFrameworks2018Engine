@@ -20,4 +20,7 @@ public:
     bool willCollide(const Hitbox*, float, float) const;
     float getDistanceX(const Hitbox*) const;
     float getDistanceY(const Hitbox*) const;
+
+	// Mouse Checks
+	bool isClickedOn(int, int);
 };
