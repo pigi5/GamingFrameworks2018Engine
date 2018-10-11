@@ -1018,6 +1018,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 				this->SetLabel(fileName.AfterLast('\\'));
 			}
 			files->push_back(fileName.ToStdString());
+			wxCopyFile(fileName, currentPath + "\\sprites");
 			lb1->Append(fileName.AfterLast('\\'));
 		}
 	}
