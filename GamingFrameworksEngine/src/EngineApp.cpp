@@ -856,9 +856,9 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	wxStaticText *st1 = new wxStaticText(pnl1, wxID_ANY, "Triggers", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	wxStaticText *st2 = new wxStaticText(pnl2, wxID_ANY, "Actions", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	wxStaticText *st3 = new wxStaticText(pnl3, wxID_ANY, "Conditionals", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st1 = new wxStaticText(pnl1, wxID_ANY, "Primary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st2 = new wxStaticText(pnl2, wxID_ANY, "Secondary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 	wxStaticText *st4 = new wxStaticText(pnl4, wxID_ANY, "Attributes", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
 	bx1->Add(st1, 0, wxCENTRE | wxTOP, 0);
@@ -914,6 +914,22 @@ void Editor::resetTrigger()
 			lb4->Append(str);
 		}
 	}
+	if (operation == "sprites")
+	{
+		Sprite* spr = Sprite::objectMap.at(selObject);
+		vector<string> files = spr->textrFiles;
+		for (int i = 0; i < files.size(); i++)
+		{
+			wxString str = wxString(files[i]);
+			lb1->Append(str.AfterLast('\\'));
+		}
+	}
+	if (operation == "rooms")
+	{
+		wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
+		rmEditor->Show();
+		listbox->DeselectAll();
+	}
 }
 void Editor::resetAction()
 {
@@ -960,28 +976,87 @@ void Editor::resetCon()
 
 void Editor::onNew1(wxCommandEvent& event)
 {
-
+	if (operation == "sprites")
+	{
+		wxFileDialog *openSprDialog = new wxFileDialog(this, "Select Image File");
+		wxString fileName;
+		if (openSprDialog->ShowModal() == wxID_OK) {
+			fileName = openSprDialog->GetPath();
+			currentPath = fileName;
+			this->SetLabel(fileName.AfterLast('\\'));
+		}
+		Sprite* spr = Sprite::objectMap.at(selObject);
+		vector<string>* files = &spr->textrFiles;
+		files->push_back(fileName.ToStdString());
+		lb1->Append(fileName.AfterLast('\\'));
+	}
 }
 void Editor::onEdit1(wxCommandEvent& event)
-{
-
-}
-void Editor::onDelete1(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
 	if (sel != -1)
 	{
-		wxString str = lb1->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
-		bool found = false;
-		for (const auto& pair : actionMap)
+		if (operation == "sprites")
 		{
-			if (pair.first->toString() == str.ToStdString() && !found)
+			wxString str = lb1->GetString(sel);
+			Sprite* spr = Sprite::objectMap.at(selObject);
+			vector<string>* files = &spr->textrFiles;
+			bool found = false;
+			for (int i = 0; i < files->size() && !found; i++)
 			{
-				actionMap.erase(pair.first);
-				lb1->Delete(sel);
-				found = true;
+				if (files->at(i) == str)
+				{
+					files->erase(files->begin() + i);
+					lb1->Delete(sel);
+					found = true;
+				}
+			}
+			wxFileDialog *openSprDialog = new wxFileDialog(this, "Select Image File");
+			wxString fileName;
+			if (openSprDialog->ShowModal() == wxID_OK) {
+				fileName = openSprDialog->GetPath();
+				currentPath = fileName;
+				this->SetLabel(fileName.AfterLast('\\'));
+			}
+			files->push_back(fileName.ToStdString());
+			lb1->Append(fileName.AfterLast('\\'));
+		}
+	}
+}
+void Editor::onDelete1(wxCommandEvent& event)
+{
+	int sel = lb1->GetSelection();
+	wxString str = lb1->GetString(sel);
+	if (sel != -1)
+	{
+		if (operation == "sprites")
+		{
+			Sprite* spr = Sprite::objectMap.at(selObject);
+			vector<string>* files = &spr->textrFiles;
+			bool found = false;
+			for (int i = 0; i < files->size() && !found; i++)
+			{
+				if (files->at(i) == str)
+				{
+					files->erase(files->begin() + i);
+					lb1->Delete(sel);
+					found = true;
+				}
+			}
+		}
+		if (operation == "actor_types")
+		{
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+			bool found = false;
+			for (const auto& pair : actionMap)
+			{
+				if (pair.first->toString() == str.ToStdString() && !found)
+				{
+					actionMap.erase(pair.first);
+					lb1->Delete(sel);
+					found = true;
+				}
 			}
 		}
 	}
@@ -1113,7 +1188,7 @@ void Editor::onDelete4(wxCommandEvent& event)
 void Editor::onBox1Select(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
-	if (sel != -1)
+	if (sel != -1 && operation == "actor_types")
 	{
 		wxString str = lb1->GetString(sel);
 		selTrigger = str.ToStdString();
@@ -1124,7 +1199,7 @@ void Editor::onBox1Select(wxCommandEvent& event)
 void Editor::onBox2Select(wxCommandEvent& event)
 {
 	int sel = lb2->GetSelection();
-	if (sel != -1)
+	if (sel != -1 && operation == "actor_types")
 	{
 		wxString str = lb2->GetString(sel);
 		selAction = str.ToStdString();

@@ -10,12 +10,11 @@
 // Holds an animation and a hitbox for objects to use.
 class Sprite
 {
-private:	
+public:	
 	sf::Sprite s;
 	std::vector<sf::Texture*> textures;
 	std::vector<std::string> textrFiles;
 
-public:
 	static const std::string DIR_NAME;
 	static std::unordered_map<std::string, Sprite*> objectMap;
 	static void createSprite(std::string);
