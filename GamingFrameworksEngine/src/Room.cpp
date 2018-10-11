@@ -81,6 +81,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
     {
         out << YAML::BeginMap;
         out << *actor;
+        out << YAML::Key << "follow" << YAML::Value << (actor == obj.followedActor);
         out << YAML::EndMap;
     }
     out << YAML::EndSeq;
