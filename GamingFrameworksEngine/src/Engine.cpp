@@ -162,6 +162,8 @@ void Engine::run()
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
 		localCurrentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
+        State followedActorState = localCurrentRoom->getFollowedActor()->getCurrentState();
+        camera.setCenter(followedActorState.xPosition, followedActorState.yPosition);
 
         // Clear window
 		window.clear(sf::Color::Black);

@@ -22,6 +22,8 @@ private:
 
     float timers[NUM_TIMERS];
 
+    Actor* followedActor;
+
     Engine* engine;
 public:
     static const std::string DIR_NAME;
@@ -58,6 +60,8 @@ public:
     void startTimer(int, float);
 
     std::list<Actor*> getActors() const;
+
+    Actor* getFollowedActor() const;
 
     friend std::ostream& operator<<(std::ostream&, const Room&);
     

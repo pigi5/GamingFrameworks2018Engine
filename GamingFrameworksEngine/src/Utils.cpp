@@ -8,7 +8,7 @@ Logger engine_util::logger("debug.log");
 // determines the distance between two actors
 float engine_util::distance(Actor* actor1, Actor* actor2)
 {
-    State distanceVector = actor1->getState() - actor2->getState();
+    State distanceVector = actor1->getNextState() - actor2->getNextState();
     return sqrt(distanceVector.xPosition * distanceVector.xPosition + 
             distanceVector.yPosition * distanceVector.yPosition);
 }
