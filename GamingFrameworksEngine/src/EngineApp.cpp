@@ -113,9 +113,21 @@ public:
 	void resetAction();
 	void resetCon();
 	
-	void onNew(wxCommandEvent& event);
-	void onEdit(wxCommandEvent& event);
-	void onDelete(wxCommandEvent& event);
+	void onNew1(wxCommandEvent& event);
+	void onEdit1(wxCommandEvent& event);
+	void onDelete1(wxCommandEvent& event);
+
+	void onNew2(wxCommandEvent& event);
+	void onEdit2(wxCommandEvent& event);
+	void onDelete2(wxCommandEvent& event);
+
+	void onNew3(wxCommandEvent& event);
+	void onEdit3(wxCommandEvent& event);
+	void onDelete3(wxCommandEvent& event);
+
+	void onNew4(wxCommandEvent& event);
+	void onEdit4(wxCommandEvent& event);
+	void onDelete4(wxCommandEvent& event);
 
 	void onBox1Select(wxCommandEvent& event);
 	void onBox2Select(wxCommandEvent& event);
@@ -284,7 +296,7 @@ void MyFrame::OnNew(wxCommandEvent& event)
 	}
 	if (f != wxEmptyString)
 	{
-		f;
+		this->SetLabel(f);
 		wxMkdir(f);
 		currentPath = p + "//" + f;
 		if (wxSetWorkingDirectory(currentPath))
@@ -310,6 +322,7 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 	if (openProjDialog->ShowModal() == wxID_OK) {
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
+		this->SetLabel(fileName.AfterLast('\\'));
 	}
     
 	reloadConfig();
@@ -745,30 +758,30 @@ Editor::Editor(wxWindow* parent)
 	wxButton* newBtn1 = new wxButton(bpnl1, NEW_ITEM, wxT("New"));
 	wxButton* editBtn1 = new wxButton(bpnl1, EDIT_ITEM, wxT("Edit"));
 	wxButton* delBtn1 = new wxButton(bpnl1, DELETE_ITEM, wxT("Delete"));
-	newBtn1->Bind(wxEVT_BUTTON, &Editor::onNew, this);
-	editBtn1->Bind(wxEVT_BUTTON, &Editor::onEdit, this);
-	delBtn1->Bind(wxEVT_BUTTON, &Editor::onDelete, this);
+	newBtn1->Bind(wxEVT_BUTTON, &Editor::onNew1, this);
+	editBtn1->Bind(wxEVT_BUTTON, &Editor::onEdit1, this);
+	delBtn1->Bind(wxEVT_BUTTON, &Editor::onDelete1, this);
 
 	wxButton* newBtn2 = new wxButton(bpnl2, NEW_ITEM, wxT("New"));
 	wxButton* editBtn2 = new wxButton(bpnl2, EDIT_ITEM, wxT("Edit"));
 	wxButton* delBtn2 = new wxButton(bpnl2, DELETE_ITEM, wxT("Delete"));
-	newBtn2->Bind(wxEVT_BUTTON, &Editor::onNew, this);
-	editBtn2->Bind(wxEVT_BUTTON, &Editor::onEdit, this);
-	delBtn2->Bind(wxEVT_BUTTON, &Editor::onDelete, this);
+	newBtn2->Bind(wxEVT_BUTTON, &Editor::onNew2, this);
+	editBtn2->Bind(wxEVT_BUTTON, &Editor::onEdit2, this);
+	delBtn2->Bind(wxEVT_BUTTON, &Editor::onDelete2, this);
 
 	wxButton* newBtn3 = new wxButton(bpnl3, NEW_ITEM, wxT("New"));
 	wxButton* editBtn3 = new wxButton(bpnl3, EDIT_ITEM, wxT("Edit"));
 	wxButton* delBtn3 = new wxButton(bpnl3, DELETE_ITEM, wxT("Delete"));
-	newBtn3->Bind(wxEVT_BUTTON, &Editor::onNew, this);
-	editBtn3->Bind(wxEVT_BUTTON, &Editor::onEdit, this);
-	delBtn3->Bind(wxEVT_BUTTON, &Editor::onDelete, this);
+	newBtn3->Bind(wxEVT_BUTTON, &Editor::onNew3, this);
+	editBtn3->Bind(wxEVT_BUTTON, &Editor::onEdit3, this);
+	delBtn3->Bind(wxEVT_BUTTON, &Editor::onDelete3, this);
 
 	wxButton* newBtn4 = new wxButton(bpnl4, NEW_ITEM, wxT("New"));
 	wxButton* editBtn4 = new wxButton(bpnl4, EDIT_ITEM, wxT("Edit"));
 	wxButton* delBtn4 = new wxButton(bpnl4, DELETE_ITEM, wxT("Delete"));
-	newBtn4->Bind(wxEVT_BUTTON, &Editor::onNew, this);
-	editBtn4->Bind(wxEVT_BUTTON, &Editor::onEdit, this);
-	delBtn4->Bind(wxEVT_BUTTON, &Editor::onDelete, this);
+	newBtn4->Bind(wxEVT_BUTTON, &Editor::onNew4, this);
+	editBtn4->Bind(wxEVT_BUTTON, &Editor::onEdit4, this);
+	delBtn4->Bind(wxEVT_BUTTON, &Editor::onDelete4, this);
 
 	gdbox1->Add(newBtn1, 0, wxALIGN_CENTER | wxCENTER, 2);
 	gdbox1->Add(editBtn1, 0, wxALIGN_CENTER | wxCENTER, 2);
@@ -790,10 +803,20 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	bx1->Add(bpnl1, 1, wxEXPAND | wxRIGHT, 2);
-	bx2->Add(bpnl2, 1, wxEXPAND | wxRIGHT, 2);
-	bx3->Add(bpnl3, 1, wxEXPAND | wxRIGHT, 2);
-	bx4->Add(bpnl4, 1, wxEXPAND | wxRIGHT, 2);
+	wxStaticText *st1 = new wxStaticText(pnl1, wxID_ANY, "Triggers", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st2 = new wxStaticText(pnl2, wxID_ANY, "Actions", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st3 = new wxStaticText(pnl3, wxID_ANY, "Conditionals", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	wxStaticText *st4 = new wxStaticText(pnl4, wxID_ANY, "Attributes", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+
+	bx1->Add(st1, 0, wxCENTRE | wxTOP, 0);
+	bx2->Add(st2, 0, wxCENTRE | wxTOP, 0);
+	bx3->Add(st3, 0, wxCENTRE | wxTOP, 0);
+	bx4->Add(st4, 0, wxCENTRE | wxTOP, 0);
+
+	bx1->Add(bpnl1, 1, wxEXPAND | wxTOP, 2);
+	bx2->Add(bpnl2, 1, wxEXPAND | wxTOP, 2);
+	bx3->Add(bpnl3, 1, wxEXPAND | wxTOP, 2);
+	bx4->Add(bpnl4, 1, wxEXPAND | wxTOP, 2);
 
 	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
 	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
@@ -892,17 +915,117 @@ void Editor::resetCon()
 	}
 }
 
-void Editor::onNew(wxCommandEvent& event)
+void Editor::onNew1(wxCommandEvent& event)
 {
 
 }
-void Editor::onEdit(wxCommandEvent& event)
+void Editor::onEdit1(wxCommandEvent& event)
 {
 
 }
-void Editor::onDelete(wxCommandEvent& event)
+void Editor::onDelete1(wxCommandEvent& event)
 {
 
+}
+
+void Editor::onNew2(wxCommandEvent& event)
+{
+
+}
+void Editor::onEdit2(wxCommandEvent& event)
+{
+
+}
+void Editor::onDelete2(wxCommandEvent& event)
+{
+
+}
+
+void Editor::onNew3(wxCommandEvent& event)
+{
+
+}
+void Editor::onEdit3(wxCommandEvent& event)
+{
+
+}
+void Editor::onDelete3(wxCommandEvent& event)
+{
+	int sel = lb3->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb3->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (const auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (auto const& i : pair.second)
+				{
+					if (i->toString() == selAction && !found)
+					{
+						for (auto const& j : i->conditionals)
+						{
+							if (j->key == str.ToStdString() && !found)
+							{
+								
+								found = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void Editor::onNew4(wxCommandEvent& event)
+{
+	wxString str;
+	wxTextEntryDialog* getNewAttr = new wxTextEntryDialog(this, "Enter New Attribute Name");
+	if (selObject != "")
+	{
+		if (getNewAttr->ShowModal() == wxID_OK)
+		{
+			str = getNewAttr->GetValue();
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<std::string, int> attr = at->attributes;
+			attr.emplace(str.ToStdString(), 0);
+		}
+	}
+}
+void Editor::onEdit4(wxCommandEvent& event)
+{
+	wxString str;
+	long toEdit;
+	wxTextEntryDialog* editAttr = new wxTextEntryDialog(this, "Edit Attribute Value");
+	int sel = lb4->GetSelection();
+	if (sel != -1)
+	{
+		if (editAttr->ShowModal() == wxID_OK)
+		{
+			str = editAttr->GetValue();
+			str.ToLong(&toEdit);
+			str = lb4->GetString(sel);
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<std::string, int> attr = at->attributes;
+			attr.insert(pair<string, int>(str.ToStdString(), toEdit));
+		}
+	}
+}
+void Editor::onDelete4(wxCommandEvent& event)
+{
+	int sel = lb4->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb4->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		std::unordered_map<std::string, int> attr = at->attributes;
+		attr.erase(str.ToStdString());
+		lb4->Delete(sel);
+	}
 }
 
 void Editor::onBox1Select(wxCommandEvent& event)

@@ -185,7 +185,7 @@ struct MouseInputType
         return logger;
     }
     
-    const std::string& toString() const
+    const std::string toString() const
     {
         std::string repr = MouseInputType::emitState(state);
         return repr;

@@ -189,7 +189,7 @@ size_t ActorType::hashCode() const
     return hasher(name);
 }
 
-const std::string& ActorType::toString() const
+const std::string ActorType::toString() const
 {
     return name;
 }
