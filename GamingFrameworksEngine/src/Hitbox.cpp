@@ -106,3 +106,9 @@ float Hitbox::getDistanceY(const Hitbox* other) const
     }
     return 0.0f;
 }
+
+bool Hitbox::isClickedOn(int clickX, int clickY)
+{
+	return clickX > this->x && clickX < this->x + width
+		&& clickY > this->y && clickY < this->y + height;
+}

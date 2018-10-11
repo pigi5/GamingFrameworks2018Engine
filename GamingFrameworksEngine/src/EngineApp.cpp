@@ -983,11 +983,14 @@ void Editor::onNew1(wxCommandEvent& event)
 		wxString fileName;
 		if (openSprDialog->ShowModal() == wxID_OK) {
 			fileName = openSprDialog->GetPath();
-			this->SetLabel(fileName.AfterLast('\\'));
+			wxCopyFile(fileName, currentPath + "\\sprites\\" + fileName.AfterLast('\\'));
+			Sprite* spr = Sprite::objectMap.at(selObject);
+			wxString relPath = wxString(currentPath);
+			relPath = relPath.AfterLast('\\');
+			relPath += "\\sprites\\" + fileName.AfterLast('\\');
+			spr->textrFiles.push_back(relPath.ToStdString());
+			lb1->Append(fileName.AfterLast('\\'));
 		}
-		Sprite* spr = Sprite::objectMap.at(selObject);
-	    spr->textrFiles.push_back(fileName.ToStdString());
-		lb1->Append(fileName.AfterLast('\\'));
 	}
 }
 void Editor::onEdit1(wxCommandEvent& event)
@@ -1014,12 +1017,14 @@ void Editor::onEdit1(wxCommandEvent& event)
 			wxString fileName;
 			if (openSprDialog->ShowModal() == wxID_OK) {
 				fileName = openSprDialog->GetPath();
-				currentPath = fileName;
-				this->SetLabel(fileName.AfterLast('\\'));
+				wxCopyFile(fileName, currentPath + "\\sprites\\" + fileName.AfterLast('\\'));
+				Sprite* spr = Sprite::objectMap.at(selObject);
+				wxString relPath = wxString(currentPath);
+				relPath = relPath.AfterLast('\\');
+				relPath += "\\sprites\\" + fileName.AfterLast('\\');
+				spr->textrFiles.push_back(relPath.ToStdString());
+				lb1->Append(fileName.AfterLast('\\'));
 			}
-			files->push_back(fileName.ToStdString());
-			wxCopyFile(fileName, currentPath + "\\sprites");
-			lb1->Append(fileName.AfterLast('\\'));
 		}
 	}
 }
@@ -1036,7 +1041,8 @@ void Editor::onDelete1(wxCommandEvent& event)
 			bool found = false;
 			for (int i = 0; i < files->size() && !found; i++)
 			{
-				if (files->at(i) == str)
+				wxString file = files->at(i);
+				if (file.AfterLast('\\') == str)
 				{
 					files->erase(files->begin() + i);
 					lb1->Delete(sel);

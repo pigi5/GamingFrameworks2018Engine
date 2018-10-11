@@ -418,11 +418,24 @@ Logger& operator<<(Logger& logger, const Actor& obj)
 
 // Mouse Functions
 
-void Actor::checkPressOn(int x, int y)
+void Actor::checkPressOn(int clickX, int clickY)
 {
-
+	if (this->hitbox->isClickedOn(clickX, clickY)) 
+	{
+		MouseInputType m;
+		m.state = MouseState::PRESS_ON;
+		trigger_preset::MouseInput trigger(&m);
+		this->fireTrigger(&trigger);
+	}
 }
 
-void Actor::checkReleaseOn(int x, int y)
+void Actor::checkReleaseOn(int clickX, int clickY)
 {
+	if (this->hitbox->isClickedOn(clickX, clickY))
+	{
+		MouseInputType m;
+		m.state = MouseState::RELEASE_ON;
+		trigger_preset::MouseInput trigger(&m);
+		this->fireTrigger(&trigger);
+	}
 }
