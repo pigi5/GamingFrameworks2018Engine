@@ -5,9 +5,11 @@ actors:
   - type: player
     startX: 200
     startY: 200
+    follow: true
   - type: wall
     startX: 200
     startY: 400
+    follow: false
 overlays:
   - type: hud
     startX: 50
