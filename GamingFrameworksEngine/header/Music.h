@@ -8,17 +8,16 @@ private:
 	sf::Music music;
 
 public:
-	Music();
-	Music(Audio* audio);
-	Music(std::string fileName);
+	static const std::string DIR_NAME;
+	static std::unordered_map<std::string, Music*> objectMap;
+
+	static void createMusic(std::string, std::string);
+
+    Music(std::string name, std::string fileName) : Audio(name, fileName) {};
+	Music(const YAML::Node& config, bool shallow) : Audio(config, shallow) {};
 	~Music();
-
-	int playMusic();
-	void stopMusic();
-
-	std::string getFileName();
-
-	Music& operator=(Music other);
-
-
+    
+	bool load();
+	void play();
+	void stop();
 };

@@ -4,6 +4,8 @@
 #include "wx/dir.h"
 #include "wx/file.h"
 #include "../header/Engine.h"
+#include "../header/Music.h"
+#include "../header/Sound.h"
 #include "../header/Utils.h"
 #include <direct.h>
 #include <iostream>
@@ -26,7 +28,8 @@ enum
 	ROOM = 5,
 	OBJECT = 6,
 	SPRITE = 7,
-	AUDIO = 8,
+	SOUND = 8,
+	MUSIC = 16,
 	MATERIAL = 9,
 	OVERLAY = 10,
 	NEW_ITEM = 11,
@@ -91,7 +94,8 @@ public:
 	virtual ~Sidebar() {};
 
 	void onSprite(wxCommandEvent& event);
-	void onAudio(wxCommandEvent& event);
+	void onSound(wxCommandEvent& event);
+	void onMusic(wxCommandEvent& event);
 	void onObject(wxCommandEvent& event);
 	void onRoom(wxCommandEvent& event);
 	void onMaterial(wxCommandEvent& event);
@@ -228,7 +232,8 @@ void MyFrame::loadConfig()
     {
 	    loadAll<Material>(currentPath.ToStdString());
 	    loadAll<Sprite>(currentPath.ToStdString());
-		loadAll<Audio>(currentPath.ToStdString());
+		loadAll<Sound>(currentPath.ToStdString());
+		loadAll<Music>(currentPath.ToStdString());
 	    // load shallow first so we can have all the name references
 	    loadAll<ActorType>(currentPath.ToStdString(), true);
 	    loadAll<ActorType>(currentPath.ToStdString());
@@ -257,7 +262,8 @@ void MyFrame::unloadConfig()
 	unloadAll<OverlayType>();
 	unloadAll<ActorType>();
 	unloadAll<Sprite>();
-	unloadAll<Audio>();
+	unloadAll<Music>();
+	unloadAll<Sound>();
 	unloadAll<Material>();
 }
 
@@ -265,7 +271,8 @@ void MyFrame::saveConfig()
 {
 	saveAll<Material>(currentPath.ToStdString());
 	saveAll<Sprite>(currentPath.ToStdString());
-	saveAll<Audio>(currentPath.ToStdString());
+	saveAll<Sound>(currentPath.ToStdString());
+	saveAll<Music>(currentPath.ToStdString());
 	saveAll<ActorType>(currentPath.ToStdString());
 	saveAll<OverlayType>(currentPath.ToStdString());
 	saveAll<Room>(currentPath.ToStdString());
@@ -372,10 +379,11 @@ Sidebar::Sidebar(wxWindow* parent)
 	SetScrollbars(20, 20, 5, 5);
 	this->parent = parent;
 	wxBoxSizer *vszr = new wxBoxSizer(wxVERTICAL);
-	wxGridSizer *buttons = new wxGridSizer(6, 1, 20, 20);
+	wxGridSizer *buttons = new wxGridSizer(7, 1, 20, 20);
 	wxPanel *pnl = new wxPanel(this, wxID_ANY);
 	wxButton *bt1 = new wxButton(pnl, SPRITE, "Sprites");
-	wxButton *bt2 = new wxButton(pnl, AUDIO, "Audio");
+	wxButton *bt2 = new wxButton(pnl, SOUND, "Sound");
+	wxButton *bt7 = new wxButton(pnl, MUSIC, "Music");
 	wxButton *bt3 = new wxButton(pnl, ROOM, "Rooms");
 	wxButton *bt4 = new wxButton(pnl, OBJECT, "Objects");
 	wxButton *bt5 = new wxButton(pnl, OVERLAY, "Overlays");
@@ -383,8 +391,10 @@ Sidebar::Sidebar(wxWindow* parent)
 
 	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onSprite));
-	Connect(AUDIO, wxEVT_COMMAND_BUTTON_CLICKED,
-		wxCommandEventHandler(Sidebar::onAudio));
+	Connect(SOUND, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onSound));
+	Connect(MUSIC, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onMusic));
 	Connect(ROOM, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onRoom));
 	Connect(OBJECT, wxEVT_COMMAND_BUTTON_CLICKED,
@@ -396,6 +406,7 @@ Sidebar::Sidebar(wxWindow* parent)
 
 	buttons->Add(bt1, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
+	buttons->Add(bt7, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt3, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt4, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt5, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -451,16 +462,58 @@ void Sidebar::onSprite(wxCommandEvent& event)
 
 	boxFrame->Show(true);
 }
-void Sidebar::onAudio(wxCommandEvent& event)
+void Sidebar::onSound(wxCommandEvent& event)
 {
-	operation = "audio";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Audio Control", wxDefaultPosition, wxSize(270, 200));
+	operation = "sound";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Sound Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 	
-	//Audio map
+	for (const auto& pair : Sound::objectMap)
+	{
+		listbox->Append(pair.first);
+	}
+
+	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
+
+	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
+	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
+
+	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
+	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
+	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
+	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
+
+	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
+
+	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
+	btnPanel->SetSizer(gbox);
+
+	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
+	panel->SetSizer(hbox);
+	this->SetFocus();
+	boxFrame->SetFocus();
+	panel->SetFocus();
+	btnPanel->SetFocus();
+
+	boxFrame->Show(true);
+}
+void Sidebar::onMusic(wxCommandEvent& event)
+{
+	operation = "music";
+	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Music Control", wxDefaultPosition, wxSize(270, 200));
+
+	wxPanel * panel = new wxPanel(boxFrame, -1);
+	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	
+	for (const auto& pair : Music::objectMap)
+	{
+		listbox->Append(pair.first);
+	}
 
 	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
 

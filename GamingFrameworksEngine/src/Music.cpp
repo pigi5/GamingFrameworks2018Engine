@@ -1,20 +1,21 @@
 #include "../header/Music.h"
+#include "../header/ConfigurationError.h"
 
+const std::string Music::DIR_NAME = "music";
+std::unordered_map<std::string, Music*> Music::objectMap;
 
-Music::Music()
+void Music::createMusic(std::string name, std::string fileName)
 {
+	Music* newMusic = new Music(name, fileName);
 
-}
-
-Music::Music(Audio* audio)
-{
-	this->name = audio->name;
-	this->fileName = audio->fileName;
-}
-
-Music::Music(std::string fileName)
-{
-	this->fileName = fileName;
+	//add audio to map
+	if (!objectMap.emplace(newMusic->name, newMusic).second)
+	{
+		//if audio already exists, throw error
+		std::stringstream errorMessage;
+		errorMessage << "Music name \"" << newMusic->name << "\" is not unique.";
+		throw ConfigurationError(errorMessage.str());
+	}
 }
 
 Music::~Music()
@@ -22,26 +23,20 @@ Music::~Music()
 
 }
 
-int Music::playMusic()
+bool Music::load()
 {
-	if (!this->music.openFromFile(this->fileName))
-	{
-		return -1;
-	}
-
-	this->music.play();
-	return 0;
+	return music.openFromFile(fileName);
 }
 
-void Music::stopMusic()
+void Music::play()
 {
-	this->music.stop();
+    if (load())
+    {
+	    music.play();
+    }
 }
 
-std::string Music::getFileName() {
-	return this->fileName;
-}
-
-Music& Music::operator=(Music other) {
-	return other;
+void Music::stop()
+{
+	music.stop();
 }

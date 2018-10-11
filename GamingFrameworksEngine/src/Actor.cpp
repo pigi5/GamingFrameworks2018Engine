@@ -66,6 +66,12 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
 
 void Actor::step()
 {
+    if (attributes.count("touchingGround") > 0){
+    engine_util::logger << "touchingGround: " << attributes["touchingGround"] << std::endl;
+    }
+
+
+
     imageFrame += imageSpeed;
     // fire step trigger
     ActorTypeWrapper wrapper(type);

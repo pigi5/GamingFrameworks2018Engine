@@ -1,19 +1,38 @@
 #include "../header/Sound.h"
+#include "../header/ConfigurationError.h"
+#include "../header/Utils.h"
 
-Sound::Sound()
+const std::string Sound::DIR_NAME = "sounds";
+std::unordered_map<std::string, Sound*> Sound::objectMap;
+
+void Sound::createSound(std::string name, std::string fileName)
 {
+	Sound* newSound = new Sound(name, fileName);
 
+	//add audio to map
+	if (!objectMap.emplace(newSound->name, newSound).second)
+	{
+		//if audio already exists, throw error
+		std::stringstream errorMessage;
+		errorMessage << "Sound name \"" << newSound->name << "\" is not unique.";
+		throw ConfigurationError(errorMessage.str());
+	}
 }
 
-Sound::Sound(std::string fileName)
+Sound::Sound(std::string name, std::string fileName) : Audio(name, fileName)
 {
-	this->fileName = fileName;
+    if (!load())
+    {
+        throw ConfigurationError("Sound named " + name + " could not be loaded from " + fileName + ".");
+    }
 }
 
-Sound::Sound(Audio* audio)
+Sound::Sound(const YAML::Node& config, bool shallow) : Audio(config, shallow)
 {
-	this->fileName = audio->fileName;
-	this->name = audio->name;
+    if (!load())
+    {
+        throw ConfigurationError("Sound named " + name + " could not be loaded from " + fileName + ".");
+    }
 }
 
 Sound::~Sound()
@@ -22,20 +41,19 @@ Sound::~Sound()
 }
 
 //loads sound from given filename
-bool Sound::loadSound()
+bool Sound::load()
 {
-	if (!this->buffer.loadFromFile(this->fileName))
-	{
-		return false;
-	}
-	return true;
+	return buffer.loadFromFile(fileName);
 }
 
 //plays sound
-void Sound::playSound()
+void Sound::play()
 {
-	this->sound.setBuffer(buffer);
+	sound.setBuffer(buffer);
+	sound.play();
+}
 
-	this->sound.play();
-
+void Sound::stop()
+{
+    // can't
 }

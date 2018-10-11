@@ -11,20 +11,18 @@ class Audio
 private:
 
 public:
-	static const std::string DIR_NAME;
-
-	static std::unordered_map<std::string, Audio*> objectMap;
-
-	static void createAudio(std::string);
-
 	std::string name;
 	std::string fileName;
-	std::string audioType;
 
-	Audio();
-	Audio(std::string name);
+	Audio(std::string name, std::string filename);
 	Audio(const YAML::Node&, bool);
 	~Audio();
+    
+
+	virtual bool load() = 0;
+	virtual void play() = 0;
+	virtual void stop() = 0;
+
 	bool operator<(const Audio& other) const;
 	friend YAML::Emitter& operator<<(YAML::Emitter& out, const Audio& obj);
 	friend Logger& operator<<(Logger&, const Audio&);

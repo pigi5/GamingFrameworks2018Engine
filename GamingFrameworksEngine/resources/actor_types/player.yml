@@ -10,6 +10,7 @@ yScale: 1
 animationSpeed: 0.025
 attributes:
   jumpsLeft: 1
+  touchingGround: 0
 triggers:
   - type: ButtonInput
     id: 71
@@ -26,6 +27,17 @@ triggers:
         conditionals:
           []
         attribute: jumpsLeft
+        value: 1
+      - type: PlaySound
+        conditionals:
+          - comparison: eq
+            attribute: touchingGround
+            value: 0
+        name: test_sound
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: touchingGround
         value: 1
   - type: ButtonInput
     id: 71
@@ -64,6 +76,13 @@ triggers:
             value: 0
         xAcceleration: 0
         yAcceleration: -2
+      - type: AttributeSet
+        conditionals:
+          - comparison: gt
+            attribute: jumpsLeft
+            value: 0
+        attribute: touchingGround
+        value: 0
       - type: AttributeChange
         conditionals:
           - comparison: gt
