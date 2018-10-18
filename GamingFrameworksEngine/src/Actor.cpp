@@ -409,12 +409,40 @@ void Actor::setYSpeed(float ySpeed)
 
 void Actor::setAttribute(std::string key, int value)
 {
-    attributes[key] = value;
+    try
+    {
+        attributes.at(key) = value;
+    } 
+    catch (const std::out_of_range& e)
+    {
+        try
+        {
+            room->getEngine()->globalAttributes.at(key) = value;
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw ConfigurationError("Attribute named " + key + " no longer exists.");
+        }
+    }
 }
 
 void Actor::changeAttribute(std::string key, int value)
 {
-    attributes[key] += value;
+    try
+    {
+        attributes.at(key) += value;
+    } 
+    catch (const std::out_of_range& e)
+    {
+        try
+        {
+            room->getEngine()->globalAttributes.at(key) += value;
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw ConfigurationError("Attribute named " + key + " no longer exists.");
+        }
+    }
 }
 
 Logger& operator<<(Logger& logger, const Actor& obj)
