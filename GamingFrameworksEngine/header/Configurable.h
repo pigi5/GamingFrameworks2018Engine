@@ -91,7 +91,9 @@ static void saveAll(std::string projectDir)
     {
         // write object to YAML emitter
         YAML::Emitter emitter;
-        emitter << YAML::BeginDoc << YAML::BeginMap << *(pair.second) << YAML::EndMap;
+        emitter << YAML::BeginDoc;
+        emitter << YAML::BeginMap << *(pair.second) << YAML::EndMap;
+        emitter << YAML::EndDoc;
 
         // write YAML to file
         std::ofstream fout(directoryPath.str() + "/" + pair.first + ".yml");

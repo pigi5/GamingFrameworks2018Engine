@@ -12,6 +12,15 @@ attributes:
   touchingGround: 0
   jumpsLeft: 1
 triggers:
+  - type: ButtonInput
+    id: 72
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: 0.1
+        yAcceleration: 0
   - type: MouseInput
     state: down on
     actions:
@@ -20,6 +29,14 @@ triggers:
           []
         xPosition: 200
         yPosition: 200
+      - type: SetXSpeed
+        conditionals:
+          []
+        speed: 0
+  - type: ButtonInput
+    id: 71
+    state: down
+    actions:
       - type: SetXSpeed
         conditionals:
           []
@@ -45,14 +62,6 @@ triggers:
         value: 1
   - type: ButtonInput
     id: 71
-    state: down
-    actions:
-      - type: SetXSpeed
-        conditionals:
-          []
-        speed: 0
-  - type: ButtonInput
-    id: 71
     state: hold
     actions:
       - type: ApplyForce
@@ -68,15 +77,6 @@ triggers:
         conditionals:
           []
         speed: 0
-  - type: ButtonInput
-    id: 72
-    state: hold
-    actions:
-      - type: ApplyForce
-        conditionals:
-          []
-        xAcceleration: 0.1
-        yAcceleration: 0
   - type: ButtonInput
     id: 73
     state: down

@@ -230,17 +230,20 @@ void MyFrame::loadConfig()
 {
     try 
     {
-	    loadAll<Material>(currentPath.ToStdString());
-	    loadAll<Sprite>(currentPath.ToStdString());
-		loadAll<Sound>(currentPath.ToStdString());
-		loadAll<Music>(currentPath.ToStdString());
+        std::string currentDir = currentPath.ToStdString();
+
+        Engine::loadAttributes(currentDir);
+	    loadAll<Material>(currentDir);
+	    loadAll<Sprite>(currentDir);
+		loadAll<Sound>(currentDir);
+		loadAll<Music>(currentDir);
 	    // load shallow first so we can have all the name references
-	    loadAll<ActorType>(currentPath.ToStdString(), true);
-	    loadAll<ActorType>(currentPath.ToStdString());
+	    loadAll<ActorType>(currentDir, true);
+	    loadAll<ActorType>(currentDir);
 	    // load shallow first so we can have all the name references
-	    loadAll<OverlayType>(currentPath.ToStdString(), true);
-	    loadAll<OverlayType>(currentPath.ToStdString());
-	    loadAll<Room>(currentPath.ToStdString());
+	    loadAll<OverlayType>(currentDir, true);
+	    loadAll<OverlayType>(currentDir);
+	    loadAll<Room>(currentDir);
     }
 	catch (const ConfigurationError& e)
 	{
@@ -269,13 +272,16 @@ void MyFrame::unloadConfig()
 
 void MyFrame::saveConfig()
 {
-	saveAll<Material>(currentPath.ToStdString());
-	saveAll<Sprite>(currentPath.ToStdString());
-	saveAll<Sound>(currentPath.ToStdString());
-	saveAll<Music>(currentPath.ToStdString());
-	saveAll<ActorType>(currentPath.ToStdString());
-	saveAll<OverlayType>(currentPath.ToStdString());
-	saveAll<Room>(currentPath.ToStdString());
+    std::string currentDir = currentPath.ToStdString();
+
+    Engine::loadAttributes(currentDir);
+	saveAll<Material>(currentDir);
+	saveAll<Sprite>(currentDir);
+	saveAll<Sound>(currentDir);
+	saveAll<Music>(currentDir);
+	saveAll<ActorType>(currentDir);
+	saveAll<OverlayType>(currentDir);
+	saveAll<Room>(currentDir);
 }
 
 void MyFrame::reloadConfig()

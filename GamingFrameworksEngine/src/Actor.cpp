@@ -355,14 +355,21 @@ Room* Actor::getRoom() const
     return room;
 }
 
+// checks the local actor type attribute list for the given attribute,
+// then checks the global attributes list. Throws an error if the given
+// key is not in either list
 int Actor::getAttribute(std::string key) const
 {
     auto val = attributes.find(key);
     if (val == attributes.end())
     {
-        std::stringstream errorMessage;
-        errorMessage << "Attribute " << key << " does not exist.";
-        throw ConfigurationError(errorMessage.str());
+        val = room->getEngine()->globalAttributes.find(key);
+        if (val == attributes.end())
+        {
+            std::stringstream errorMessage;
+            errorMessage << "Attribute " << key << " does not exist.";
+            throw ConfigurationError(errorMessage.str());
+        }
     }
     return val->second;
 }

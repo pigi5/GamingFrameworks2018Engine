@@ -14,6 +14,55 @@
 #include "../header/Sprite.h"
 #include "../header/Utils.h"
 
+std::unordered_map<std::string, int> Engine::defaultAttributes;
+
+void Engine::loadAttributes(std::string projectDir)
+{
+    YAML::Node config;
+    try 
+    {
+        config = YAML::LoadFile(projectDir + "/globals.yml");
+    }
+    catch (const YAML::BadFile& e) 
+    {
+        // Create file if it doesn't exist
+        std::ofstream fout(projectDir + "/globals.yml");
+        fout.close();
+        return;
+    }
+    for (auto attribute : config)
+    {
+        std::string attrName = attribute.first.as<std::string>();
+
+        if (!defaultAttributes.emplace(attrName, attribute.second.as<int>()).second)
+        {
+            // if key already existed, throw error
+            std::stringstream errorMessage;
+            errorMessage << "Global attribute name \"" << attrName;
+            errorMessage << "\" is not unique.";
+            throw ConfigurationError(errorMessage.str());
+        }
+    }
+}
+
+void Engine::saveAttributes(std::string projectDir)
+{
+    // create YAML emitter
+    YAML::Emitter emitter;
+    emitter << YAML::BeginDoc << YAML::BeginMap;
+    // iterate all attributes in memory
+    for (const auto& pair :defaultAttributes)
+    {
+        // write attribute to emitter
+        emitter << YAML::Key << pair.first << YAML::Value << pair.second;
+    }
+    emitter << YAML::EndMap << YAML::EndDoc;
+    // write YAML to file
+    std::ofstream fout(projectDir + "/globals.yml");
+    fout << emitter.c_str();
+    fout.close();
+}
+
 Engine::Engine()
 {
     
@@ -43,6 +92,10 @@ void Engine::run()
             break;
         }
     }
+
+    // Set global attributes
+    globalAttributes.clear();
+    globalAttributes.insert(defaultAttributes.begin(), defaultAttributes.end());
 
     if (currentRoomIterator->second == NULL)
     {

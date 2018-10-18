@@ -13,6 +13,8 @@ public:
         static Engine instance;
         return instance;
     }
+    static std::unordered_map<std::string, int> defaultAttributes;
+    std::unordered_map<std::string, int> globalAttributes;
 private:
     std::map<std::string, Room*>::iterator currentRoomIterator;
 	sf::RenderWindow window;
@@ -28,5 +30,8 @@ public:
     // Functions that should not exist in the Singleton pattern
     Engine(Engine const&) = delete;
     void operator=(Engine const&) = delete;
+
+    static void loadAttributes(std::string);
+    static void saveAttributes(std::string);
 };
 
