@@ -12,6 +12,7 @@
 
 string operation;
 wxListBox* listbox;
+wxFrame* boxFrame;
 wxString currentPath;
 string selObject;
 string selTrigger;
@@ -423,7 +424,7 @@ Sidebar::Sidebar(wxWindow* parent)
 void Sidebar::onSprite(wxCommandEvent& event)
 {
 	operation = "sprites";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Sprite Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Sprite Control", wxDefaultPosition, wxSize(270, 200));
 	
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -462,7 +463,7 @@ void Sidebar::onSprite(wxCommandEvent& event)
 void Sidebar::onSound(wxCommandEvent& event)
 {
 	operation = "sound";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Sound Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Sound Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -501,7 +502,7 @@ void Sidebar::onSound(wxCommandEvent& event)
 void Sidebar::onMusic(wxCommandEvent& event)
 {
 	operation = "music";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Music Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Music Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -540,7 +541,7 @@ void Sidebar::onMusic(wxCommandEvent& event)
 void Sidebar::onObject(wxCommandEvent& event)
 {
 	operation = "actor_types";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Object Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Object Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -579,7 +580,7 @@ void Sidebar::onObject(wxCommandEvent& event)
 void Sidebar::onRoom(wxCommandEvent& event)
 {
 	operation = "rooms";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Room Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Room Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -619,7 +620,7 @@ void Sidebar::onRoom(wxCommandEvent& event)
 void Sidebar::onOverlay(wxCommandEvent& event)
 {
 	operation = "overlay_types";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Overlay Control", wxDefaultPosition, wxSize(270, 200));
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Overlay Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -864,6 +865,7 @@ void Editor::resetTrigger()
 			string str = pair.first + ": {default: " + to_string(pair.second) + "}";
 			lb4->Append(str);
 		}
+		boxFrame->Show(false);
 	}
 	if (operation == "sprites")
 	{
@@ -874,12 +876,13 @@ void Editor::resetTrigger()
 			wxString str = wxString(files[i]);
 			lb1->Append(str.AfterLast('\\'));
 		}
+		boxFrame->Show(false);
 	}
 	if (operation == "rooms")
 	{
 		wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
-		rmEditor->Show();
-		listbox->DeselectAll();
+		rmEditor->Show(true);
+		boxFrame->Show(false);
 	}
 }
 void Editor::resetAction()
