@@ -1,6 +1,6 @@
 ---
 name: wall
-material: ground
+friction: 0.017
 maxXSpeed: -1
 maxYSpeed: -1
 gravitous: false

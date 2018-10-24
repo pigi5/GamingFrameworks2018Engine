@@ -30,7 +30,6 @@ enum
 	SPRITE = 7,
 	SOUND = 8,
 	MUSIC = 16,
-	MATERIAL = 9,
 	OVERLAY = 10,
 	NEW_ITEM = 11,
 	EDIT_ITEM = 12,
@@ -98,7 +97,6 @@ public:
 	void onMusic(wxCommandEvent& event);
 	void onObject(wxCommandEvent& event);
 	void onRoom(wxCommandEvent& event);
-	void onMaterial(wxCommandEvent& event);
 	void onOverlay(wxCommandEvent& event);
 	void onNew(wxCommandEvent& event);
 	void onSelect(wxCommandEvent& event);
@@ -233,7 +231,6 @@ void MyFrame::loadConfig()
         std::string currentDir = currentPath.ToStdString();
 
         Engine::loadAttributes(currentDir);
-	    loadAll<Material>(currentDir);
 	    loadAll<Sprite>(currentDir);
 		loadAll<Sound>(currentDir);
 		loadAll<Music>(currentDir);
@@ -267,7 +264,6 @@ void MyFrame::unloadConfig()
 	unloadAll<Sprite>();
 	unloadAll<Music>();
 	unloadAll<Sound>();
-	unloadAll<Material>();
 }
 
 void MyFrame::saveConfig()
@@ -275,7 +271,6 @@ void MyFrame::saveConfig()
     std::string currentDir = currentPath.ToStdString();
 
     Engine::loadAttributes(currentDir);
-	saveAll<Material>(currentDir);
 	saveAll<Sprite>(currentDir);
 	saveAll<Sound>(currentDir);
 	saveAll<Music>(currentDir);
@@ -315,7 +310,6 @@ void MyFrame::OnNew(wxCommandEvent& event)
 		if (wxSetWorkingDirectory(currentPath))
 		{
 			wxMkdir("actor_types");
-			wxMkdir("materials");
 			wxMkdir("overlay_types");
 			wxMkdir("rooms");
 			wxMkdir("audio");
@@ -394,7 +388,6 @@ Sidebar::Sidebar(wxWindow* parent)
 	wxButton *bt3 = new wxButton(pnl, ROOM, "Rooms");
 	wxButton *bt4 = new wxButton(pnl, OBJECT, "Objects");
 	wxButton *bt5 = new wxButton(pnl, OVERLAY, "Overlays");
-	wxButton *bt6 = new wxButton(pnl, MATERIAL, "Materials");
 
 	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onSprite));
@@ -408,8 +401,6 @@ Sidebar::Sidebar(wxWindow* parent)
 		wxCommandEventHandler(Sidebar::onObject));
 	Connect(OVERLAY, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onOverlay));
-	Connect(MATERIAL, wxEVT_COMMAND_BUTTON_CLICKED,
-		wxCommandEventHandler(Sidebar::onMaterial));
 
 	buttons->Add(bt1, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -417,7 +408,6 @@ Sidebar::Sidebar(wxWindow* parent)
 	buttons->Add(bt3, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt4, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt5, 0, wxALIGN_CENTER | wxCENTER, 20);
-	buttons->Add(bt6, 0, wxALIGN_CENTER | wxCENTER, 20);
 
 	pnl->SetSizer(buttons);
 
@@ -625,45 +615,7 @@ void Sidebar::onRoom(wxCommandEvent& event)
 
 	boxFrame->Show(true);
 }
-void Sidebar::onMaterial(wxCommandEvent& event)
-{
-	operation = "materials";
-	wxFrame *boxFrame = new wxFrame(NULL, wxID_ANY, "Material Control", wxDefaultPosition, wxSize(270, 200));
 
-	wxPanel * panel = new wxPanel(boxFrame, -1);
-	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-	listbox = new wxListBox(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	
-	for (const auto& pair : Material::objectMap)
-	{
-		listbox->Append(pair.first);
-	}
-
-	hbox->Add(listbox, 3, wxEXPAND | wxALL, 20);
-
-	wxPanel *btnPanel = new wxPanel(panel, wxID_ANY);
-	wxGridSizer* gbox = new wxGridSizer(2, 1, 20, 20);
-
-	wxButton* newBtn = new wxButton(btnPanel, NEW_ITEM, wxT("New"));
-	newBtn->Bind(wxEVT_BUTTON, &Sidebar::onNew, this);
-	wxButton* delBtn = new wxButton(btnPanel, DELETE_ITEM, wxT("Delete"));
-	delBtn->Bind(wxEVT_BUTTON, &Sidebar::onDelete, this);
-
-	listbox->Bind(wxEVT_LISTBOX, &Sidebar::onSelect, this);
-
-	gbox->Add(newBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
-	gbox->Add(delBtn, 0, wxALIGN_CENTER | wxCENTER, 20);
-	btnPanel->SetSizer(gbox);
-
-	hbox->Add(btnPanel, 2, wxEXPAND | wxRIGHT, 10);
-	panel->SetSizer(hbox);
-	this->SetFocus();
-	boxFrame->SetFocus();
-	panel->SetFocus();
-	btnPanel->SetFocus();
-
-	boxFrame->Show(true);
-}
 void Sidebar::onOverlay(wxCommandEvent& event)
 {
 	operation = "overlay_types";
@@ -726,10 +678,6 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 		{
 			OverlayType::createOverlayType(str.ToStdString());
 		}
-		else if (operation == "materials")
-		{
-			Material::createMaterial(str.ToStdString());
-		}
 		else if (operation == "rooms")
 		{
 			Room::createRoom(str.ToStdString());
@@ -765,10 +713,6 @@ void Sidebar::onDelete(wxCommandEvent& event)
 		else if (operation == "overlay_types")
 		{
 			OverlayType::objectMap.erase(str.ToStdString());
-		}
-		else if (operation == "materials")
-		{
-			Material::objectMap.erase(str.ToStdString());
 		}
 		else if (operation == "rooms")
 		{

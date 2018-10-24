@@ -7,7 +7,6 @@
 #include "../header/Configurable.h"
 #include "../header/Trigger.h"
 #include "../header/Action.h"
-#include "../header/Material.h"
 #include "yaml-cpp/yaml.h"
 #include "Sprite.h"
 
@@ -22,7 +21,7 @@ public:
     static void createActorType(std::string);
     
     std::string name;
-    const Material* material;
+    float friction;
     float maxXSpeed;
     float maxYSpeed;
     bool gravitous;

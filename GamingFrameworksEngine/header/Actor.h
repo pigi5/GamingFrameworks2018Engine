@@ -6,7 +6,6 @@
 #include "Sprite.h"
 #include "Audio.h"
 #include "Shape.h"
-#include "Material.h"
 #include "Trigger.h"
 #include "Action.h"
 #include "Hitbox.h"
@@ -157,6 +156,9 @@ public:
 	void setYSpeed(float);
 	void setXAcceleration(float);
 	void setYAcceleration(float);
+	void setCollidable(bool);
+	void setAnimationSpeed(float);
+	void setAnimationFrame(float);
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);

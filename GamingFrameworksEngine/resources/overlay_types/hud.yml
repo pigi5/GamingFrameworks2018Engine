@@ -1,6 +1,6 @@
 ---
 name: hud
-material: ~
+friction: 0
 maxXSpeed: -1
 maxYSpeed: -1
 gravitous: false

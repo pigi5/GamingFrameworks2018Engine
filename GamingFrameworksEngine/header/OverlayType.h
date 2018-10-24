@@ -8,7 +8,6 @@
 #include "../header/Trigger.h"
 #include "../header/Action.h"
 #include "../header/ActorType.h"
-#include "../header/Material.h"
 #include "yaml-cpp/yaml.h"
 
 class OverlayType : public ActorType

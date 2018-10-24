@@ -25,7 +25,7 @@ void ActorType::createActorType(std::string name)
 ActorType::ActorType(std::string name)
 {
     this->name = name;
-    material = NULL;
+    friction = 0.0f;
     maxXSpeed = -1.0f;
     maxYSpeed = -1.0f;
     gravitous = true;
@@ -42,20 +42,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 
     if (!shallow)
     {
-        YAML::Node materialNode = config["material"];
-        if (!materialNode.IsNull())
-        {
-            std::string typeName = materialNode.as<std::string>();
-            auto mapItem = Material::objectMap.find(typeName);
-            if (mapItem == Material::objectMap.end())
-            {
-                std::stringstream errorMessage;
-                errorMessage << "Material Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
-            }
-            material = mapItem->second;
-        }
-
+        friction = config["friction"].as<float>();
         maxXSpeed = config["maxXSpeed"].as<float>();
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
@@ -118,14 +105,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
 YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj) 
 {
     out << YAML::Key << "name" << YAML::Value << obj.name;
-    if (obj.material == NULL) 
-    {
-        out << YAML::Key << "material" << YAML::Value << YAML::Null;
-    }
-    else 
-    {
-        out << YAML::Key << "material" << YAML::Value << obj.material->name;
-    }
+    out << YAML::Key << "friction" << YAML::Value << obj.friction;
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
     out << YAML::Key << "maxYSpeed" << YAML::Value << obj.maxYSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
