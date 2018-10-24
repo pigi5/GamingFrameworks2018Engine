@@ -18,7 +18,10 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
         float width = type->sprite->getRecommendedWidth() * type->xScale;
         float height = type->sprite->getRecommendedHeight() * type->yScale;
 
-        this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
+        if (type->collidable)
+        {
+            this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
+        }
     }
 	imageFrame = 0.0f;
     imageSpeed = type->imageSpeed;

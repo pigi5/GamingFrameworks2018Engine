@@ -29,6 +29,7 @@ ActorType::ActorType(std::string name)
     maxXSpeed = -1.0f;
     maxYSpeed = -1.0f;
     gravitous = true;
+    collidable = true;
     xScale = 1.0f;
     yScale = 1.0f;
     imageSpeed = 0.0f;
@@ -58,6 +59,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         maxXSpeed = config["maxXSpeed"].as<float>();
         maxYSpeed = config["maxYSpeed"].as<float>();
         gravitous = config["gravitous"].as<bool>();
+        collidable = config["collidable"].as<bool>();
 
 		YAML::Node spriteNode = config["sprite"];
 		if (!spriteNode.IsNull()) {
@@ -127,6 +129,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "maxXSpeed" << YAML::Value << obj.maxXSpeed;
     out << YAML::Key << "maxYSpeed" << YAML::Value << obj.maxYSpeed;
     out << YAML::Key << "gravitous" << YAML::Value << obj.gravitous;
+    out << YAML::Key << "collidable" << YAML::Value << obj.collidable;
     if (obj.sprite == NULL) 
     {
         out << YAML::Key << "sprite" << YAML::Value << YAML::Null;

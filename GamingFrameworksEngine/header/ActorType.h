@@ -26,6 +26,7 @@ public:
     float maxXSpeed;
     float maxYSpeed;
     bool gravitous;
+    bool collidable;
 	Sprite* sprite;
     float xScale;
     float yScale;
