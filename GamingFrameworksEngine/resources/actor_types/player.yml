@@ -8,19 +8,11 @@ sprite: spr_player
 xScale: 1
 yScale: 1
 animationSpeed: 0.025
+depth: 0
 attributes:
   touchingGround: 0
   jumpsLeft: 1
 triggers:
-  - type: ButtonInput
-    id: 72
-    state: hold
-    actions:
-      - type: ApplyForce
-        conditionals:
-          []
-        xAcceleration: 0.1
-        yAcceleration: 0
   - type: MouseInput
     state: down on
     actions:
@@ -34,13 +26,14 @@ triggers:
           []
         speed: 0
   - type: ButtonInput
-    id: 71
-    state: down
+    id: 72
+    state: hold
     actions:
-      - type: SetXSpeed
+      - type: ApplyForce
         conditionals:
           []
-        speed: 0
+        xAcceleration: 0.1
+        yAcceleration: 0
   - type: Collision
     target: wall
     actions:
@@ -60,6 +53,14 @@ triggers:
           []
         attribute: touchingGround
         value: 1
+  - type: ButtonInput
+    id: 71
+    state: down
+    actions:
+      - type: SetXSpeed
+        conditionals:
+          []
+        speed: 0
   - type: ButtonInput
     id: 71
     state: hold
@@ -102,3 +103,4 @@ triggers:
             value: 0
         attribute: jumpsLeft
         offset: -1
+...

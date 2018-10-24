@@ -8,7 +8,9 @@ sprite: ~
 xScale: 0
 yScale: 0
 animationSpeed: 0
+depth: 0
 attributes:
   {}
 triggers:
   []
+...

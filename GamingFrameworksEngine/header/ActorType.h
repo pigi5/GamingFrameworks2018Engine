@@ -30,6 +30,7 @@ public:
     float xScale;
     float yScale;
     float imageSpeed;
+    float depth;
     std::unordered_map<std::string, int> attributes;
     // triggers/actions
     std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap;

@@ -8,7 +8,9 @@ sprite: spr_brick
 xScale: 10
 yScale: 1
 animationSpeed: 0
+depth: 1
 attributes:
   {}
 triggers:
   []
+...

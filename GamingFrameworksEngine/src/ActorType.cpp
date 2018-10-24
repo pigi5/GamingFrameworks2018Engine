@@ -28,9 +28,11 @@ ActorType::ActorType(std::string name)
     material = NULL;
     maxXSpeed = -1.0f;
     maxYSpeed = -1.0f;
+    gravitous = true;
     xScale = 1.0f;
     yScale = 1.0f;
-    gravitous = true;
+    imageSpeed = 0.0f;
+    depth = 0.0f;
 }
 
 ActorType::ActorType(const YAML::Node& config, bool shallow)
@@ -73,6 +75,7 @@ ActorType::ActorType(const YAML::Node& config, bool shallow)
         xScale = config["xScale"].as<float>();
         yScale = config["yScale"].as<float>();
         imageSpeed = config["animationSpeed"].as<float>();
+        depth = config["depth"].as<float>();
         
         YAML::Node attrsNode = config["attributes"];
         for (auto attribute : attrsNode)
@@ -135,6 +138,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const ActorType& obj)
     out << YAML::Key << "xScale" << YAML::Value << obj.xScale;
     out << YAML::Key << "yScale" << YAML::Value << obj.yScale;
     out << YAML::Key << "animationSpeed" << YAML::Value << obj.imageSpeed;
+    out << YAML::Key << "depth" << YAML::Value << obj.depth;
     out << YAML::Key << "attributes" << YAML::Value << YAML::BeginMap;
     for (auto pair : obj.attributes)
     {

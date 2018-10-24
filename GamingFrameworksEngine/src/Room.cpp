@@ -1,3 +1,5 @@
+
+#include <algorithm>
 #include "../header/Room.h"
 #include "../header/Constants.h"
 #include "../header/TriggerPresets.h"
@@ -165,6 +167,10 @@ void Room::step()
         delete overlay;
     }
     actorDeleteQueue.clear();
+    
+    // sort actors by depth
+    actors.sort(Actor::compareDepth);
+    overlays.sort(Actor::compareDepth);
 }
 
 void Room::interpolateState(float progress)

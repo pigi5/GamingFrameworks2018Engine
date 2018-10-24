@@ -20,9 +20,10 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
 
         this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
     }
-	this->imageFrame = 0.0f;
-    this->imageSpeed = type->imageSpeed;
-    this->imageAngle = 0.0f;
+	imageFrame = 0.0f;
+    imageSpeed = type->imageSpeed;
+    imageAngle = 0.0f;
+    depth = type->depth;
     // Set the default yAcceleration to gravity
     if (type->gravitous)
     {
@@ -473,4 +474,10 @@ void Actor::checkReleaseOn(int clickX, int clickY)
 		trigger_preset::MouseInput trigger(&m);
 		this->fireTrigger(&trigger);
 	}
+}
+
+// reverse ordering for containers
+bool Actor::compareDepth(const Actor* obj1, const Actor* obj2)
+{
+    return obj1->depth > obj2->depth;
 }

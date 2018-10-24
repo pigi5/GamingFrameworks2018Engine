@@ -106,6 +106,7 @@ protected:
     float xSpriteOffset;
     float ySpriteOffset;
     float imageAngle;
+    float depth;
     
     // Type data
     const ActorType* type;
@@ -165,4 +166,7 @@ public:
 	// Mouse Functions
 	void checkPressOn(int, int);
 	void checkReleaseOn(int, int);
+
+    // comparators
+    static bool compareDepth(const Actor*, const Actor*);
 };
