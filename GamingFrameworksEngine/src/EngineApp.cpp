@@ -658,7 +658,7 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 }
 void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 {
-	wxString str;
+	wxString str, fn;
 	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New " + operation + " Name");
 	if (getTxt->ShowModal() == wxID_OK)
 	{
@@ -683,6 +683,34 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 		{
 			Room::createRoom(str.ToStdString());
 		}
+		else if (operation == "sound")
+		{
+			wxFileDialog *openSndDialog = new wxFileDialog(this, "Select Sound File");
+			openSndDialog->SetWildcard("WAV files (*.wav)|*.wav");
+			if (openSndDialog->ShowModal() == wxID_OK) {
+				fn= openSndDialog->GetPath();
+				wxCopyFile(fn, currentPath + "\\sounds\\" + fn.AfterLast('\\'));
+				wxString relPath = wxString(currentPath);
+				relPath = relPath.AfterLast('\\');
+				relPath += "\\sounds\\" + fn.AfterLast('\\');
+				Sound::createSound(str.ToStdString(), relPath.ToStdString());
+				boxFrame->Close(true);
+			}
+		}
+		else if (operation == "music")
+		{
+			wxFileDialog *openMusDialog = new wxFileDialog(this, "Select Music File");
+			openMusDialog->SetWildcard("WAV files (*.wav)|*.wav");
+			if (openMusDialog->ShowModal() == wxID_OK) {
+				fn = openMusDialog->GetPath();
+				wxCopyFile(fn, currentPath + "\\music\\" + fn.AfterLast('\\'));
+				wxString relPath = wxString(currentPath);
+				relPath = relPath.AfterLast('\\');
+				relPath += "\\music\\" + fn.AfterLast('\\');
+				Music::createMusic(str.ToStdString(), relPath.ToStdString());
+				boxFrame->Close(true);
+			}
+		}
 	}
 }
 void Sidebar::onSelect(wxCommandEvent& event)
@@ -706,18 +734,34 @@ void Sidebar::onDelete(wxCommandEvent& event)
 		if (operation == "sprites")
 		{
 			Sprite::objectMap.erase(str.ToStdString());
+			boxFrame->Close(true);
 		}
 		else if (operation == "actor_types")
 		{
 			ActorType::objectMap.erase(str.ToStdString());
+			boxFrame->Close(true);
 		}
 		else if (operation == "overlay_types")
 		{
 			OverlayType::objectMap.erase(str.ToStdString());
+			boxFrame->Close(true);
 		}
 		else if (operation == "rooms")
 		{
 			Room::objectMap.erase(str.ToStdString());
+			boxFrame->Close(true);
+		}
+		else if (operation == "sound")
+		{
+			Sound::objectMap.erase(str.ToStdString());
+			wxRemoveFile(currentPath + "\\sounds\\" + str + ".yml");
+			boxFrame->Close(true);
+		}
+		else if (operation == "music")
+		{
+			Music::objectMap.erase(str.ToStdString());
+			wxRemoveFile(currentPath + "\\music\\" + str + ".yml");
+			boxFrame->Close(true);
 		}
 	}
 }
@@ -865,7 +909,7 @@ void Editor::resetTrigger()
 			string str = pair.first + ": {default: " + to_string(pair.second) + "}";
 			lb4->Append(str);
 		}
-		boxFrame->Show(false);
+		boxFrame->Close(true);
 	}
 	if (operation == "sprites")
 	{
@@ -876,13 +920,13 @@ void Editor::resetTrigger()
 			wxString str = wxString(files[i]);
 			lb1->Append(str.AfterLast('\\'));
 		}
-		boxFrame->Show(false);
+		boxFrame->Close(true);
 	}
 	if (operation == "rooms")
 	{
 		wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
 		rmEditor->Show(true);
-		boxFrame->Show(false);
+		boxFrame->Close(true);
 	}
 }
 void Editor::resetAction()
@@ -933,6 +977,7 @@ void Editor::onNew1(wxCommandEvent& event)
 	if (operation == "sprites")
 	{
 		wxFileDialog *openSprDialog = new wxFileDialog(this, "Select Image File");
+		openSprDialog->SetWildcard("BMP files (*.bmp)|*.bmp|JPG files (*.jpg)|*.jpg|PNG files (*.png)|*.png");
 		wxString fileName;
 		if (openSprDialog->ShowModal() == wxID_OK) {
 			fileName = openSprDialog->GetPath();
