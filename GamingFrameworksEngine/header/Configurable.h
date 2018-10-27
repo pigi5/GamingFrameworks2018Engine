@@ -62,7 +62,7 @@ static void loadAll(std::string projectDir, bool shallow = false)
         errorMessage << "Directory " << directoryPath.str() << " could not be opened.";
         throw ConfigurationError(errorMessage.str());
     }
-
+    
     for (const auto& obj : objectMap)
     {
         T::objectMap[obj.first] = obj.second;
