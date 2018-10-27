@@ -438,6 +438,170 @@ namespace action_preset
         }
     };
     
+    // sets collidability
+    class CollidableSet : public Action
+    {
+    private:
+        bool value;
+    public:
+        std::string getTypeName() const
+        {
+            return "CollidableSet";
+        }
+
+        CollidableSet(bool value)
+        {
+            this->value = value;
+        }
+
+        CollidableSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<bool>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setCollidable(value);
+        }
+    };
+    
+    // sets animation speed
+    class AnimationSpeedSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "AnimationSpeedSet";
+        }
+
+        AnimationSpeedSet(float value)
+        {
+            this->value = value;
+        }
+
+        AnimationSpeedSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setAnimationSpeed(value);
+        }
+    };
+    
+    // sets animation frame
+    class AnimationFrameSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "AnimationFrameSet";
+        }
+
+        AnimationFrameSet(float value)
+        {
+            this->value = value;
+        }
+
+        AnimationFrameSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setAnimationFrame(value);
+        }
+    };
+    
+    // sets animation speed
+    class DepthSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "DepthSet";
+        }
+
+        DepthSet(float value)
+        {
+            this->value = value;
+        }
+
+        DepthSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setDepth(value);
+        }
+    };
+    
     // sets an attribute
     class AttributeSet : public Action
     {
@@ -477,9 +641,7 @@ namespace action_preset
     
         void run(Actor* actor)
         {
-            engine_util::logger << "maybe " << toString() << std::endl;
             if (!checkConditionals(actor)) return;
-            engine_util::logger << "actually " << toString() << std::endl;
 
             actor->setAttribute(key, value);
         }
@@ -893,6 +1055,22 @@ namespace action_preset
         else if (typeName == "Create")
         {
             return new Create(node);
+        }
+        else if (typeName == "CollidableSet")
+        {
+            return new CollidableSet(node);
+        }
+        else if (typeName == "AnimationSpeedSet")
+        {
+            return new AnimationSpeedSet(node);
+        }
+        else if (typeName == "AnimationFrameSet")
+        {
+            return new AnimationFrameSet(node);
+        }
+        else if (typeName == "DepthSet")
+        {
+            return new DepthSet(node);
         }
         else if (typeName == "AttributeSet")
         {

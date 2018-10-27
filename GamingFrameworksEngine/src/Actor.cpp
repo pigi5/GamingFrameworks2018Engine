@@ -403,6 +403,33 @@ void Actor::setYSpeed(float ySpeed)
 	this->ySpeed = ySpeed;
 }
 
+void Actor::setCollidable(bool collidable)
+{
+    if (collidable)
+    {
+        float width = type->sprite->getRecommendedWidth() * type->xScale;
+        float height = type->sprite->getRecommendedHeight() * type->yScale;
+        this->hitbox = new Hitbox(nextState.xPosition + xSpriteOffset, 
+            nextState.yPosition + ySpriteOffset, width, height);
+    }
+    else
+    {
+        this->hitbox = NULL;
+    }
+}
+void Actor::setAnimationSpeed(float imageSpeed)
+{
+    this->imageSpeed = imageSpeed;
+}
+void Actor::setAnimationFrame(float imageFrame)
+{
+    this->imageFrame = imageFrame;
+}
+void Actor::setDepth(float depth)
+{
+    this->depth = depth;
+}
+
 void Actor::setAttribute(std::string key, int value)
 {
     try

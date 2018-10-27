@@ -159,6 +159,7 @@ public:
 	void setCollidable(bool);
 	void setAnimationSpeed(float);
 	void setAnimationFrame(float);
+	void setDepth(float);
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);
