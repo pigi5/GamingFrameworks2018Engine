@@ -1143,7 +1143,12 @@ void Editor::onNew3(wxCommandEvent& event)
 }
 void Editor::onEdit3(wxCommandEvent& event)
 {
-	
+	int sel = lb3->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb3->GetString(sel);
+
+	}
 }
 void Editor::onDelete3(wxCommandEvent& event)
 {
