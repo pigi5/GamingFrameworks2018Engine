@@ -10,7 +10,7 @@
 #include <direct.h>
 #include <iostream>
 
-string operation;
+int operation;
 wxListBox* listbox;
 wxFrame* boxFrame;
 wxString currentPath;
@@ -27,17 +27,20 @@ enum
 	OPEN = 3,
 	SAVE = 4,
 	ROOM = 5,
-	OBJECT = 6,
+	ACTOR = 6,
 	SPRITE = 7,
 	SOUND = 8,
 	MUSIC = 16,
 	OVERLAY = 10,
+	ATTRIBUTE = 9,
 	NEW_ITEM = 11,
 	EDIT_ITEM = 12,
 	DELETE_ITEM = 13,
 	CLEAR = 14,
 	PLAY = 15
 };
+
+unordered_map<int, std::string> actionNames;
 
 // ----------------------------------------------------------------------------
 // our classes
@@ -96,8 +99,9 @@ public:
 	void onSprite(wxCommandEvent& event);
 	void onSound(wxCommandEvent& event);
 	void onMusic(wxCommandEvent& event);
-	void onObject(wxCommandEvent& event);
+	void onActor(wxCommandEvent& event);
 	void onRoom(wxCommandEvent& event);
+	void onAttribute(wxCommandEvent& event);
 	void onOverlay(wxCommandEvent& event);
 	void onNew(wxCommandEvent& event);
 	void onSelect(wxCommandEvent& event);
@@ -155,6 +159,14 @@ bool MyApp::OnInit()
 {
 	if (!wxApp::OnInit())
 		return false;
+    
+    actionNames[SPRITE] = "Sprite";
+    actionNames[ACTOR] = "Actor";
+    actionNames[OVERLAY] = "Overlay";
+    actionNames[ROOM] = "Room";
+    actionNames[SOUND] = "Sound";
+    actionNames[MUSIC] = "Music";
+    actionNames[ATTRIBUTE] = "Attribute";
 
 	// create and show the main frame
 	MyFrame* frame = new MyFrame;
@@ -259,6 +271,7 @@ void MyFrame::loadConfig()
 
 void MyFrame::unloadConfig()
 {
+    Engine::defaultAttributes.clear();
 	unloadAll<Room>();
 	unloadAll<OverlayType>();
 	unloadAll<ActorType>();
@@ -271,7 +284,7 @@ void MyFrame::saveConfig()
 {
     std::string currentDir = currentPath.ToStdString();
 
-    Engine::loadAttributes(currentDir);
+    Engine::saveAttributes(currentDir);
 	saveAll<Sprite>(currentDir);
 	saveAll<Sound>(currentDir);
 	saveAll<Music>(currentDir);
@@ -387,8 +400,9 @@ Sidebar::Sidebar(wxWindow* parent)
 	wxButton *bt2 = new wxButton(pnl, SOUND, "Sound");
 	wxButton *bt7 = new wxButton(pnl, MUSIC, "Music");
 	wxButton *bt3 = new wxButton(pnl, ROOM, "Rooms");
-	wxButton *bt4 = new wxButton(pnl, OBJECT, "Objects");
+	wxButton *bt4 = new wxButton(pnl, ACTOR, "Actors");
 	wxButton *bt5 = new wxButton(pnl, OVERLAY, "Overlays");
+	wxButton *bt6 = new wxButton(pnl, ATTRIBUTE, "Attributes");
 
 	Connect(SPRITE, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onSprite));
@@ -398,10 +412,12 @@ Sidebar::Sidebar(wxWindow* parent)
 		wxCommandEventHandler(Sidebar::onMusic));
 	Connect(ROOM, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onRoom));
-	Connect(OBJECT, wxEVT_COMMAND_BUTTON_CLICKED,
-		wxCommandEventHandler(Sidebar::onObject));
+	Connect(ACTOR, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onActor));
 	Connect(OVERLAY, wxEVT_COMMAND_BUTTON_CLICKED,
 		wxCommandEventHandler(Sidebar::onOverlay));
+	Connect(ATTRIBUTE, wxEVT_COMMAND_BUTTON_CLICKED,
+		wxCommandEventHandler(Sidebar::onAttribute));
 
 	buttons->Add(bt1, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt2, 0, wxALIGN_CENTER | wxCENTER, 20);
@@ -409,6 +425,7 @@ Sidebar::Sidebar(wxWindow* parent)
 	buttons->Add(bt3, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt4, 0, wxALIGN_CENTER | wxCENTER, 20);
 	buttons->Add(bt5, 0, wxALIGN_CENTER | wxCENTER, 20);
+	buttons->Add(bt6, 0, wxALIGN_CENTER | wxCENTER, 20);
 
 	pnl->SetSizer(buttons);
 
@@ -423,7 +440,7 @@ Sidebar::Sidebar(wxWindow* parent)
 
 void Sidebar::onSprite(wxCommandEvent& event)
 {
-	operation = "sprites";
+	operation = SPRITE;
 	boxFrame = new wxFrame(NULL, wxID_ANY, "Sprite Control", wxDefaultPosition, wxSize(270, 200));
 	
 	wxPanel * panel = new wxPanel(boxFrame, -1);
@@ -462,7 +479,7 @@ void Sidebar::onSprite(wxCommandEvent& event)
 }
 void Sidebar::onSound(wxCommandEvent& event)
 {
-	operation = "sound";
+	operation = SOUND;
 	boxFrame = new wxFrame(NULL, wxID_ANY, "Sound Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
@@ -501,7 +518,7 @@ void Sidebar::onSound(wxCommandEvent& event)
 }
 void Sidebar::onMusic(wxCommandEvent& event)
 {
-	operation = "music";
+	operation = MUSIC;
 	boxFrame = new wxFrame(NULL, wxID_ANY, "Music Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
@@ -538,10 +555,10 @@ void Sidebar::onMusic(wxCommandEvent& event)
 
 	boxFrame->Show(true);
 }
-void Sidebar::onObject(wxCommandEvent& event)
+void Sidebar::onActor(wxCommandEvent& event)
 {
-	operation = "actor_types";
-	boxFrame = new wxFrame(NULL, wxID_ANY, "Object Control", wxDefaultPosition, wxSize(270, 200));
+	operation = ACTOR;
+	boxFrame = new wxFrame(NULL, wxID_ANY, "Actor Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
 	wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -579,7 +596,7 @@ void Sidebar::onObject(wxCommandEvent& event)
 }
 void Sidebar::onRoom(wxCommandEvent& event)
 {
-	operation = "rooms";
+	operation = ROOM;
 	boxFrame = new wxFrame(NULL, wxID_ANY, "Room Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
@@ -619,7 +636,7 @@ void Sidebar::onRoom(wxCommandEvent& event)
 
 void Sidebar::onOverlay(wxCommandEvent& event)
 {
-	operation = "overlay_types";
+	operation = OVERLAY;
 	boxFrame = new wxFrame(NULL, wxID_ANY, "Overlay Control", wxDefaultPosition, wxSize(270, 200));
 
 	wxPanel * panel = new wxPanel(boxFrame, -1);
@@ -656,10 +673,19 @@ void Sidebar::onOverlay(wxCommandEvent& event)
 
 	boxFrame->Show(true);
 }
+
+void Sidebar::onAttribute(wxCommandEvent& event)
+{
+	operation = ATTRIBUTE;
+	selObject = "";
+	MySplitterWindow* p = (MySplitterWindow*) this->GetParent();
+	p->OnChange();
+}
+
 void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 {
 	wxString str, fn;
-	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New " + operation + " Name");
+	wxTextEntryDialog* getTxt = new wxTextEntryDialog(this, "Enter New " + actionNames[operation] + " Name");
 	if (getTxt->ShowModal() == wxID_OK)
 	{
 		str = getTxt->GetValue();
@@ -667,50 +693,51 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 	if (str.Len() > 0)
 	{
 		listbox->Append(str);
-		if (operation == "sprites")
-		{
-			Sprite::createSprite(str.ToStdString());
-		}
-		else if (operation == "actor_types")
-		{
-			ActorType::createActorType(str.ToStdString());
-		}
-		else if (operation == "overlay_types")
-		{
-			OverlayType::createOverlayType(str.ToStdString());
-		}
-		else if (operation == "rooms")
-		{
-			Room::createRoom(str.ToStdString());
-		}
-		else if (operation == "sound")
-		{
-			wxFileDialog *openSndDialog = new wxFileDialog(this, "Select Sound File");
-			openSndDialog->SetWildcard("WAV files (*.wav)|*.wav");
-			if (openSndDialog->ShowModal() == wxID_OK) {
-				fn= openSndDialog->GetPath();
-				wxCopyFile(fn, currentPath + "\\sounds\\" + fn.AfterLast('\\'));
-				wxString relPath = wxString(currentPath);
-				relPath = relPath.AfterLast('\\');
-				relPath += "\\sounds\\" + fn.AfterLast('\\');
-				Sound::createSound(str.ToStdString(), relPath.ToStdString());
-				boxFrame->Close(true);
-			}
-		}
-		else if (operation == "music")
-		{
-			wxFileDialog *openMusDialog = new wxFileDialog(this, "Select Music File");
-			openMusDialog->SetWildcard("WAV files (*.wav)|*.wav");
-			if (openMusDialog->ShowModal() == wxID_OK) {
-				fn = openMusDialog->GetPath();
-				wxCopyFile(fn, currentPath + "\\music\\" + fn.AfterLast('\\'));
-				wxString relPath = wxString(currentPath);
-				relPath = relPath.AfterLast('\\');
-				relPath += "\\music\\" + fn.AfterLast('\\');
-				Music::createMusic(str.ToStdString(), relPath.ToStdString());
-				boxFrame->Close(true);
-			}
-		}
+        switch (operation)
+        {
+            case SPRITE:
+			    Sprite::createSprite(str.ToStdString());
+                break;
+            case ACTOR:
+			    ActorType::createActorType(str.ToStdString());
+                break;
+            case OVERLAY:
+			    OverlayType::createOverlayType(str.ToStdString());
+                break;
+            case ROOM:
+			    Room::createRoom(str.ToStdString());
+                break;
+            case SOUND:
+            {
+			    wxFileDialog *openSndDialog = new wxFileDialog(this, "Select Sound File");
+			    openSndDialog->SetWildcard("WAV files (*.wav)|*.wav");
+			    if (openSndDialog->ShowModal() == wxID_OK) {
+				    fn= openSndDialog->GetPath();
+				    wxCopyFile(fn, currentPath + "\\sounds\\" + fn.AfterLast('\\'));
+				    wxString relPath = wxString(currentPath);
+				    relPath = relPath.AfterLast('\\');
+				    relPath += "\\sounds\\" + fn.AfterLast('\\');
+				    Sound::createSound(str.ToStdString(), relPath.ToStdString());
+				    boxFrame->Close(true);
+			    }
+                break;
+            }
+            case MUSIC:
+            {
+			    wxFileDialog *openMusDialog = new wxFileDialog(this, "Select Music File");
+			    openMusDialog->SetWildcard("WAV files (*.wav)|*.wav");
+			    if (openMusDialog->ShowModal() == wxID_OK) {
+				    fn = openMusDialog->GetPath();
+				    wxCopyFile(fn, currentPath + "\\music\\" + fn.AfterLast('\\'));
+				    wxString relPath = wxString(currentPath);
+				    relPath = relPath.AfterLast('\\');
+				    relPath += "\\music\\" + fn.AfterLast('\\');
+				    Music::createMusic(str.ToStdString(), relPath.ToStdString());
+				    boxFrame->Close(true);
+			    }
+                break;
+            }
+        }
 	}
 }
 void Sidebar::onSelect(wxCommandEvent& event)
@@ -731,38 +758,30 @@ void Sidebar::onDelete(wxCommandEvent& event)
 	{
 		wxString str = listbox->GetString(sel);
 		listbox->Delete(sel);
-		if (operation == "sprites")
-		{
-			Sprite::objectMap.erase(str.ToStdString());
-			boxFrame->Close(true);
-		}
-		else if (operation == "actor_types")
-		{
-			ActorType::objectMap.erase(str.ToStdString());
-			boxFrame->Close(true);
-		}
-		else if (operation == "overlay_types")
-		{
-			OverlayType::objectMap.erase(str.ToStdString());
-			boxFrame->Close(true);
-		}
-		else if (operation == "rooms")
-		{
-			Room::objectMap.erase(str.ToStdString());
-			boxFrame->Close(true);
-		}
-		else if (operation == "sound")
-		{
-			Sound::objectMap.erase(str.ToStdString());
-			wxRemoveFile(currentPath + "\\sounds\\" + str + ".yml");
-			boxFrame->Close(true);
-		}
-		else if (operation == "music")
-		{
-			Music::objectMap.erase(str.ToStdString());
-			wxRemoveFile(currentPath + "\\music\\" + str + ".yml");
-			boxFrame->Close(true);
-		}
+        switch (operation)
+        {
+            case SPRITE:
+			    Sprite::objectMap.erase(str.ToStdString());
+                break;
+            case ACTOR:
+			    ActorType::objectMap.erase(str.ToStdString());
+                break;
+            case OVERLAY:
+			    OverlayType::objectMap.erase(str.ToStdString());
+                break;
+            case ROOM:
+			    Room::objectMap.erase(str.ToStdString());
+                break;
+            case SOUND:
+			    Sound::objectMap.erase(str.ToStdString());
+			    wxRemoveFile(currentPath + "\\sounds\\" + str + ".yml");
+                break;
+            case MUSIC:
+			    Music::objectMap.erase(str.ToStdString());
+			    wxRemoveFile(currentPath + "\\music\\" + str + ".yml");
+                break;
+        }
+		boxFrame->Close(true);
 	}
 }
 
@@ -894,40 +913,60 @@ void Editor::resetTrigger()
 	lb2->Clear();
 	lb3->Clear();
 	lb4->Clear();
-	if (operation == "actor_types")
-	{
-		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
-		for (const auto& pair : actionMap)
-		{
-			string str = pair.first->toString();
-			lb1->Append(str);
-		}
-		std::unordered_map<std::string, int> attributes = at->attributes;
-		for (const auto& pair : attributes)
-		{
-			string str = pair.first + ": {default: " + to_string(pair.second) + "}";
-			lb4->Append(str);
-		}
-		boxFrame->Close(true);
-	}
-	if (operation == "sprites")
-	{
-		Sprite* spr = Sprite::objectMap.at(selObject);
-		vector<string> files = spr->textrFiles;
-		for (int i = 0; i < files.size(); i++)
-		{
-			wxString str = wxString(files[i]);
-			lb1->Append(str.AfterLast('\\'));
-		}
-		boxFrame->Close(true);
-	}
-	if (operation == "rooms")
-	{
-		wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
-		rmEditor->Show(true);
-		boxFrame->Close(true);
-	}
+    
+    switch (operation)
+    {
+        case SPRITE:
+        {
+		    Sprite* spr = Sprite::objectMap.at(selObject);
+		    vector<string> files = spr->textrFiles;
+		    for (int i = 0; i < files.size(); i++)
+		    {
+			    wxString str = wxString(files[i]);
+			    lb1->Append(str.AfterLast('\\'));
+		    }
+		    boxFrame->Close(true);
+            break;
+        }
+        case ACTOR:
+        {
+		    ActorType* at = ActorType::objectMap.at(selObject);
+		    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+		    for (const auto& pair : actionMap)
+		    {
+			    string str = pair.first->toString();
+			    lb1->Append(str);
+		    }
+		    std::unordered_map<std::string, int> attributes = at->attributes;
+		    for (const auto& pair : attributes)
+		    {
+			    string str = pair.first + ": {default: " + to_string(pair.second) + "}";
+			    lb4->Append(str);
+		    }
+		    boxFrame->Close(true);
+            break;
+        }
+        case OVERLAY:
+            break;
+        case ROOM:
+        {
+		    wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
+		    rmEditor->Show(true);
+		    boxFrame->Close(true);
+            break;
+        }
+        case SOUND:
+            break;
+        case MUSIC:
+            break;
+        case ATTRIBUTE:
+		    for (const auto& pair : Engine::defaultAttributes)
+		    {
+			    string str = pair.first + ": {default: " + to_string(pair.second) + "}";
+			    lb4->Append(str);
+		    }
+            break;
+    }
 }
 void Editor::resetAction()
 {
@@ -974,7 +1013,7 @@ void Editor::resetCon()
 
 void Editor::onNew1(wxCommandEvent& event)
 {
-	if (operation == "sprites")
+	if (operation == SPRITE)
 	{
 		wxFileDialog *openSprDialog = new wxFileDialog(this, "Select Image File");
 		openSprDialog->SetWildcard("BMP files (*.bmp)|*.bmp|JPG files (*.jpg)|*.jpg|PNG files (*.png)|*.png");
@@ -996,7 +1035,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 	int sel = lb1->GetSelection();
 	if (sel != -1)
 	{
-		if (operation == "sprites")
+		if (operation == SPRITE)
 		{
 			wxString str = lb1->GetString(sel);
 			Sprite* spr = Sprite::objectMap.at(selObject);
@@ -1032,37 +1071,42 @@ void Editor::onDelete1(wxCommandEvent& event)
 	wxString str = lb1->GetString(sel);
 	if (sel != -1)
 	{
-		if (operation == "sprites")
-		{
-			Sprite* spr = Sprite::objectMap.at(selObject);
-			vector<string>* files = &spr->textrFiles;
-			bool found = false;
-			for (int i = 0; i < files->size() && !found; i++)
-			{
-				wxString file = files->at(i);
-				if (file.AfterLast('\\') == str)
-				{
-					files->erase(files->begin() + i);
-					lb1->Delete(sel);
-					found = true;
-				}
-			}
-		}
-		if (operation == "actor_types")
-		{
-			ActorType* at = ActorType::objectMap.at(selObject);
-			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
-			bool found = false;
-			for (const auto& pair : actionMap)
-			{
-				if (pair.first->toString() == str.ToStdString() && !found)
-				{
-					actionMap.erase(pair.first);
-					lb1->Delete(sel);
-					found = true;
-				}
-			}
-		}
+        switch (operation)
+        {
+            case SPRITE:
+            {
+			    Sprite* spr = Sprite::objectMap.at(selObject);
+			    vector<string>* files = &spr->textrFiles;
+			    bool found = false;
+			    for (int i = 0; i < files->size() && !found; i++)
+			    {
+				    wxString file = files->at(i);
+				    if (file.AfterLast('\\') == str)
+				    {
+					    files->erase(files->begin() + i);
+					    lb1->Delete(sel);
+					    found = true;
+				    }
+			    }
+                break;
+            }
+            case ACTOR:
+            {
+			    ActorType* at = ActorType::objectMap.at(selObject);
+			    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+			    bool found = false;
+			    for (const auto& pair : actionMap)
+			    {
+				    if (pair.first->toString() == str.ToStdString() && !found)
+				    {
+					    actionMap.erase(pair.first);
+					    lb1->Delete(sel);
+					    found = true;
+				    }
+			    }
+                break;
+            }
+        }
 	}
 }
 
@@ -1154,10 +1198,20 @@ void Editor::onNew4(wxCommandEvent& event)
 			ActorType* at = ActorType::objectMap.at(selObject);
 			std::unordered_map<std::string, int>* attr = &at->attributes;
 			attr->emplace(str.ToStdString(), 0);
-			string ret = str.ToStdString() + ": {default: " + to_string(attr->at(str.ToStdString())) + "}";
+			string ret = str.ToStdString() + ": {default: 0}";
 			lb4->Append(ret);
 		}
 	}
+    else if (operation == ATTRIBUTE)
+    {
+		if (getNewAttr->ShowModal() == wxID_OK)
+		{
+			str = getNewAttr->GetValue();
+			Engine::defaultAttributes[str.ToStdString()] = 0;
+			string ret = str.ToStdString() + ": {default: 0}";
+			lb4->Append(ret);
+		}
+    }
 }
 void Editor::onEdit4(wxCommandEvent& event)
 {
@@ -1167,18 +1221,34 @@ void Editor::onEdit4(wxCommandEvent& event)
 	int sel = lb4->GetSelection();
 	if (sel != -1)
 	{
-		if (editAttr->ShowModal() == wxID_OK)
-		{
-			str = editAttr->GetValue();
-			str.ToLong(&toEdit);
-			str = lb4->GetString(sel);
-			ActorType* at = ActorType::objectMap.at(selObject);
-			std::unordered_map<std::string, int>* attr = &at->attributes;
-			attr->erase((str.BeforeFirst(':')).ToStdString());
-			attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
-			string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
-			lb4->SetString(sel, ret);
-		}
+        switch (operation)
+        {
+            case ACTOR:
+		        if (editAttr->ShowModal() == wxID_OK)
+		        {
+			        str = editAttr->GetValue();
+			        str.ToLong(&toEdit);
+			        str = lb4->GetString(sel);
+			        ActorType* at = ActorType::objectMap.at(selObject);
+			        std::unordered_map<std::string, int>* attr = &at->attributes;
+			        attr->erase((str.BeforeFirst(':')).ToStdString());
+			        attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
+			        string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
+			        lb4->SetString(sel, ret);
+		        }
+                break;
+            case ATTRIBUTE:
+		        if (editAttr->ShowModal() == wxID_OK)
+		        {
+			        str = editAttr->GetValue();
+			        str.ToLong(&toEdit);
+			        str = lb4->GetString(sel);
+			        Engine::defaultAttributes[(str.BeforeFirst(':')).ToStdString()] = (int)toEdit;
+			        string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
+			        lb4->SetString(sel, ret);
+		        }
+                break;
+        }
 	}
 }
 void Editor::onDelete4(wxCommandEvent& event)
@@ -1187,17 +1257,28 @@ void Editor::onDelete4(wxCommandEvent& event)
 	if (sel != -1)
 	{
 		wxString str = lb4->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
-		std::unordered_map<std::string, int>* attr = &at->attributes;
-		attr->erase((str.BeforeFirst(':')).ToStdString());
-		lb4->Delete(sel);
+        switch (operation)
+        {
+            case ACTOR:
+            {
+		        ActorType* at = ActorType::objectMap.at(selObject);
+		        std::unordered_map<std::string, int>* attr = &at->attributes;
+		        attr->erase((str.BeforeFirst(':')).ToStdString());
+		        lb4->Delete(sel);
+                break;
+            }
+            case ATTRIBUTE:
+		        Engine::defaultAttributes.erase((str.BeforeFirst(':')).ToStdString());
+		        lb4->Delete(sel);
+                break;
+        }
 	}
 }
 
 void Editor::onBox1Select(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
-	if (sel != -1 && operation == "actor_types")
+	if (sel != -1 && operation == ACTOR)
 	{
 		wxString str = lb1->GetString(sel);
 		selTrigger = str.ToStdString();
@@ -1208,7 +1289,7 @@ void Editor::onBox1Select(wxCommandEvent& event)
 void Editor::onBox2Select(wxCommandEvent& event)
 {
 	int sel = lb2->GetSelection();
-	if (sel != -1 && operation == "actor_types")
+	if (sel != -1 && operation == ACTOR)
 	{
 		wxString str = lb2->GetString(sel);
 		selAction = str.ToStdString();
