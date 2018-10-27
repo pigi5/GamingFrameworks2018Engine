@@ -17,7 +17,11 @@ wxString currentPath;
 string selObject;
 string selTrigger;
 string selAction;
-
+wxString box1Text;
+wxStaticText* st1;
+wxStaticText* st2;
+wxStaticText* st3;
+wxStaticText* st4;
 
 // ID for the menu commands
 enum
@@ -318,7 +322,7 @@ void MyFrame::OnNew(wxCommandEvent& event)
 	}
 	if (f != wxEmptyString)
 	{
-		this->SetLabel(f);
+		this->SetLabel("Frameworks Engine --- " + f);
 		wxMkdir(f);
 		currentPath = p + "//" + f;
 		if (wxSetWorkingDirectory(currentPath))
@@ -343,7 +347,7 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 	if (openProjDialog->ShowModal() == wxID_OK) {
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
-		this->SetLabel(fileName.AfterLast('\\'));
+		this->SetLabel("Frameworks Engine --- " + fileName.AfterLast('\\'));
 	}
     
 	reloadConfig();
@@ -747,6 +751,7 @@ void Sidebar::onSelect(wxCommandEvent& event)
 	{
 		wxString str = listbox->GetString(sel);
 		selObject = str.ToStdString();
+		box1Text = str;
 		MySplitterWindow* p = (MySplitterWindow*) this->GetParent();
 		p->OnChange();
 	}
@@ -871,10 +876,10 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	wxStaticText *st1 = new wxStaticText(pnl1, wxID_ANY, "Primary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	wxStaticText *st2 = new wxStaticText(pnl2, wxID_ANY, "Secondary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	wxStaticText *st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	wxStaticText *st4 = new wxStaticText(pnl4, wxID_ANY, "Attributes", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	st1 = new wxStaticText(pnl1, wxID_ANY, "Primary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	st2 = new wxStaticText(pnl2, wxID_ANY, "Secondary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	st4 = new wxStaticText(pnl4, wxID_ANY, "Quaternary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
 
 	bx1->Add(st1, 0, wxCENTRE | wxTOP, 0);
 	bx2->Add(st2, 0, wxCENTRE | wxTOP, 0);
@@ -913,11 +918,17 @@ void Editor::resetTrigger()
 	lb2->Clear();
 	lb3->Clear();
 	lb4->Clear();
+    st1->SetLabel(box1Text);
     
     switch (operation)
     {
         case SPRITE:
         {
+            st1->SetLabel(box1Text + " -- Images");
+		    st2->SetLabel("Unused");
+		    st3->SetLabel("Unused");
+		    st4->SetLabel("Unused");
+
 		    Sprite* spr = Sprite::objectMap.at(selObject);
 		    vector<string> files = spr->textrFiles;
 		    for (int i = 0; i < files.size(); i++)
@@ -930,6 +941,11 @@ void Editor::resetTrigger()
         }
         case ACTOR:
         {
+		    st1->SetLabel(box1Text + " -- Triggers");
+		    st2->SetLabel("Actions");
+		    st3->SetLabel("Conditionals");
+		    st4->SetLabel("Attributes");
+
 		    ActorType* at = ActorType::objectMap.at(selObject);
 		    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
 		    for (const auto& pair : actionMap)
@@ -947,19 +963,37 @@ void Editor::resetTrigger()
             break;
         }
         case OVERLAY:
+
             break;
         case ROOM:
         {
+		    st1->SetLabel("Unused");
+		    st2->SetLabel("Unused");
+		    st3->SetLabel("Unused");
+		    st4->SetLabel("Unused");
+
 		    wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
 		    rmEditor->Show(true);
 		    boxFrame->Close(true);
             break;
         }
         case SOUND:
+		    st1->SetLabel("Unused");
+		    st2->SetLabel("Unused");
+		    st3->SetLabel("Unused");
+		    st4->SetLabel("Unused");
             break;
         case MUSIC:
+		    st1->SetLabel("Unused");
+		    st2->SetLabel("Unused");
+		    st3->SetLabel("Unused");
+		    st4->SetLabel("Unused");
             break;
         case ATTRIBUTE:
+		    st1->SetLabel("Unused");
+		    st2->SetLabel("Unused");
+		    st3->SetLabel("Unused");
+		    st4->SetLabel("Attributes");
 		    for (const auto& pair : Engine::defaultAttributes)
 		    {
 			    string str = pair.first + ": {default: " + to_string(pair.second) + "}";
