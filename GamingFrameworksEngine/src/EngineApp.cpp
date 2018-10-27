@@ -17,11 +17,14 @@ wxString currentPath;
 string selObject;
 string selTrigger;
 string selAction;
-wxString box1Text;
+wxStaticText* topText;
 wxStaticText* st1;
 wxStaticText* st2;
 wxStaticText* st3;
 wxStaticText* st4;
+
+wxString DEFAULT_TOP_STR("Edit Panel: Select an object to edit from the sidebar.");
+wxString UNOPENED_TOP_STR("Open a project to start editing.");
 
 // ID for the menu commands
 enum
@@ -196,7 +199,7 @@ wxEND_EVENT_TABLE()
 
 // My frame constructor
 MyFrame::MyFrame()
-	: wxFrame(NULL, wxID_ANY, wxT("Frameworks Engine"),
+	: wxFrame(NULL, wxID_ANY, wxT("RAGE"),
 		wxDefaultPosition, wxSize(800, 600),
 		wxDEFAULT_FRAME_STYLE | wxNO_FULL_REPAINT_ON_RESIZE)
 {
@@ -322,7 +325,7 @@ void MyFrame::OnNew(wxCommandEvent& event)
 	}
 	if (f != wxEmptyString)
 	{
-		this->SetLabel("Frameworks Engine --- " + f);
+		this->SetLabel("RAGE - " + f);
 		wxMkdir(f);
 		currentPath = p + "//" + f;
 		if (wxSetWorkingDirectory(currentPath))
@@ -347,9 +350,9 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 	if (openProjDialog->ShowModal() == wxID_OK) {
 		wxString fileName = openProjDialog->GetPath();
 		currentPath = fileName;
-		this->SetLabel("Frameworks Engine --- " + fileName.AfterLast('\\'));
-	}
-    
+		this->SetLabel("RAGE - " + fileName.AfterLast('\\'));
+        topText->SetLabel(DEFAULT_TOP_STR);
+	}    
 	reloadConfig();
 }
 void MyFrame::OnSave(wxCommandEvent& event)
@@ -751,7 +754,6 @@ void Sidebar::onSelect(wxCommandEvent& event)
 	{
 		wxString str = listbox->GetString(sel);
 		selObject = str.ToStdString();
-		box1Text = str;
 		MySplitterWindow* p = (MySplitterWindow*) this->GetParent();
 		p->OnChange();
 	}
@@ -796,9 +798,10 @@ Editor::Editor(wxWindow* parent)
 		wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE)
 {
 	SetScrollbars(20, 20, 5, 5);
+    
 	wxPanel* panel = new wxPanel(this, wxID_ANY);
 	wxPanel *pnl1, *pnl2, *pnl3, *pnl4;
-	wxBoxSizer *vszr = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *vszr = new wxBoxSizer(wxVERTICAL);
 	wxGridSizer* obGrid = new wxGridSizer(2, 2, 2, 2);
 
 	pnl1 = new wxPanel(panel, wxID_ANY);
@@ -876,25 +879,25 @@ Editor::Editor(wxWindow* parent)
 	gdbox4->Add(delBtn4, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bpnl4->SetSizer(gdbox4);
 
-	st1 = new wxStaticText(pnl1, wxID_ANY, "Primary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	st2 = new wxStaticText(pnl2, wxID_ANY, "Secondary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
-	st4 = new wxStaticText(pnl4, wxID_ANY, "Quaternary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+	st1 = new wxStaticText(pnl1, wxID_ANY, "Primary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+	st2 = new wxStaticText(pnl2, wxID_ANY, "Secondary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+	st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+	st4 = new wxStaticText(pnl4, wxID_ANY, "Quaternary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 
-	bx1->Add(st1, 0, wxCENTRE | wxTOP, 0);
-	bx2->Add(st2, 0, wxCENTRE | wxTOP, 0);
-	bx3->Add(st3, 0, wxCENTRE | wxTOP, 0);
-	bx4->Add(st4, 0, wxCENTRE | wxTOP, 0);
+	bx1->Add(st1, 0, wxCENTRE | wxALL, 7);
+	bx2->Add(st2, 0, wxCENTRE | wxALL, 7);
+	bx3->Add(st3, 0, wxCENTRE | wxALL, 7);
+	bx4->Add(st4, 0, wxCENTRE | wxALL, 7);
 
-	bx1->Add(bpnl1, 1, wxEXPAND | wxTOP, 2);
-	bx2->Add(bpnl2, 1, wxEXPAND | wxTOP, 2);
-	bx3->Add(bpnl3, 1, wxEXPAND | wxTOP, 2);
-	bx4->Add(bpnl4, 1, wxEXPAND | wxTOP, 2);
+	bx1->Add(bpnl1, 0, wxEXPAND | wxBOTTOM, 5);
+	bx2->Add(bpnl2, 0, wxEXPAND | wxBOTTOM, 5);
+	bx3->Add(bpnl3, 0, wxEXPAND | wxBOTTOM, 5);
+	bx4->Add(bpnl4, 0, wxEXPAND | wxBOTTOM, 5);
 
-	bx1->Add(lb1, 3, wxEXPAND | wxALL, 2);
-	bx2->Add(lb2, 3, wxEXPAND | wxALL, 2);
-	bx3->Add(lb3, 3, wxEXPAND | wxALL, 2);
-	bx4->Add(lb4, 3, wxEXPAND | wxALL, 2);
+	bx1->Add(lb1, 1, wxEXPAND | wxALL, 2);
+	bx2->Add(lb2, 1, wxEXPAND | wxALL, 2);
+	bx3->Add(lb3, 1, wxEXPAND | wxALL, 2);
+	bx4->Add(lb4, 1, wxEXPAND | wxALL, 2);
 
 	pnl1->SetSizer(bx1);
 	pnl2->SetSizer(bx2);
@@ -906,7 +909,10 @@ Editor::Editor(wxWindow* parent)
 	obGrid->Add(pnl3, 0, wxEXPAND | wxBOTTOM | wxLEFT, 2);
 	obGrid->Add(pnl4, 0, wxEXPAND | wxBOTTOM | wxRIGHT, 2);
 
+    topText = new wxStaticText(this, wxID_ANY, UNOPENED_TOP_STR, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
+   
 	panel->SetSizer(obGrid);
+	vszr->Add(topText, 0, wxEXPAND | wxTOP, 10);
 	vszr->Add(panel, 1, wxEXPAND);
 
 	this->SetSizer(vszr);
@@ -918,13 +924,13 @@ void Editor::resetTrigger()
 	lb2->Clear();
 	lb3->Clear();
 	lb4->Clear();
-    st1->SetLabel(box1Text);
     
     switch (operation)
     {
         case SPRITE:
         {
-            st1->SetLabel(box1Text + " -- Images");
+            topText->SetLabel(wxString("Now Editing " + actionNames[operation] + " - " + selObject));
+            st1->SetLabel("Images");
 		    st2->SetLabel("Unused");
 		    st3->SetLabel("Unused");
 		    st4->SetLabel("Unused");
@@ -941,7 +947,8 @@ void Editor::resetTrigger()
         }
         case ACTOR:
         {
-		    st1->SetLabel(box1Text + " -- Triggers");
+            topText->SetLabel(wxString("Now Editing " + actionNames[operation] + " - " + selObject));
+		    st1->SetLabel("Triggers");
 		    st2->SetLabel("Actions");
 		    st3->SetLabel("Conditionals");
 		    st4->SetLabel("Attributes");
@@ -967,6 +974,7 @@ void Editor::resetTrigger()
             break;
         case ROOM:
         {
+            topText->SetLabel(DEFAULT_TOP_STR);
 		    st1->SetLabel("Unused");
 		    st2->SetLabel("Unused");
 		    st3->SetLabel("Unused");
@@ -978,18 +986,21 @@ void Editor::resetTrigger()
             break;
         }
         case SOUND:
+            topText->SetLabel(DEFAULT_TOP_STR);
 		    st1->SetLabel("Unused");
 		    st2->SetLabel("Unused");
 		    st3->SetLabel("Unused");
 		    st4->SetLabel("Unused");
             break;
         case MUSIC:
+            topText->SetLabel(DEFAULT_TOP_STR);
 		    st1->SetLabel("Unused");
 		    st2->SetLabel("Unused");
 		    st3->SetLabel("Unused");
 		    st4->SetLabel("Unused");
             break;
         case ATTRIBUTE:
+            topText->SetLabel("Now Editing Global Attributes");
 		    st1->SetLabel("Unused");
 		    st2->SetLabel("Unused");
 		    st3->SetLabel("Unused");
