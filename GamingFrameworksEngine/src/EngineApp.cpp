@@ -356,8 +356,8 @@ void MyFrame::OnOpen(wxCommandEvent& event)
 		currentPath = fileName;
 		this->SetLabel("RAGE - " + fileName.AfterLast('\\'));
         topText->SetLabel(DEFAULT_TOP_STR);
-	}    
-	reloadConfig();
+		reloadConfig();
+	}
 }
 void MyFrame::OnSave(wxCommandEvent& event)
 {
@@ -365,17 +365,20 @@ void MyFrame::OnSave(wxCommandEvent& event)
 }
 void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 {
-    saveConfig();
-	reloadConfig();
-	try
+	if (currentPath != wxEmptyString)
 	{
-		Engine::getInstance().run();
-	}
-	catch (const ConfigurationError& e)
-	{
-		std::cerr << e.what() << std::endl;
-		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
-		err->ShowModal();
+		saveConfig();
+		reloadConfig();
+		try
+		{
+			Engine::getInstance().run();
+		}
+		catch (const ConfigurationError& e)
+		{
+			std::cerr << e.what() << std::endl;
+			wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
+			err->ShowModal();
+		}
 	}
 }
 
@@ -970,6 +973,15 @@ void Editor::resetTrigger()
 			    string str = pair.first + ": {default: " + to_string(pair.second) + "}";
 			    lb4->Append(str);
 		    }
+			string str;
+			if (at->sprite != nullptr)
+			{
+				str = "Sprite: {" + at->sprite->name + "}";
+			}
+			else {
+				str = "Sprite: {None}";
+			}
+			lb4->Append(str);
 		    boxFrame->Close(true);
             break;
         }
@@ -1859,7 +1871,33 @@ void Editor::onNew2(wxCommandEvent& event)
 }
 void Editor::onEdit2(wxCommandEvent& event)
 {
-
+	int sel = lb2->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb2->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (std::list<Action*>::iterator it = pair.second.begin(); it != pair.second.end() && !found; ++it) {
+					Action* a = *it;
+					if (a->toString() == str.ToStdString())
+					{
+						pair.second.erase(it);
+						lb2->Delete(sel);
+						found = true;
+					}
+				}
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+	}
 }
 void Editor::onDelete2(wxCommandEvent& event)
 {
@@ -2108,6 +2146,13 @@ void Editor::onEdit4(wxCommandEvent& event)
 {
 	wxString str;
 	long toEdit;
+	wxArrayString sprChoices;
+	for (const auto& pair : Sprite::objectMap)
+	{
+		sprChoices.Add(pair.first);
+	}
+	sprChoices.Add("None");
+	wxSingleChoiceDialog* editSpr = new wxSingleChoiceDialog(this, "Edit Sprite", "Choose one from the list", sprChoices);
 	wxTextEntryDialog* editAttr = new wxTextEntryDialog(this, "Edit Attribute Value");
 	int sel = lb4->GetSelection();
 	if (sel != -1)
@@ -2115,18 +2160,40 @@ void Editor::onEdit4(wxCommandEvent& event)
         switch (operation)
         {
             case ACTOR:
-		        if (editAttr->ShowModal() == wxID_OK)
-		        {
-			        str = editAttr->GetValue();
-			        str.ToLong(&toEdit);
-			        str = lb4->GetString(sel);
-			        ActorType* at = ActorType::objectMap.at(selObject);
-			        std::unordered_map<std::string, int>* attr = &at->attributes;
-			        attr->erase((str.BeforeFirst(':')).ToStdString());
-			        attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
-			        string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
-			        lb4->SetString(sel, ret);
-		        }
+				if (lb4->GetString(sel).BeforeFirst(':') != "Sprite")
+				{
+					if (editAttr->ShowModal() == wxID_OK)
+					{
+						str = editAttr->GetValue();
+						str.ToLong(&toEdit);
+						str = lb4->GetString(sel);
+						ActorType* at = ActorType::objectMap.at(selObject);
+						std::unordered_map<std::string, int>* attr = &at->attributes;
+						attr->erase((str.BeforeFirst(':')).ToStdString());
+						attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
+						string ret = (str.BeforeFirst(':')).ToStdString() + ": {default: " + to_string(toEdit) + "}";
+						lb4->SetString(sel, ret);
+					}
+				}
+				else
+				{
+					if (editSpr->ShowModal() == wxID_OK)
+					{
+						wxString str = editSpr->GetStringSelection();
+						ActorType* at = ActorType::objectMap.at(selObject);
+						if (str == "None")
+						{
+							at->sprite = NULL;
+							lb4->SetString(sel, "Sprite: {None}");
+						}
+						else
+						{
+							Sprite* spr = Sprite::objectMap[str.ToStdString()];
+							at->sprite = spr;
+							lb4->SetString(sel, "Sprite: {" + at->sprite->name + "}");
+						}
+					}
+				}
                 break;
             case ATTRIBUTE:
 		        if (editAttr->ShowModal() == wxID_OK)
@@ -2152,10 +2219,13 @@ void Editor::onDelete4(wxCommandEvent& event)
         {
             case ACTOR:
             {
-		        ActorType* at = ActorType::objectMap.at(selObject);
-		        std::unordered_map<std::string, int>* attr = &at->attributes;
-		        attr->erase((str.BeforeFirst(':')).ToStdString());
-		        lb4->Delete(sel);
+				if (str.BeforeFirst(':') != "Sprite")
+				{
+					ActorType* at = ActorType::objectMap.at(selObject);
+					std::unordered_map<std::string, int>* attr = &at->attributes;
+					attr->erase((str.BeforeFirst(':')).ToStdString());
+					lb4->Delete(sel);
+				}
                 break;
             }
             case ATTRIBUTE:
