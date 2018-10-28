@@ -986,8 +986,9 @@ void Editor::resetTrigger()
             break;
         }
         case OVERLAY:
-
-            break;
+		{
+			break;
+		}
         case ROOM:
         {
             topText->SetLabel(DEFAULT_TOP_STR);
@@ -1887,7 +1888,6 @@ void Editor::onEdit2(wxCommandEvent& event)
 					if (a->toString() == str.ToStdString())
 					{
 						pair.second.erase(it);
-						lb2->Delete(sel);
 						found = true;
 					}
 				}
@@ -2218,6 +2218,7 @@ void Editor::onEdit2(wxCommandEvent& event)
 						}
 					}
 					found = true;
+					lb2->Delete(sel);
 				}
 			}
 			if (found)
