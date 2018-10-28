@@ -1087,6 +1087,7 @@ void Editor::onNew1(wxCommandEvent& event)
 		triggers.Add("Draw");
 		triggers.Add("Destroy");
 		triggers.Add("Timer");
+		triggers.Add("Custom");
 		wxSingleChoiceDialog *createTriggerDialog = new wxSingleChoiceDialog(this, "Select Trigger to create", "Select Trigger", triggers);
 		if (createTriggerDialog->ShowModal() == wxID_OK)
 		{
@@ -1099,6 +1100,7 @@ void Editor::onNew1(wxCommandEvent& event)
 			types.emplace("Draw", "ActorTypeWrapper");
 			types.emplace("Destroy", "ActorTypeWrapper");
 			types.emplace("Timer", "Index");
+			types.emplace("Custom", "Index");
 			string trig = createTriggerDialog->GetStringSelection().ToStdString();
 			string type = types[trig];
 			if (type == "ActorTypeWrapper")
@@ -1218,13 +1220,21 @@ void Editor::onNew1(wxCommandEvent& event)
 			}
 			else if (type == "Index")
 			{
-				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Time");
+				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
 				if (indexDialog->ShowModal() == wxID_OK)
 				{
 					wxString str = indexDialog->GetValue();
 					int ind = stoi(str.ToStdString());
 					Index* i = new Index(ind);
-					Trigger* t = new trigger_preset::Timer(i);
+					Trigger *t;
+					if (trig == "Timer")
+					{
+						t = new trigger_preset::Timer(i);
+					}
+					else if (trig == "Custom")
+					{
+						t = new trigger_preset::Custom(i);
+					}
 					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
@@ -1359,18 +1369,26 @@ void Editor::onEdit1(wxCommandEvent& event)
 							lb1->SetStringSelection(newTrig->toString());
 						}
 					}
-					else if (t->getTypeName() == "Timer")
+					else if (t->getTypeName() == "Timer" || t->getTypeName() == "Custom")
 					{
-						actionMap.erase(pair.first);
-						lb1->Delete(sel);
-						found = true;
-						wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Time");
+						wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
 						if (indexDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = indexDialog->GetValue();
 							int ind = stoi(str.ToStdString());
 							Index* i = new Index(ind);
-							Trigger* newTrig = new trigger_preset::Timer(i);
+							Trigger *newTrig;
+							if (t->getTypeName() == "Timer")
+							{
+								newTrig = new trigger_preset::Timer(i);
+							}
+							else if (t->getTypeName() == "Custom")
+							{
+								newTrig = new trigger_preset::Custom(i);
+							}
+							actionMap.erase(pair.first);
+							lb1->Delete(sel);
+							found = true;
 							at->actionMap[newTrig] = aList;
 							lb1->Append(newTrig->toString());
 							lb1->SetStringSelection(newTrig->toString());
