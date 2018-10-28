@@ -16,9 +16,15 @@ triggers:
   - type: Timer
     index: 0
     actions:
-      []
+      - type: Destroy
+        conditionals:
+          []
   - type: Create
     target: ball
     actions:
-      []
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 5
 ...
