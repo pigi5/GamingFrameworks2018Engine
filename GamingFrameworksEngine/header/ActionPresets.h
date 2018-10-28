@@ -111,7 +111,7 @@ namespace action_preset
     public:
         std::string getTypeName() const
         {
-            return "SetXSpeed";
+            return "SetYSpeed";
         }
 
         SetYSpeed(float speed)
@@ -399,7 +399,7 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + ": {target: " + actorType->toString() + ", state: {" + startState.toString() + "}";
+            return getTypeName() + ": {target: " + actorType->toString() + ", state: {" + startState.toString() + "}}";
         }
     
         void run(Actor* actor)
@@ -420,6 +420,8 @@ namespace action_preset
         {
             return "Destroy";
         }
+
+		Destroy() {}
 
         Destroy(const YAML::Node& node) : Action(node)
         {
@@ -678,7 +680,7 @@ namespace action_preset
             return "SetRoom";
         }
 
-        SetRoom(int index)
+        SetRoom(string name)
         {
             this->name = name;
         }

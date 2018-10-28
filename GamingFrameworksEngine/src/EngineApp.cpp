@@ -1570,7 +1570,7 @@ void Editor::onNew2(wxCommandEvent& event)
 					types.emplace("Move To", "FF");
 					types.emplace("Move", "FF");
 					types.emplace("Create", "AtFF");
-					types.emplace("Set Attribute", "SI");
+					types.emplace("Set Attribute", "StI");
 					types.emplace("Change Attribute", "StI");
 					types.emplace("Destroy", "NA");
 					types.emplace("Set Timer", "IF");
@@ -1584,47 +1584,243 @@ void Editor::onNew2(wxCommandEvent& event)
 					string aType = types[action];
 					if (aType == "FF")
 					{
-
+						wxTextEntryDialog *float3ChoiceDialog = new wxTextEntryDialog(this, "Enter X");
+						if (float3ChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = float3ChoiceDialog->GetValue();
+							float spd1 = stof(str.ToStdString());
+							wxTextEntryDialog *float3ChoiceDialog = new wxTextEntryDialog(this, "Enter Y");
+							if (float3ChoiceDialog->ShowModal() == wxID_OK)
+							{
+								wxString str = float3ChoiceDialog->GetValue();
+								float spd2 = stof(str.ToStdString());
+								Action* a;
+								if (action == "Apply Force")
+								{
+									a = new action_preset::ApplyForce(spd1, spd2);
+								}
+								else if (action == "Move To")
+								{
+									a = new action_preset::MoveTo(spd1, spd2);
+								}
+								else if (action == "Move")
+								{
+									a = new action_preset::Move(spd1, spd2);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
+							}
+						}
 					}
 					else if (aType == "F")
 					{
-
+						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
+						if (floatChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = floatChoiceDialog->GetValue();
+							float spd = stof(str.ToStdString());
+							Action* a;
+							if (action == "Set X Speed")
+							{
+								a = new action_preset::SetXSpeed(spd);
+							}
+							else if (action == "Set Y Speed")
+							{
+								a = new action_preset::SetYSpeed(spd);
+							}
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
 					}
 					else if (aType == "At")
 					{
-
+						wxArrayString actorChoices;
+						for (const auto& pair : ActorType::objectMap)
+						{
+							actorChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *actorDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+						if (actorDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = actorDialog->GetStringSelection();
+							ActorType* act = ActorType::objectMap[str.ToStdString()];
+							Action *a = new action_preset::MoveToNearest(act);
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
 					}
 					else if (aType == "AtF")
 					{
-
+						wxArrayString actorChoices;
+						for (const auto& pair : ActorType::objectMap)
+						{
+							actorChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *actor2Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+						if (actor2Dialog->ShowModal() == wxID_OK)
+						{
+							wxString str = actor2Dialog->GetStringSelection();
+							ActorType* act = ActorType::objectMap[str.ToStdString()];
+							wxTextEntryDialog *float2ChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
+							if (float2ChoiceDialog->ShowModal() == wxID_OK)
+							{
+								wxString str = float2ChoiceDialog->GetValue();
+								float spd = stof(str.ToStdString());
+								Action *a = new action_preset::MoveTowardNearest(act, spd);
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
+							}
+						}
 					}
 					else if (aType == "AtFF")
 					{
-
+						wxArrayString actorChoices;
+						for (const auto& pair : ActorType::objectMap)
+						{
+							actorChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *actor3Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+						if (actor3Dialog->ShowModal() == wxID_OK)
+						{
+							wxString str = actor3Dialog->GetStringSelection();
+							ActorType* act = ActorType::objectMap[str.ToStdString()];
+							wxTextEntryDialog *float5ChoiceDialog = new wxTextEntryDialog(this, "Enter X");
+							if (float5ChoiceDialog->ShowModal() == wxID_OK)
+							{
+								wxString str = float5ChoiceDialog->GetValue();
+								float spd1 = stof(str.ToStdString());
+								wxTextEntryDialog *float6ChoiceDialog = new wxTextEntryDialog(this, "Enter Y");
+								if (float6ChoiceDialog->ShowModal() == wxID_OK)
+								{
+									wxString str = float6ChoiceDialog->GetValue();
+									float spd2 = stof(str.ToStdString());
+									State st = State(spd1, spd2);
+									Action *a = new action_preset::Create(act, st);
+									aList->emplace_back(a);
+									lb2->Append(a->toString());
+									lb2->SetStringSelection(a->toString());
+								}
+							}
+						}
 					}
 					else if (aType == "NA")
 					{
-
+						Action* a = new action_preset::Destroy();
+						aList->emplace_back(a);
+						lb2->Append(a->toString());
+						lb2->SetStringSelection(a->toString());
 					}
 					else if (aType == "StI")
 					{
-
+						wxArrayString attrChoices;
+						std::unordered_map<std::string, int> attributes = at->attributes;
+						for (const auto& pair : attributes)
+						{
+							string str = pair.first;
+							attrChoices.Add(str);
+						}
+						wxSingleChoiceDialog *attrChoiceDialog = new wxSingleChoiceDialog(this, "Choose Attribute", "Choose one from the list", attrChoices);
+						if (attrChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = attrChoiceDialog->GetStringSelection();
+							string nm = str.ToStdString();
+							wxTextEntryDialog *int3ChoiceDialog = new wxTextEntryDialog(this, "Enter Value");
+							if (int3ChoiceDialog->ShowModal() == wxID_OK)
+							{
+								wxString str = int3ChoiceDialog->GetValue();
+								int ind = stoi(str.ToStdString());
+								Action *a;
+								if (action == "Set Attribute")
+								{
+									a = new action_preset::AttributeSet(nm, ind);
+								}
+								else if (action == "Change Attribute")
+								{
+									a = new action_preset::AttributeChange(nm, ind);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
+							}
+						}
 					}
 					else if (aType == "IF")
 					{
-
+					wxTextEntryDialog *int2ChoiceDialog = new wxTextEntryDialog(this, "Enter Index");
+					if (int2ChoiceDialog->ShowModal() == wxID_OK)
+					{
+						wxString str = int2ChoiceDialog->GetValue();
+						int ind = stoi(str.ToStdString());
+						wxTextEntryDialog *float4ChoiceDialog = new wxTextEntryDialog(this, "Enter Time");
+						if (float4ChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = float4ChoiceDialog->GetValue();
+							float spd = stof(str.ToStdString());
+							Action* a = new action_preset::SetTimer(ind, spd);
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
+					}
 					}
 					else if (aType == "I")
 					{
-
+						wxTextEntryDialog *intChoiceDialog = new wxTextEntryDialog(this, "Enter Index");
+						if (intChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = intChoiceDialog->GetValue();
+							int ind = stoi(str.ToStdString());
+							Action* a;
+							if (action == "Call Custom")
+							{
+								a = new action_preset::CallCustom(ind);
+							}
+							else if (action == "Change Room")
+							{
+								a = new action_preset::ChangeRoom(ind);
+							}
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
 					}
 					else if (aType == "St")
 					{
-
+						wxArrayString roomChoices;
+						for (const auto& pair : Room::objectMap)
+						{
+							roomChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *roomChoiceDialog = new wxSingleChoiceDialog(this, "Choose Room", "Choose one from the list", roomChoices);
+						if (roomChoiceDialog->ShowModal() == wxID_OK)
+						{
+							string str = roomChoiceDialog->GetStringSelection().ToStdString();
+							Action* a = new action_preset::SetRoom(str);
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
 					}
 					else if (aType == "So")
 					{
-
+						wxArrayString soundChoices;
+						for (const auto& pair : Sound::objectMap)
+						{
+							soundChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *soundChoiceDialog = new wxSingleChoiceDialog(this, "Choose Sound", "Choose one from the list", soundChoices);
+						if (soundChoiceDialog->ShowModal() == wxID_OK)
+						{
+							Sound* s = Sound::objectMap[soundChoiceDialog->GetStringSelection().ToStdString()];
+							Action* a = new action_preset::PlaySound(s);
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
 					}
 					else if (aType == "M")
 					{
