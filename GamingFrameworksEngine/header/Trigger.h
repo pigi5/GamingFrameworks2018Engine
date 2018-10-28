@@ -88,7 +88,11 @@ struct TriggerHash
 {
     size_t operator()(Trigger* obj) const 
     {
-        return obj->hashCode();
+        std::hash<std::string> hasher;
+        int lhs = hasher(obj->getTypeName());
+        int rhs = obj->hashCode();
+        lhs^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+        return lhs;
     }
 };
 
@@ -98,6 +102,6 @@ struct TriggerEquals : public std::binary_function<Trigger*, Trigger*, bool>
 {
     bool operator()(Trigger* a, Trigger* b) const 
     {
-        return a->hashCode() == b->hashCode();
+        return a->getTypeName() == b->getTypeName() && a->hashCode() == b->hashCode();
     }
 };
