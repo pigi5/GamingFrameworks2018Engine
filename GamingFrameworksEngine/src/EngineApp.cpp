@@ -1894,7 +1894,78 @@ void Editor::onDelete2(wxCommandEvent& event)
 
 void Editor::onNew3(wxCommandEvent& event)
 {
-
+	int sel = lb2->GetSelection();
+	if (sel != -1)
+	{
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (const auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (auto const& i : pair.second)
+				{
+					if (i->toString() == selAction && !found)
+					{
+						list<Conditional*> *cList = &i->conditionals;
+						wxArrayString attrChoices;
+						std::unordered_map<std::string, int> attributes = at->attributes;
+						for (const auto& pair : attributes)
+						{
+							string str = pair.first;
+							attrChoices.Add(str);
+						}
+						wxSingleChoiceDialog *attr2ChoiceDialog = new wxSingleChoiceDialog(this, "Choose Attribute", "Choose one from the list", attrChoices);
+						if (attr2ChoiceDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = attr2ChoiceDialog->GetStringSelection();
+							string key = str.ToStdString();
+							map<string, Comparison> types;
+							types.emplace("==", EQUAL);
+							types.emplace("=/=", NOT_EQUAL);
+							types.emplace("<", LESS_THAN);
+							types.emplace("<=", LESS_THAN_EQUAL);
+							types.emplace(">", GREATER_THAN);
+							types.emplace(">=", GREATER_THAN_EQUAL);
+							wxArrayString compChoices;
+							compChoices.Add("==");
+							compChoices.Add("=/=");
+							compChoices.Add("<");
+							compChoices.Add("<=");
+							compChoices.Add(">");
+							compChoices.Add(">=");
+							wxSingleChoiceDialog *compChoiceDialog = new wxSingleChoiceDialog(this, "Choose Comparison", "Choose one from the list", compChoices);
+							if (compChoiceDialog->ShowModal() == wxID_OK)
+							{
+								wxString str = compChoiceDialog->GetStringSelection();
+								Comparison c = types[str.ToStdString()];
+								wxTextEntryDialog *intChoiceDialog = new wxTextEntryDialog(this, "Enter Value");
+								if (intChoiceDialog->ShowModal() == wxID_OK)
+								{
+									wxString str = intChoiceDialog->GetValue();
+									int val = stoi(str.ToStdString());
+									Conditional* cnd = new Conditional(c, key, val);
+									cList->emplace_back(cnd);
+									lb3->Append(cnd->toString());
+									lb3->SetStringSelection(cnd->toString());
+								}
+							}
+						}
+						found = true;
+					}
+				}
+				if (found)
+				{
+					break;
+				}
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+	}
 }
 void Editor::onEdit3(wxCommandEvent& event)
 {
