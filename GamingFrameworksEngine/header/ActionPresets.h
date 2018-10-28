@@ -440,6 +440,47 @@ namespace action_preset
         }
     };
     
+    // sets gravitous
+    class GravitousSet : public Action
+    {
+    private:
+        bool value;
+    public:
+        std::string getTypeName() const
+        {
+            return "GravitousSet";
+        }
+
+        GravitousSet(bool value)
+        {
+            this->value = value;
+        }
+
+        GravitousSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<bool>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setGravitous(value);
+        }
+    };
+    
     // sets collidability
     class CollidableSet : public Action
     {

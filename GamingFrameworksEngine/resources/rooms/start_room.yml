@@ -6,6 +6,10 @@ actors:
     startX: 200
     startY: 200
     follow: true
+  - type: ball
+    startX: 300
+    startY: 200
+    follow: false
   - type: wall
     startX: 200
     startY: 400

@@ -90,6 +90,7 @@ protected:
 
     // physics
     Hitbox* hitbox;
+    bool gravitous;
     float xAcceleration;
     float yAcceleration;
     float xSpeed;
@@ -157,6 +158,7 @@ public:
 	void setXAcceleration(float);
 	void setYAcceleration(float);
 	void setCollidable(bool);
+	void setGravitous(bool);
 	void setAnimationSpeed(float);
 	void setAnimationFrame(float);
 	void setDepth(float);

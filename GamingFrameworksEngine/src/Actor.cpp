@@ -27,8 +27,9 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     imageSpeed = type->imageSpeed;
     imageAngle = 0.0f;
     depth = type->depth;
+    gravitous = type->gravitous;
     // Set the default yAcceleration to gravity
-    if (type->gravitous)
+    if (gravitous)
     {
         yAcceleration = engine_constant::GRAVITY;
     }
@@ -167,7 +168,7 @@ void Actor::move(const std::list<Actor*>& actors)
     }
 
     // reset acceleration
-    if (type->gravitous)
+    if (gravitous)
     {
         yAcceleration = engine_constant::GRAVITY;
     }
@@ -416,6 +417,10 @@ void Actor::setCollidable(bool collidable)
     {
         this->hitbox = NULL;
     }
+}
+void Actor::setGravitous(bool gravitous)
+{
+    this->gravitous = gravitous;
 }
 void Actor::setAnimationSpeed(float imageSpeed)
 {
