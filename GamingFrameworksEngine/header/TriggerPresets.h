@@ -119,7 +119,7 @@ struct MouseInputType
 		return state;
 	}
 
-    MouseInputType() {}
+	MouseInputType() {}
 
     MouseInputType(const YAML::Node& config)
     {

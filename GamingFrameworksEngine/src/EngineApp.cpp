@@ -7,6 +7,8 @@
 #include "../header/Music.h"
 #include "../header/Sound.h"
 #include "../header/Utils.h"
+#include "../header/MouseStates.h"
+#include "../header/TriggerPresets.h"
 #include <direct.h>
 #include <iostream>
 
@@ -1074,15 +1076,168 @@ void Editor::onNew1(wxCommandEvent& event)
 			lb1->Append(fileName.AfterLast('\\'));
 		}
 	}
+	if (operation == ACTOR)
+	{
+		wxArrayString triggers;
+		triggers.Add("Collision");
+		triggers.Add("ButtonInput");
+		triggers.Add("MouseInput");
+		triggers.Add("Create");
+		triggers.Add("Step");
+		triggers.Add("Draw");
+		triggers.Add("Destroy");
+		triggers.Add("Timer");
+		wxSingleChoiceDialog *createTriggerDialog = new wxSingleChoiceDialog(this, "Select Trigger to create", "Select Trigger", triggers);
+		if (createTriggerDialog->ShowModal() == wxID_OK)
+		{
+			map<string, string> types;
+			types.emplace("Collision", "ActorTypeWrapper");
+			types.emplace("ButtonInput", "ButtonInputType");
+			types.emplace("MouseInput", "MouseInputType");
+			types.emplace("Create", "ActorTypeWrapper");
+			types.emplace("Step", "ActorTypeWrapper");
+			types.emplace("Draw", "ActorTypeWrapper");
+			types.emplace("Destroy", "ActorTypeWrapper");
+			types.emplace("Timer", "Index");
+			string trig = createTriggerDialog->GetStringSelection().ToStdString();
+			string type = types[trig];
+			if (type == "ActorTypeWrapper")
+			{
+				wxArrayString actorChoices;
+				for (const auto& pair : ActorType::objectMap)
+				{
+					actorChoices.Add(pair.first);
+				}
+				wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+				if (typeWrapperDialog->ShowModal() == wxID_OK)
+				{
+					ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+					Trigger* t;
+					if (trig == "Collision")
+					{
+						t = new trigger_preset::Collision(aType);
+					}
+					else if (trig == "Create")
+					{
+						t = new trigger_preset::Create(aType);
+					}
+					else if (trig == "Step") 
+					{
+						t = new trigger_preset::Step(aType);
+					}
+					else if (trig == "Draw")
+					{
+						t = new trigger_preset::Draw(aType);
+					}
+					else if (trig == "Destroy")
+					{
+						t = new trigger_preset::Destroy(aType);
+					}
+					ActorType* at = ActorType::objectMap.at(selObject);
+					list<Action*> aList;
+					at->actionMap[t] = aList;
+				}
+			}
+			else if (type == "ButtonInputType")
+			{
+				wxArrayString buttonChoices;
+				//Add button choices
+				wxArrayString buttonStateChoices;
+				buttonStateChoices.Add("Press");
+				buttonStateChoices.Add("Release");
+				buttonStateChoices.Add("Hold");
+				wxSingleChoiceDialog *buttonDialog = new wxSingleChoiceDialog(this, "Choose Button", "Choose one from the list", buttonChoices);
+				wxSingleChoiceDialog *buttonStateDialog = new wxSingleChoiceDialog(this, "Choose Button State", "Choose one from the list", buttonStateChoices);
+				if (buttonDialog->ShowModal() == wxID_OK)
+				{
+					string buttonName = buttonDialog->GetStringSelection().ToStdString();
+					if (buttonStateDialog->ShowModal() == wxID_OK)
+					{
+						string buttonState = buttonStateDialog->GetStringSelection().ToStdString();
+						ButtonState::ButtonState bState;
+						if (buttonState == "Press")
+						{
+							bState = ButtonState::PRESS;
+						}
+						else if (buttonState == "Release")
+						{
+							bState = ButtonState::RELEASE;
+						}
+						else if (buttonState == "Hold")
+						{
+							bState = ButtonState::HOLD;
+						}
+						ButtonInputType* bit = new ButtonInputType();
+						bit->state = bState;
+						bit->id; // Convert name to int
+						Trigger *t = new trigger_preset::ButtonInput(bit);
+						ActorType* at = ActorType::objectMap.at(selObject);
+						list<Action*> aList;
+						at->actionMap[t] = aList;
+					}
+				}
+			}
+			else if (type == "MouseInputType")
+			{
+				wxArrayString mouseChoices;
+				mouseChoices.Add("Press");
+				mouseChoices.Add("Release");
+				mouseChoices.Add("Press On Actor");
+				mouseChoices.Add("Release On Actor");
+				wxSingleChoiceDialog *mouseDialog = new wxSingleChoiceDialog(this, "Choose Mouse State", "Choose one from the list", mouseChoices);
+				if (mouseDialog->ShowModal() == wxID_OK) 
+				{
+					string mouseState = mouseDialog->GetStringSelection().ToStdString();
+					MouseState::MouseState mState;
+					if (mouseState == "Press")
+					{
+						mState = MouseState::PRESS;
+					}
+					else if (mouseState == "Release")
+					{
+						mState = MouseState::RELEASE;
+					}
+					else if (mouseState == "Press On Actor")
+					{
+						mState = MouseState::PRESS_ON;
+					}
+					else if (mouseState == "Release On Actor")
+					{
+						mState = MouseState::RELEASE_ON;
+					}
+					MouseInputType* mit = new MouseInputType();
+					mit->state = mState;
+					Trigger* t = new trigger_preset::MouseInput(mit);
+					ActorType* at = ActorType::objectMap.at(selObject);
+					list<Action*> aList;
+					at->actionMap[t] = aList;
+				}
+			}
+			else if (type == "Index")
+			{
+				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
+				if (indexDialog->ShowModal() == wxID_OK)
+				{
+					wxString str = indexDialog->GetValue();
+					int ind = stoi(str.ToStdString());
+					Index* i = new Index(ind);
+					Trigger* t = new trigger_preset::Timer(i);
+					ActorType* at = ActorType::objectMap.at(selObject);
+					list<Action*> aList;
+					at->actionMap[t] = aList;
+				}
+			}
+		}
+	}
 }
 void Editor::onEdit1(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
+	wxString str = lb1->GetString(sel);
 	if (sel != -1)
 	{
 		if (operation == SPRITE)
 		{
-			wxString str = lb1->GetString(sel);
 			Sprite* spr = Sprite::objectMap.at(selObject);
 			vector<string>* files = &spr->textrFiles;
 			bool found = false;
@@ -1106,6 +1261,19 @@ void Editor::onEdit1(wxCommandEvent& event)
 				relPath += "\\sprites\\" + fileName.AfterLast('\\');
 				spr->textrFiles.push_back(relPath.ToStdString());
 				lb1->Append(fileName.AfterLast('\\'));
+			}
+		}
+		if(operation == ACTOR)
+		{
+			ActorType* at = ActorType::objectMap.at(selObject);
+			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+			bool found = false;
+			for (const auto& pair : actionMap)
+			{
+				if (pair.first->toString() == str.ToStdString() && !found)
+				{
+					//Edit trigger
+				}
 			}
 		}
 	}
