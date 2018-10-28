@@ -1136,6 +1136,7 @@ void Editor::onNew1(wxCommandEvent& event)
 					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
+					lb1->Append(t->toString());
 				}
 			}
 			else if (type == "ButtonInputType")
@@ -1174,6 +1175,7 @@ void Editor::onNew1(wxCommandEvent& event)
 						ActorType* at = ActorType::objectMap.at(selObject);
 						list<Action*> aList;
 						at->actionMap[t] = aList;
+						lb1->Append(t->toString());
 					}
 				}
 			}
@@ -1211,6 +1213,7 @@ void Editor::onNew1(wxCommandEvent& event)
 					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
+					lb1->Append(t->toString());
 				}
 			}
 			else if (type == "Index")
@@ -1225,6 +1228,7 @@ void Editor::onNew1(wxCommandEvent& event)
 					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
+					lb1->Append(t->toString());
 				}
 			}
 		}
