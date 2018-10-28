@@ -20,6 +20,8 @@ public:
 
     Conditional(const YAML::Node& node);
 
+	Conditional(Comparison comparison, std::string key, int value);
+
     const std::string toString() const;
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj);

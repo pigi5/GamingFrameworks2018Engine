@@ -88,6 +88,13 @@ Conditional::Conditional(const YAML::Node& node)
     key = node["attribute"].as<std::string>();
     value = node["value"].as<int>();
 }
+
+Conditional::Conditional(Comparison comparison, std::string key, int value)
+{
+	this->comparison = comparison;
+	this->key = key;
+	this->value = value;
+}
     
 YAML::Emitter& operator<<(YAML::Emitter& out, const Conditional& obj)
 {
