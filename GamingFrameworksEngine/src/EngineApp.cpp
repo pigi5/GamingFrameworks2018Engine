@@ -1969,7 +1969,72 @@ void Editor::onNew3(wxCommandEvent& event)
 }
 void Editor::onEdit3(wxCommandEvent& event)
 {
-	
+	int sel = lb3->GetSelection();
+	if (sel != -1)
+	{
+		wxString str = lb3->GetString(sel);
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (const auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				for (auto const& i : pair.second)
+				{
+					if (i->toString() == selAction && !found)
+					{
+						for (std::list<Conditional*>::iterator it = i->conditionals.begin(); it != i->conditionals.end() && !found; ++it) {
+							Conditional* cnd = *it;
+							if (cnd->toString() == str.ToStdString())
+							{
+								lb3->Delete(sel);
+								found = true;
+								map<string, Comparison> types;
+								types.emplace("==", EQUAL);
+								types.emplace("=/=", NOT_EQUAL);
+								types.emplace("<", LESS_THAN);
+								types.emplace("<=", LESS_THAN_EQUAL);
+								types.emplace(">", GREATER_THAN);
+								types.emplace(">=", GREATER_THAN_EQUAL);
+								wxArrayString compChoices;
+								compChoices.Add("==");
+								compChoices.Add("=/=");
+								compChoices.Add("<");
+								compChoices.Add("<=");
+								compChoices.Add(">");
+								compChoices.Add(">=");
+								wxSingleChoiceDialog *compChoiceDialog = new wxSingleChoiceDialog(this, "Choose Comparison", "Choose one from the list", compChoices);
+								if (compChoiceDialog->ShowModal() == wxID_OK)
+								{
+									wxString str = compChoiceDialog->GetStringSelection();
+									Comparison c = types[str.ToStdString()];
+									wxTextEntryDialog *intChoiceDialog = new wxTextEntryDialog(this, "Enter Value");
+									if (intChoiceDialog->ShowModal() == wxID_OK)
+									{
+										wxString str = intChoiceDialog->GetValue();
+										int val = stoi(str.ToStdString());
+										cnd->comparison = c;
+										cnd->value = val;
+										lb3->Append(cnd->toString());
+										lb3->SetStringSelection(cnd->toString());
+									}
+								}
+							}
+						}
+					}
+				}
+				if (found)
+				{
+					break;
+				}
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+	}
 }
 void Editor::onDelete3(wxCommandEvent& event)
 {
@@ -1990,7 +2055,7 @@ void Editor::onDelete3(wxCommandEvent& event)
 					{
 						for (std::list<Conditional*>::iterator it = i->conditionals.begin(); it != i->conditionals.end() && !found; ++it) {
 							Conditional* cnd = *it;
-							if (cnd->key == str.ToStdString())
+							if (cnd->toString() == str.ToStdString())
 							{
 								i->conditionals.erase(it);
 								lb3->Delete(sel);
