@@ -1103,6 +1103,10 @@ namespace action_preset
         {
             return new CollidableSet(node);
         }
+        else if (typeName == "GravitousSet")
+        {
+            return new GravitousSet(node);
+        }
         else if (typeName == "AnimationSpeedSet")
         {
             return new AnimationSpeedSet(node);
