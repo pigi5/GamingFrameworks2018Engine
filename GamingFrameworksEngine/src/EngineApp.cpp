@@ -1571,6 +1571,10 @@ void Editor::onNew2(wxCommandEvent& event)
 				actionChoices.Add("Stop Music");
 				actionChoices.Add("Set Room");
 				actionChoices.Add("Change Room");
+				actionChoices.Add("Collidable");
+				actionChoices.Add("Set Animation Speed");
+				actionChoices.Add("Set Animation Frame");
+				actionChoices.Add("Set Depth");
 				wxSingleChoiceDialog *actionChoiceDialog = new wxSingleChoiceDialog(this, "Choose Action", "Choose one from the list", actionChoices);
 				if (actionChoiceDialog->ShowModal() == wxID_OK)
 				{
@@ -1593,6 +1597,10 @@ void Editor::onNew2(wxCommandEvent& event)
 					types.emplace("Stop Music", "M");
 					types.emplace("Set Room", "St");
 					types.emplace("Change Room", "I");
+					types.emplace("Collidable", "B");
+					types.emplace("Set Animation Speed", "F");
+					types.emplace("Set Animation Frame", "F");
+					types.emplace("Set Depth", "F");
 					string action = actionChoiceDialog->GetStringSelection().ToStdString();
 					string aType = types[action];
 					if (aType == "FF")
@@ -1626,6 +1634,29 @@ void Editor::onNew2(wxCommandEvent& event)
 							}
 						}
 					}
+					else if (aType == "B")
+					{
+						wxArrayString tf;
+						tf.Add("True");
+						tf.Add("False");
+						wxSingleChoiceDialog *boolChoiceDialog = new wxSingleChoiceDialog(this, "Collidable", "Set True or False", tf);
+						if (boolChoiceDialog->ShowModal() == wxID_OK)
+						{
+							string answer = boolChoiceDialog->GetStringSelection().ToStdString();
+							Action *a;
+							if (answer == "True")
+							{
+								a = new action_preset::CollidableSet(true);
+							}
+							else
+							{
+								a = new action_preset::CollidableSet(false);
+							}
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
+					}
 					else if (aType == "F")
 					{
 						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
@@ -1641,6 +1672,18 @@ void Editor::onNew2(wxCommandEvent& event)
 							else if (action == "Set Y Speed")
 							{
 								a = new action_preset::SetYSpeed(spd);
+							}
+							else if (action == "Set Animation Speed")
+							{
+								a = new action_preset::AnimationSpeedSet(spd);
+							}
+							else if (action == "Set Animation Frame")
+							{
+								a = new action_preset::AnimationFrameSet(spd);
+							}
+							else if (action == "Set Depth")
+							{
+								a = new action_preset::DepthSet(spd);
 							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -1928,6 +1971,10 @@ void Editor::onEdit2(wxCommandEvent& event)
 				actionChoices.Add("Stop Music");
 				actionChoices.Add("Set Room");
 				actionChoices.Add("Change Room");
+				actionChoices.Add("Collidable");
+				actionChoices.Add("Set Animation Speed");
+				actionChoices.Add("Set Animation Frame");
+				actionChoices.Add("Set Depth");
 				wxSingleChoiceDialog *actionChoiceDialog = new wxSingleChoiceDialog(this, "Choose Action", "Choose one from the list", actionChoices);
 				if (actionChoiceDialog->ShowModal() == wxID_OK)
 				{
@@ -1950,6 +1997,10 @@ void Editor::onEdit2(wxCommandEvent& event)
 					types.emplace("Stop Music", "M");
 					types.emplace("Set Room", "St");
 					types.emplace("Change Room", "I");
+					types.emplace("Collidable", "B");
+					types.emplace("Set Animation Speed", "F");
+					types.emplace("Set Animation Frame", "F");
+					types.emplace("Set Depth", "F");
 					string action = actionChoiceDialog->GetStringSelection().ToStdString();
 					string aType = types[action];
 					if (aType == "FF")
@@ -1985,7 +2036,7 @@ void Editor::onEdit2(wxCommandEvent& event)
 					}
 					else if (aType == "F")
 					{
-						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
+						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Value");
 						if (floatChoiceDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = floatChoiceDialog->GetValue();
@@ -1998,6 +2049,18 @@ void Editor::onEdit2(wxCommandEvent& event)
 							else if (action == "Set Y Speed")
 							{
 								a = new action_preset::SetYSpeed(spd);
+							}
+							else if (action == "Set Animation Speed")
+							{
+								a = new action_preset::AnimationSpeedSet(spd);
+							}
+							else if (action == "Set Animation Frame")
+							{
+								a = new action_preset::AnimationFrameSet(spd);
+							}
+							else if (action == "Set Depth")
+							{
+								a = new action_preset::DepthSet(spd);
 							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());

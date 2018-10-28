@@ -511,7 +511,15 @@ namespace action_preset
         
         const std::string toString() const
         {
-            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+			string str;
+			switch (value)
+			{
+			case true: str = "true";
+				break;
+			case false: str = "false";
+				break;
+			}
+            return getTypeName() + ": {value: " + str + "}";
         }
     
         void run(Actor* actor)
