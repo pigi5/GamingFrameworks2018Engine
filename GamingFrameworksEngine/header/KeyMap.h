@@ -3,7 +3,7 @@
 
 using namespace std;
 
-map<int, string> keyNames =
+static map<int, string> keyNames =
 
 { {-1, "Unknown"}, ///< Unhandled key
 		{0,"A"},        ///< The A key

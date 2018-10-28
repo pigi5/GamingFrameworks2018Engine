@@ -8,7 +8,9 @@
 #include "../header/Sound.h"
 #include "../header/Utils.h"
 #include "../header/MouseStates.h"
+#include "../header/KeyMap.h"
 #include "../header/TriggerPresets.h"
+#include "../header/ActionPresets.h"
 #include <direct.h>
 #include <iostream>
 
@@ -1144,7 +1146,12 @@ void Editor::onNew1(wxCommandEvent& event)
 			else if (type == "ButtonInputType")
 			{
 				wxArrayString buttonChoices;
-				//Add button choices
+				for (const auto& pair : keyNames) {
+					if (pair.first >= 0 && pair.first <= 100)
+					{
+						buttonChoices.Add(pair.second);
+					}
+				}
 				wxArrayString buttonStateChoices;
 				buttonStateChoices.Add("Press");
 				buttonStateChoices.Add("Release");
@@ -1172,7 +1179,18 @@ void Editor::onNew1(wxCommandEvent& event)
 						}
 						ButtonInputType* bit = new ButtonInputType();
 						bit->state = bState;
-						bit->id; // Convert name to int
+						bool find = false;
+						for (const auto& pair : keyNames) {
+							if (pair.second == buttonName && !find)
+							{
+								bit->id = pair.first;
+								find = true;
+							}
+							if (find)
+							{
+								break;
+							}
+						}
 						Trigger *t = new trigger_preset::ButtonInput(bit);
 						ActorType* at = ActorType::objectMap.at(selObject);
 						list<Action*> aList;
@@ -1220,7 +1238,7 @@ void Editor::onNew1(wxCommandEvent& event)
 			}
 			else if (type == "Index")
 			{
-				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
+				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Index");
 				if (indexDialog->ShowModal() == wxID_OK)
 				{
 					wxString str = indexDialog->GetValue();
@@ -1294,7 +1312,12 @@ void Editor::onEdit1(wxCommandEvent& event)
 						lb1->Delete(sel);
 						found = true;
 						wxArrayString buttonChoices;
-						//Add button choices
+						for (const auto& pair : keyNames) {
+							if (pair.first >= 0 && pair.first <= 100)
+							{
+								buttonChoices.Add(pair.second);
+							}
+						}
 						wxArrayString buttonStateChoices;
 						buttonStateChoices.Add("Press");
 						buttonStateChoices.Add("Release");
@@ -1322,7 +1345,18 @@ void Editor::onEdit1(wxCommandEvent& event)
 								}
 								ButtonInputType* bit = new ButtonInputType();
 								bit->state = bState;
-								bit->id; // Convert name to int
+								bool find = false;
+								for (const auto& pair : keyNames) {
+									if (pair.second == buttonName && !find)
+									{
+										bit->id = pair.first;
+										find = true;
+									}
+									if (find)
+									{
+										break;
+									}
+								}
 								Trigger *newTrig = new trigger_preset::ButtonInput(bit);
 								at->actionMap[newTrig] = aList;
 								lb1->Append(newTrig->toString());
@@ -1371,7 +1405,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 					}
 					else if (t->getTypeName() == "Timer" || t->getTypeName() == "Custom")
 					{
-						wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
+						wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Index");
 						if (indexDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = indexDialog->GetValue();
@@ -1481,6 +1515,10 @@ void Editor::onDelete1(wxCommandEvent& event)
 					    lb1->Delete(sel);
 					    found = true;
 				    }
+					if (found)
+					{
+						break;
+					}
 			    }
                 break;
             }
@@ -1490,7 +1528,138 @@ void Editor::onDelete1(wxCommandEvent& event)
 
 void Editor::onNew2(wxCommandEvent& event)
 {
+	if (lb1->GetSelection() != -1)
+	{
+		ActorType* at = ActorType::objectMap.at(selObject);
+		auto actionMap = at->actionMap;
+		bool found = false;
+		for (auto& pair : actionMap)
+		{
+			if (pair.first->toString() == selTrigger && !found)
+			{
+				Trigger* t = pair.first;
+				list<Action*> *aList = &pair.second;
+				wxArrayString actionChoices;
+				actionChoices.Add("Apply Force");
+				actionChoices.Add("Set X Speed");
+				actionChoices.Add("Set Y Speed");
+				actionChoices.Add("Move To Nearest");
+				actionChoices.Add("Move Toward Nearest");
+				actionChoices.Add("Move To");
+				actionChoices.Add("Move");
+				actionChoices.Add("Create");
+				actionChoices.Add("Set Attribute");
+				actionChoices.Add("Change Attribute");
+				actionChoices.Add("Destroy");
+				actionChoices.Add("Set Timer");
+				actionChoices.Add("Call Custom");
+				actionChoices.Add("Play Sound");
+				actionChoices.Add("Play Music");
+				actionChoices.Add("Stop Music");
+				actionChoices.Add("Set Room");
+				actionChoices.Add("Change Room");
+				wxSingleChoiceDialog *actionChoiceDialog = new wxSingleChoiceDialog(this, "Choose Action", "Choose one from the list", actionChoices);
+				if (actionChoiceDialog->ShowModal() == wxID_OK)
+				{
+					map<string, string> types;
+					types.emplace("Apply Force", "FF");
+					types.emplace("Set X Speed", "F");
+					types.emplace("Set Y Speed", "F");
+					types.emplace("Move To Nearest", "At");
+					types.emplace("Move Toward Nearest", "AtF");
+					types.emplace("Move To", "FF");
+					types.emplace("Move", "FF");
+					types.emplace("Create", "AtFF");
+					types.emplace("Set Attribute", "SI");
+					types.emplace("Change Attribute", "StI");
+					types.emplace("Destroy", "NA");
+					types.emplace("Set Timer", "IF");
+					types.emplace("Call Custom", "I");
+					types.emplace("Play Sound", "So");
+					types.emplace("Play Music", "M");
+					types.emplace("Stop Music", "M");
+					types.emplace("Set Room", "St");
+					types.emplace("Change Room", "I");
+					string action = actionChoiceDialog->GetStringSelection().ToStdString();
+					string aType = types[action];
+					if (aType == "FF")
+					{
 
+					}
+					else if (aType == "F")
+					{
+
+					}
+					else if (aType == "At")
+					{
+
+					}
+					else if (aType == "AtF")
+					{
+
+					}
+					else if (aType == "AtFF")
+					{
+
+					}
+					else if (aType == "NA")
+					{
+
+					}
+					else if (aType == "StI")
+					{
+
+					}
+					else if (aType == "IF")
+					{
+
+					}
+					else if (aType == "I")
+					{
+
+					}
+					else if (aType == "St")
+					{
+
+					}
+					else if (aType == "So")
+					{
+
+					}
+					else if (aType == "M")
+					{
+						wxArrayString musicChoices;
+						for (const auto& pair : Music::objectMap)
+						{
+							musicChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *musicChoiceDialog = new wxSingleChoiceDialog(this, "Choose Music", "Choose one from the list", musicChoices);
+						if (musicChoiceDialog->ShowModal() == wxID_OK)
+						{
+							Music* m = Music::objectMap[musicChoiceDialog->GetStringSelection().ToStdString()];
+							Action* a;
+							if (action == "Play Music")
+							{
+								a = new action_preset::PlayMusic(m);
+							}
+							else if (action == "Stop Music")
+							{
+								a = new action_preset::StopMusic(m);
+							}
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
+						}
+					}
+					found = true;
+				}
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+	}
 }
 void Editor::onEdit2(wxCommandEvent& event)
 {
@@ -1519,6 +1688,10 @@ void Editor::onDelete2(wxCommandEvent& event)
 					}
 				}
 			}
+			if (found)
+			{
+				break;
+			}
 		}
 	}
 }
@@ -1529,12 +1702,7 @@ void Editor::onNew3(wxCommandEvent& event)
 }
 void Editor::onEdit3(wxCommandEvent& event)
 {
-	int sel = lb3->GetSelection();
-	if (sel != -1)
-	{
-		wxString str = lb3->GetString(sel);
-
-	}
+	
 }
 void Editor::onDelete3(wxCommandEvent& event)
 {
@@ -1564,6 +1732,14 @@ void Editor::onDelete3(wxCommandEvent& event)
 						}
 					}
 				}
+				if (found)
+				{
+					break;
+				}
+			}
+			if (found)
+			{
+				break;
 			}
 		}
 	}

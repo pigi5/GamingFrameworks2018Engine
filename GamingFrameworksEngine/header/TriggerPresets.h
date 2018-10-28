@@ -25,6 +25,7 @@ public:                                                             \
 #include "Configurable.h"
 #include "ButtonStates.h"
 #include "MouseStates.h"
+#include "KeyMap.h"
 
 // ID structures //
 
@@ -100,7 +101,7 @@ struct ButtonInputType
     
     const std::string toString() const
     {
-        std::string repr = "id: " + std::to_string(id) + ", state: " + ButtonInputType::emitState(state);
+        std::string repr = "button: " + keyNames[id] + ", state: " + ButtonInputType::emitState(state);
         return repr;
     }
 };
