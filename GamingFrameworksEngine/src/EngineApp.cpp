@@ -891,10 +891,10 @@ Editor::Editor(wxWindow* parent)
 	st3 = new wxStaticText(pnl3, wxID_ANY, "Tertiary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 	st4 = new wxStaticText(pnl4, wxID_ANY, "Quaternary", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE | wxST_NO_AUTORESIZE);
 
-	bx1->Add(st1, 0, wxCENTRE | wxALL, 7);
-	bx2->Add(st2, 0, wxCENTRE | wxALL, 7);
-	bx3->Add(st3, 0, wxCENTRE | wxALL, 7);
-	bx4->Add(st4, 0, wxCENTRE | wxALL, 7);
+	bx1->Add(st1, 0, wxEXPAND | wxCENTRE | wxALL, 7);
+	bx2->Add(st2, 0, wxEXPAND | wxCENTRE | wxALL, 7);
+	bx3->Add(st3, 0, wxEXPAND | wxCENTRE | wxALL, 7);
+	bx4->Add(st4, 0, wxEXPAND | wxCENTRE | wxALL, 7);
 
 	bx1->Add(bpnl1, 0, wxEXPAND | wxBOTTOM, 5);
 	bx2->Add(bpnl2, 0, wxEXPAND | wxBOTTOM, 5);
