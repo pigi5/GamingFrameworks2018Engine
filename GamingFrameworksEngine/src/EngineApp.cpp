@@ -1120,25 +1120,37 @@ void Editor::onNew1(wxCommandEvent& event)
 			string type = types[trig];
 			if (type == "ActorTypeWrapper")
 			{
-				wxArrayString actorChoices;
-				for (const auto& pair : ActorType::objectMap)
+				if (trig == "Collision")
 				{
-					actorChoices.Add(pair.first);
-				}
-				wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
-				if (typeWrapperDialog->ShowModal() == wxID_OK)
-				{
-					ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
-					Trigger* t;
-					if (trig == "Collision")
+					wxArrayString actorChoices;
+					for (const auto& pair : ActorType::objectMap)
 					{
-						t = new trigger_preset::Collision(aType);
+						actorChoices.Add(pair.first);
 					}
-					else if (trig == "Create")
+					wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+					if (typeWrapperDialog->ShowModal() == wxID_OK)
+					{
+						ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+						Trigger* t;
+						if (trig == "Collision")
+						{
+							t = new trigger_preset::Collision(aType);
+						}
+						ActorType* at = ActorType::objectMap.at(selObject);
+						list<Action*> aList;
+						at->actionMap[t] = aList;
+						lb1->Append(t->toString());
+					}
+				}
+				else
+				{
+					ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[selObject]);
+					Trigger* t;
+					if (trig == "Create")
 					{
 						t = new trigger_preset::Create(aType);
 					}
-					else if (trig == "Step") 
+					else if (trig == "Step")
 					{
 						t = new trigger_preset::Step(aType);
 					}
@@ -1311,9 +1323,9 @@ void Editor::onEdit1(wxCommandEvent& event)
 		if(operation == ACTOR)
 		{
 			ActorType* at = ActorType::objectMap.at(selObject);
-			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals>* actionMap = &at->actionMap;
 			bool found = false;
-			for (const auto& pair : actionMap)
+			for (const auto& pair : *actionMap)
 			{
 				if (pair.first->toString() == str.ToStdString() && !found)
 				{
@@ -1321,7 +1333,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 					list<Action*> aList = pair.second;
 					if (t->getTypeName() == "ButtonInput")
 					{
-						actionMap.erase(pair.first);
+						actionMap->erase(pair.first);
 						lb1->Delete(sel);
 						found = true;
 						wxArrayString buttonChoices;
@@ -1379,7 +1391,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 					}
 					else if (t->getTypeName() == "MouseInput")
 					{
-						actionMap.erase(pair.first);
+						actionMap->erase(pair.first);
 						lb1->Delete(sel);
 						found = true;
 						wxArrayString mouseChoices;
@@ -1433,7 +1445,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 							{
 								newTrig = new trigger_preset::Custom(i);
 							}
-							actionMap.erase(pair.first);
+							actionMap->erase(pair.first);
 							lb1->Delete(sel);
 							found = true;
 							at->actionMap[newTrig] = aList;
@@ -1441,7 +1453,7 @@ void Editor::onEdit1(wxCommandEvent& event)
 							lb1->SetStringSelection(newTrig->toString());
 						}
 					}
-					else
+					else if(t->getTypeName() == "Collision")
 					{
 						wxArrayString actorChoices;
 						for (const auto& pair : ActorType::objectMap)
@@ -1457,29 +1469,17 @@ void Editor::onEdit1(wxCommandEvent& event)
 							{
 								newTrig = new trigger_preset::Collision(aType);
 							}
-							else if (t->getTypeName() == "Create")
-							{
-								newTrig = new trigger_preset::Create(aType);
-							}
-							else if (t->getTypeName() == "Step")
-							{
-								newTrig = new trigger_preset::Step(aType);
-							}
-							else if (t->getTypeName() == "Draw")
-							{
-								newTrig = new trigger_preset::Draw(aType);
-							}
-							else if (t->getTypeName() == "Destroy")
-							{
-								newTrig = new trigger_preset::Destroy(aType);
-							}
-							actionMap.erase(pair.first);
+							actionMap->erase(pair.first);
 							lb1->Delete(sel);
 							found = true;
 							at->actionMap[newTrig] = aList;
 							lb1->Append(newTrig->toString());
 							lb1->SetStringSelection(newTrig->toString());
 						}
+					}
+					else 
+					{
+						found = true;
 					}
 				}
 				if (found)
@@ -1518,13 +1518,13 @@ void Editor::onDelete1(wxCommandEvent& event)
             case ACTOR:
             {
 			    ActorType* at = ActorType::objectMap.at(selObject);
-			    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
+			    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals>* actionMap = &at->actionMap;
 			    bool found = false;
-			    for (const auto& pair : actionMap)
+			    for (const auto& pair : *actionMap)
 			    {
 				    if (pair.first->toString() == str.ToStdString() && !found)
 				    {
-					    actionMap.erase(pair.first);
+					    actionMap->erase(pair.first);
 					    lb1->Delete(sel);
 					    found = true;
 				    }
@@ -1544,7 +1544,7 @@ void Editor::onNew2(wxCommandEvent& event)
 	if (lb1->GetSelection() != -1)
 	{
 		ActorType* at = ActorType::objectMap.at(selObject);
-		auto actionMap = at->actionMap;
+		auto& actionMap = at->actionMap;
 		bool found = false;
 		for (auto& pair : actionMap)
 		{
@@ -1572,6 +1572,7 @@ void Editor::onNew2(wxCommandEvent& event)
 				actionChoices.Add("Set Room");
 				actionChoices.Add("Change Room");
 				actionChoices.Add("Collidable");
+				actionChoices.Add("Uses Gravity");
 				actionChoices.Add("Set Animation Speed");
 				actionChoices.Add("Set Animation Frame");
 				actionChoices.Add("Set Depth");
@@ -1598,6 +1599,7 @@ void Editor::onNew2(wxCommandEvent& event)
 					types.emplace("Set Room", "St");
 					types.emplace("Change Room", "I");
 					types.emplace("Collidable", "B");
+					types.emplace("Uses Gravity", "B");
 					types.emplace("Set Animation Speed", "F");
 					types.emplace("Set Animation Frame", "F");
 					types.emplace("Set Depth", "F");
@@ -1646,11 +1648,25 @@ void Editor::onNew2(wxCommandEvent& event)
 							Action *a;
 							if (answer == "True")
 							{
-								a = new action_preset::CollidableSet(true);
+								if (action == "Collidable")
+								{
+									a = new action_preset::CollidableSet(true);
+								}
+								else
+								{
+									a = new action_preset::GravitousSet(true);
+								}
 							}
 							else
 							{
-								a = new action_preset::CollidableSet(false);
+								if (action == "Collidable")
+								{
+									a = new action_preset::CollidableSet(false);
+								}
+								else
+								{
+									a = new action_preset::GravitousSet(false);
+								}
 							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -1972,6 +1988,7 @@ void Editor::onEdit2(wxCommandEvent& event)
 				actionChoices.Add("Set Room");
 				actionChoices.Add("Change Room");
 				actionChoices.Add("Collidable");
+				actionChoices.Add("Uses Gravity");
 				actionChoices.Add("Set Animation Speed");
 				actionChoices.Add("Set Animation Frame");
 				actionChoices.Add("Set Depth");
@@ -1998,6 +2015,7 @@ void Editor::onEdit2(wxCommandEvent& event)
 					types.emplace("Set Room", "St");
 					types.emplace("Change Room", "I");
 					types.emplace("Collidable", "B");
+					types.emplace("Uses Gravity", "B");
 					types.emplace("Set Animation Speed", "F");
 					types.emplace("Set Animation Frame", "F");
 					types.emplace("Set Depth", "F");
@@ -2032,6 +2050,43 @@ void Editor::onEdit2(wxCommandEvent& event)
 								lb2->Append(a->toString());
 								lb2->SetStringSelection(a->toString());
 							}
+						}
+					}
+					else if (aType == "B")
+					{
+						wxArrayString tf;
+						tf.Add("True");
+						tf.Add("False");
+						wxSingleChoiceDialog *boolChoiceDialog = new wxSingleChoiceDialog(this, "Collidable", "Set True or False", tf);
+						if (boolChoiceDialog->ShowModal() == wxID_OK)
+						{
+							string answer = boolChoiceDialog->GetStringSelection().ToStdString();
+							Action *a;
+							if (answer == "True")
+							{
+								if (action == "Collidable")
+								{
+									a = new action_preset::CollidableSet(true);
+								}
+								else
+								{
+									a = new action_preset::GravitousSet(true);
+								}
+							}
+							else
+							{
+								if (action == "Collidable")
+								{
+									a = new action_preset::CollidableSet(false);
+								}
+								else
+								{
+									a = new action_preset::GravitousSet(false);
+								}
+							}
+							aList->emplace_back(a);
+							lb2->Append(a->toString());
+							lb2->SetStringSelection(a->toString());
 						}
 					}
 					else if (aType == "F")
@@ -2418,7 +2473,6 @@ void Editor::onEdit3(wxCommandEvent& event)
 							Conditional* cnd = *it;
 							if (cnd->toString() == str.ToStdString())
 							{
-								lb3->Delete(sel);
 								found = true;
 								map<string, Comparison> types;
 								types.emplace("==", EQUAL);
@@ -2446,6 +2500,7 @@ void Editor::onEdit3(wxCommandEvent& event)
 										int val = stoi(str.ToStdString());
 										cnd->comparison = c;
 										cnd->value = val;
+										lb3->Delete(sel);
 										lb3->Append(cnd->toString());
 										lb3->SetStringSelection(cnd->toString());
 									}
