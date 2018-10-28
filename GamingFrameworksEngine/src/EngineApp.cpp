@@ -1218,7 +1218,7 @@ void Editor::onNew1(wxCommandEvent& event)
 			}
 			else if (type == "Index")
 			{
-				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Integer");
+				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Time");
 				if (indexDialog->ShowModal() == wxID_OK)
 				{
 					wxString str = indexDialog->GetValue();
@@ -1237,9 +1237,9 @@ void Editor::onNew1(wxCommandEvent& event)
 void Editor::onEdit1(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
-	wxString str = lb1->GetString(sel);
 	if (sel != -1)
 	{
+		wxString str = lb1->GetString(sel);
 		if (operation == SPRITE)
 		{
 			Sprite* spr = Sprite::objectMap.at(selObject);
@@ -1276,7 +1276,150 @@ void Editor::onEdit1(wxCommandEvent& event)
 			{
 				if (pair.first->toString() == str.ToStdString() && !found)
 				{
-					//Edit trigger
+					Trigger* t = pair.first;
+					list<Action*> aList = pair.second;
+					if (t->getTypeName() == "ButtonInput")
+					{
+						actionMap.erase(pair.first);
+						lb1->Delete(sel);
+						found = true;
+						wxArrayString buttonChoices;
+						//Add button choices
+						wxArrayString buttonStateChoices;
+						buttonStateChoices.Add("Press");
+						buttonStateChoices.Add("Release");
+						buttonStateChoices.Add("Hold");
+						wxSingleChoiceDialog *buttonDialog = new wxSingleChoiceDialog(this, "Choose Button", "Choose one from the list", buttonChoices);
+						wxSingleChoiceDialog *buttonStateDialog = new wxSingleChoiceDialog(this, "Choose Button State", "Choose one from the list", buttonStateChoices);
+						if (buttonDialog->ShowModal() == wxID_OK)
+						{
+							string buttonName = buttonDialog->GetStringSelection().ToStdString();
+							if (buttonStateDialog->ShowModal() == wxID_OK)
+							{
+								string buttonState = buttonStateDialog->GetStringSelection().ToStdString();
+								ButtonState::ButtonState bState;
+								if (buttonState == "Press")
+								{
+									bState = ButtonState::PRESS;
+								}
+								else if (buttonState == "Release")
+								{
+									bState = ButtonState::RELEASE;
+								}
+								else if (buttonState == "Hold")
+								{
+									bState = ButtonState::HOLD;
+								}
+								ButtonInputType* bit = new ButtonInputType();
+								bit->state = bState;
+								bit->id; // Convert name to int
+								Trigger *newTrig = new trigger_preset::ButtonInput(bit);
+								at->actionMap[newTrig] = aList;
+								lb1->Append(newTrig->toString());
+								lb1->SetStringSelection(newTrig->toString());
+							}
+						}
+					}
+					else if (t->getTypeName() == "MouseInput")
+					{
+						actionMap.erase(pair.first);
+						lb1->Delete(sel);
+						found = true;
+						wxArrayString mouseChoices;
+						mouseChoices.Add("Press");
+						mouseChoices.Add("Release");
+						mouseChoices.Add("Press On Actor");
+						mouseChoices.Add("Release On Actor");
+						wxSingleChoiceDialog *mouseDialog = new wxSingleChoiceDialog(this, "Choose Mouse State", "Choose one from the list", mouseChoices);
+						if (mouseDialog->ShowModal() == wxID_OK)
+						{
+							string mouseState = mouseDialog->GetStringSelection().ToStdString();
+							MouseState::MouseState mState;
+							if (mouseState == "Press")
+							{
+								mState = MouseState::PRESS;
+							}
+							else if (mouseState == "Release")
+							{
+								mState = MouseState::RELEASE;
+							}
+							else if (mouseState == "Press On Actor")
+							{
+								mState = MouseState::PRESS_ON;
+							}
+							else if (mouseState == "Release On Actor")
+							{
+								mState = MouseState::RELEASE_ON;
+							}
+							MouseInputType* mit = new MouseInputType();
+							mit->state = mState;
+							Trigger* newTrig = new trigger_preset::MouseInput(mit);
+							at->actionMap[newTrig] = aList;
+							lb1->Append(newTrig->toString());
+							lb1->SetStringSelection(newTrig->toString());
+						}
+					}
+					else if (t->getTypeName() == "Timer")
+					{
+						actionMap.erase(pair.first);
+						lb1->Delete(sel);
+						found = true;
+						wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Time");
+						if (indexDialog->ShowModal() == wxID_OK)
+						{
+							wxString str = indexDialog->GetValue();
+							int ind = stoi(str.ToStdString());
+							Index* i = new Index(ind);
+							Trigger* newTrig = new trigger_preset::Timer(i);
+							at->actionMap[newTrig] = aList;
+							lb1->Append(newTrig->toString());
+							lb1->SetStringSelection(newTrig->toString());
+						}
+					}
+					else
+					{
+						wxArrayString actorChoices;
+						for (const auto& pair : ActorType::objectMap)
+						{
+							actorChoices.Add(pair.first);
+						}
+						wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
+						if (typeWrapperDialog->ShowModal() == wxID_OK)
+						{
+							ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+							Trigger* newTrig;
+							if (t->getTypeName() == "Collision")
+							{
+								newTrig = new trigger_preset::Collision(aType);
+							}
+							else if (t->getTypeName() == "Create")
+							{
+								newTrig = new trigger_preset::Create(aType);
+							}
+							else if (t->getTypeName() == "Step")
+							{
+								newTrig = new trigger_preset::Step(aType);
+							}
+							else if (t->getTypeName() == "Draw")
+							{
+								newTrig = new trigger_preset::Draw(aType);
+							}
+							else if (t->getTypeName() == "Destroy")
+							{
+								newTrig = new trigger_preset::Destroy(aType);
+							}
+							actionMap.erase(pair.first);
+							lb1->Delete(sel);
+							found = true;
+							at->actionMap[newTrig] = aList;
+							lb1->Append(newTrig->toString());
+							lb1->SetStringSelection(newTrig->toString());
+						}
+					}
+				}
+				if (found)
+				{
+					break;
 				}
 			}
 		}
