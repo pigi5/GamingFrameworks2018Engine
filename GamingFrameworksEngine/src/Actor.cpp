@@ -537,26 +537,32 @@ Logger& operator<<(Logger& logger, const Actor& obj)
 
 // Mouse Functions
 
-void Actor::checkPressOn(int clickX, int clickY)
+bool Actor::checkPressOn(int clickX, int clickY)
 {
+	bool on = false;
 	if (isCollidable() && hitbox->isClickedOn(clickX, clickY)) 
 	{
 		MouseInputType m;
 		m.state = MouseState::PRESS_ON;
 		trigger_preset::MouseInput trigger(&m);
 		this->fireTrigger(&trigger);
+		on = true;
 	}
+	return on;
 }
 
-void Actor::checkReleaseOn(int clickX, int clickY)
+bool Actor::checkReleaseOn(int clickX, int clickY)
 {
+	bool on = false;
 	if (isCollidable() && hitbox->isClickedOn(clickX, clickY))
 	{
 		MouseInputType m;
 		m.state = MouseState::RELEASE_ON;
 		trigger_preset::MouseInput trigger(&m);
 		this->fireTrigger(&trigger);
+		on = true;
 	}
+	return on;
 }
 
 // reverse ordering for containers
