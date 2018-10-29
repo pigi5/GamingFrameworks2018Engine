@@ -220,23 +220,27 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 
 void Actor::fireTrigger(Trigger* trigger)
 {
-    try
+    if (room->getActorDeleteQueue().find(this) == room->getActorDeleteQueue().end() && 
+            room->getOverlayDeleteQueue().find((Overlay*)this) == room->getOverlayDeleteQueue().end())
     {
-        engine_util::logger << *this << ": trigger - " << *trigger << " - " << std::to_string(trigger->hashCode()) << std::endl;
-        // get action list for trigger if one exists
-        auto actions = type->actionMap.at(trigger);
-        for (Action* action : actions)
+        try
         {
-            engine_util::logger << *this << ": action - " << *action << std::endl;
-            action->run(this);
-            // can't continue if deleted
-            if (dynamic_cast<action_preset::Destroy*>(action) && action->checkConditionals(this))
+            engine_util::logger << *this << ": trigger - " << *trigger << " - " << std::to_string(trigger->hashCode()) << std::endl;
+            // get action list for trigger if one exists
+            auto actions = type->actionMap.at(trigger);
+            for (Action* action : actions)
             {
-                return;
+                engine_util::logger << *this << ": action - " << *action << std::endl;
+                action->run(this);
+                // can't continue if deleted
+                if (dynamic_cast<action_preset::Destroy*>(action) && action->checkConditionals(this))
+                {
+                    return;
+                }
             }
-        }
-    } 
-    catch (const std::out_of_range& e) {}
+        } 
+        catch (const std::out_of_range& e) {}
+    }
 }
 
 void Actor::onCollision(Actor* other)

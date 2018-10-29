@@ -49,12 +49,8 @@ Room::Room(const YAML::Node& config, bool shallow)
 
         State startState(actor["startX"].as<float>(), actor["startY"].as<float>());
 
-        Actor* newActor = new Actor(this, mapItem->second, startState);
-        if (actor["follow"].as<bool>())
-        {
-            followedActor = newActor;
-        }
-        actors.push_back(newActor);
+        bool followed = actor["follow"].as<bool>();
+        startActors.push_back(std::make_tuple(typeName, startState, followed));
     }
 
     YAML::Node overlaysNode = config["overlays"];
@@ -67,9 +63,9 @@ Room::Room(const YAML::Node& config, bool shallow)
         {
             throw ConfigurationError("Overlay Type " + typeName + " does not exist.");
         }
-
+        
         State startState(overlay["startX"].as<float>(), overlay["startY"].as<float>());
-        overlays.push_back(new Overlay(this, mapItem->second, startState));
+        startOverlays.push_back(std::make_tuple(typeName, startState));
     }
 }
 
@@ -79,20 +75,24 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
     out << YAML::Key << "default" << YAML::Value << obj.is_default;
 
     out << YAML::Key << "actors" << YAML::Value << YAML::BeginSeq;
-    for (Actor* actor : obj.actors)
+    for (auto tup : obj.startActors)
     {
         out << YAML::BeginMap;
-        out << *actor;
-        out << YAML::Key << "follow" << YAML::Value << (actor == obj.followedActor);
+        out << YAML::Key << "type" << YAML::Value << std::get<std::string>(tup);
+        out << YAML::Key << "startX" << YAML::Value << std::get<State>(tup).xPosition;
+        out << YAML::Key << "startY" << YAML::Value << std::get<State>(tup).yPosition;
+        out << YAML::Key << "follow" << YAML::Value << std::get<bool>(tup);
         out << YAML::EndMap;
     }
     out << YAML::EndSeq;
     
     out << YAML::Key << "overlays" << YAML::Value << YAML::BeginSeq;
-    for (Overlay* overlay : obj.overlays)
+    for (auto tup : obj.startOverlays)
     {
         out << YAML::BeginMap;
-        out << *overlay;
+        out << YAML::Key << "type" << YAML::Value << std::get<std::string>(tup);
+        out << YAML::Key << "startX" << YAML::Value << std::get<State>(tup).xPosition;
+        out << YAML::Key << "startY" << YAML::Value << std::get<State>(tup).yPosition;
         out << YAML::EndMap;
     }
     out << YAML::EndSeq;
@@ -111,9 +111,54 @@ Room::~Room()
     {
         delete actor;
     }
+    actors.clear();
     for (Overlay* overlay : overlays)
     {
         delete overlay;
+    }
+    overlays.clear();
+}
+
+void Room::reset()
+{
+    for (Actor* actor : actors)
+    {
+        delete actor;
+    }
+    actors.clear();
+    for (Overlay* overlay : overlays)
+    {
+        delete overlay;
+    }
+    overlays.clear();
+    for (auto& tup : startActors)
+    {
+        auto mapItem = ActorType::objectMap.find(std::get<std::string>(tup));
+        if (mapItem == ActorType::objectMap.end())
+        {
+            throw ConfigurationError("Actor Type " + std::get<std::string>(tup) + " does not exist.");
+        }
+
+        Actor* actor = new Actor(this, mapItem->second, std::get<State>(tup));
+
+        actors.push_back(actor);
+
+        if (std::get<bool>(tup))
+        {
+            followedActor = actor;
+        }
+    }
+    for (auto& tup : startOverlays)
+    {
+        auto mapItem = OverlayType::objectMap.find(std::get<std::string>(tup));
+        if (mapItem == OverlayType::objectMap.end())
+        {
+            throw ConfigurationError("Overlay Type " + std::get<std::string>(tup) + " does not exist.");
+        }
+
+        Overlay* actor = new Overlay(this, mapItem->second, std::get<State>(tup));
+
+        overlays.push_back(actor);
     }
 }
 
@@ -222,6 +267,15 @@ void Room::deleteOverlay(Overlay* overlay)
     overlayDeleteQueue.insert(overlay);
 }
 
+const std::set<Actor*>& Room::getActorDeleteQueue()
+{
+    return actorDeleteQueue;
+}
+const std::set<Overlay*>& Room::getOverlayDeleteQueue()
+{
+    return overlayDeleteQueue;
+}
+
 std::list<Actor*>* Room::getActors()
 {
     return &actors;
@@ -230,6 +284,16 @@ std::list<Actor*>* Room::getActors()
 std::list<Overlay*>* Room::getOverlays()
 {
 	return &overlays;
+}
+
+std::list<std::tuple<std::string, State, bool>>* Room::getStartActors()
+{
+	return &startActors;
+}
+
+std::list<std::tuple<std::string, State>>* Room::getStartOverlays()
+{
+	return &startOverlays;
 }
 
 Actor* Room::getFollowedActor() const
@@ -268,8 +332,16 @@ void Room::allMousePress(int x, int y, Trigger* trigger)
 	for (Actor* actor : actors)
 	{
 		if(!actor->checkPressOn(x, y))
+        {
 			actor->fireTrigger(trigger);
-
+        }
+	}
+	for (Overlay* overlay : overlays)
+	{
+		if(!overlay->checkPressOn(x, y))
+        {
+			overlay->fireTrigger(trigger);
+        }
 	}
 }
 
@@ -277,7 +349,16 @@ void Room::allMouseRelease(int x, int y, Trigger* trigger)
 {
 	for (Actor* actor : actors)
 	{
-		if (!actor->checkReleaseOn(x, y))
+		if(!actor->checkReleaseOn(x, y))
+        {
 			actor->fireTrigger(trigger);
+        }
+	}
+	for (Overlay* overlay : overlays)
+	{
+		if(!overlay->checkReleaseOn(x, y))
+        {
+			overlay->fireTrigger(trigger);
+        }
 	}
 }

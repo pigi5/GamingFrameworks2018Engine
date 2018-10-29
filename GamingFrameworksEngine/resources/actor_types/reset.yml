@@ -24,4 +24,14 @@ triggers:
         conditionals:
           []
         name: test_sound
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: lives
+        value: 3
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: score
+        value: 0
 ...

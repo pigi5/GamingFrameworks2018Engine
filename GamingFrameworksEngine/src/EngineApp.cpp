@@ -3246,15 +3246,15 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	wxGridSizer *g7 = new wxGridSizer(1, 2, 2, 2);
 	wxPanel *rmPanel = new wxPanel(rmEdit, wxID_ANY);
 	actBox = new wxListBox(rmPanel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	for (auto& i : *rm->getActors())
+	for (auto& i : *rm->getStartActors())
 	{
-		string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+		string ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 		actBox->Append(ap);
 	}
 	ovBox = new wxListBox(rmPanel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
-	for (auto& i : *rm->getOverlays())
+	for (auto& i : *rm->getStartOverlays())
 	{
-		string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+		string ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 		ovBox->Append(ap);
 	}
 	g7->Add(actBox, 1, wxEXPAND | wxALL, 2);
@@ -3306,9 +3306,9 @@ void RoomEditor::onSetDefault(wxCommandEvent& event)
 void RoomEditor::onSetFollow(wxCommandEvent& event)
 {
 	wxArrayString actorChoices;
-	for (auto& i : *rm->getActors())
+	for (auto& i : *rm->getStartActors())
 	{
-		string str = i->getType()->name + " : " + to_string(i->getId());
+		string str = std::get<std::string>(i);
 		actorChoices.Add(str);
 	}
 	actorChoices.Add("None");
@@ -3322,12 +3322,12 @@ void RoomEditor::onSetFollow(wxCommandEvent& event)
 		}
 		else
 		{
-			for (auto& i : *rm->getActors())
+			for (auto& i : *rm->getStartActors())
 			{
-				string find = i->getType()->name + " : " + to_string(i->getId());
+				string find = std::get<std::string>(i);
 				if (find == str)
 				{
-					rm->setFollowedActor(i);
+					std::get<bool>(i) = true;
 				}
 			}
 		}
@@ -3364,9 +3364,9 @@ void RoomEditor::onActNew(wxCommandEvent& event)
 				wxString str = actF2ChoiceDialog->GetValue();
 				float spd2 = stof(str.ToStdString());
 				State st = State(spd1, spd2);
-				a = new Actor(rm, at, st);
-				rm->addActor(a);
-				string ap = a->getType()->name + " : " + to_string(a->getId()) + " : X : " + to_string(a->getStartState().xPosition) + " : Y : " + to_string(a->getStartState().yPosition);
+                std::tuple<std::string, State, bool> tup = std::make_tuple(at->name, st, false);
+				rm->getStartActors()->push_back(tup);
+				string ap = at->name + " : X : " + to_string(st.xPosition) + " : Y : " + to_string(st.yPosition);
 				actBox->Append(ap);
 			}
 		}
@@ -3379,9 +3379,9 @@ void RoomEditor::onActEdit(wxCommandEvent& event)
 	{
 		string str = actBox->GetStringSelection().ToStdString();
 		bool found = false;
-		for (auto& i : *rm->getActors())
+		for (auto& i : *rm->getStartActors())
 		{
-			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			string ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 			if (ap == str)
 			{
 				wxTextEntryDialog *actF3ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
@@ -3395,8 +3395,8 @@ void RoomEditor::onActEdit(wxCommandEvent& event)
 						wxString str = actF4ChoiceDialog->GetValue();
 						float spd2 = stof(str.ToStdString());
 						State st = State(spd1, spd2);
-						i->setStartState(st);
-						ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+						std::get<State>(i) = st;
+						ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 						actBox->SetString(sel, ap);
 					}
 				}
@@ -3417,12 +3417,12 @@ void RoomEditor::onActDelete(wxCommandEvent& event)
 	{
 		string str = actBox->GetStringSelection().ToStdString();
 		bool found = false;
-		for (auto& i : *rm->getActors())
+		for (auto& i : *rm->getStartActors())
 		{
-			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			string ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 			if (ap == str)
 			{
-				rm->getActors()->remove(i);
+				rm->getStartActors()->remove(i);
 				actBox->Delete(sel);
 				found = true;
 			}
@@ -3459,9 +3459,9 @@ void RoomEditor::onOvNew(wxCommandEvent& event)
 				wxString str = actF2ChoiceDialog->GetValue();
 				float spd2 = stof(str.ToStdString());
 				State st = State(spd1, spd2);
-				o = new Overlay(rm, ot, st);
-				rm->addOverlay(o);
-				string ap = o->getType()->name + " : " + to_string(o->getId()) + " : X : " + to_string(o->getStartState().xPosition) + " : Y : " + to_string(o->getStartState().yPosition);
+                std::tuple<std::string, State> tup = std::make_tuple(ot->name, st);
+				rm->getStartOverlays()->push_back(tup);
+				string ap = ot->name + " : X : " + to_string(st.xPosition) + " : Y : " + to_string(st.yPosition);
 				ovBox->Append(ap);
 			}
 		}
@@ -3474,9 +3474,9 @@ void RoomEditor::onOvEdit(wxCommandEvent& event)
 	{
 		string str = ovBox->GetStringSelection().ToStdString();
 		bool found = false;
-		for (auto& i : *rm->getOverlays())
+		for (auto& i : *rm->getStartOverlays())
 		{
-			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			string ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 			if (ap == str)
 			{
 				wxTextEntryDialog *ovF3ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
@@ -3490,8 +3490,8 @@ void RoomEditor::onOvEdit(wxCommandEvent& event)
 						wxString str = ovF4ChoiceDialog->GetValue();
 						float spd2 = stof(str.ToStdString());
 						State st = State(spd1, spd2);
-						i->setStartState(st);
-						ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+						std::get<State>(i) = st;
+						ap = std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 						ovBox->SetString(sel, ap);
 					}
 				}
@@ -3512,12 +3512,12 @@ void RoomEditor::onOvDelete(wxCommandEvent& event)
 	{
 		string str = ovBox->GetStringSelection().ToStdString();
 		bool found = false;
-		for (auto& i : *rm->getOverlays())
+		for (auto& i : *rm->getStartOverlays())
 		{
-			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			string ap =std::get<std::string>(i) + " : X : " + to_string(std::get<State>(i).xPosition) + " : Y : " + to_string(std::get<State>(i).yPosition);
 			if (ap == str)
 			{
-				rm->getOverlays()->remove(i);
+				rm->getStartOverlays()->remove(i);
 				ovBox->Delete(sel);
 				found = true;
 			}

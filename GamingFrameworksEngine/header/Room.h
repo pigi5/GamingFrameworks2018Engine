@@ -13,12 +13,16 @@ class Room
 {
 private:
     std::list<Actor*> actors;
+    std::list<std::tuple<std::string, State, bool>> startActors;
     std::list<Overlay*> overlays;
+    std::list<std::tuple<std::string, State>> startOverlays;
     
     std::set<Actor*> actorDeleteQueue;
     std::set<Overlay*> overlayDeleteQueue;
 
     Actor* followedActor;
+
+    const YAML::Node* config;
 
     Engine* engine;
 public:
@@ -36,9 +40,10 @@ public:
     
     friend YAML::Emitter& operator<<(YAML::Emitter&, const Room&);
     friend Logger& operator<<(Logger&, const Room&);
-
+    
     ~Room();
-
+    
+    void reset();
     void step();
 	void interpolateState(float);
     void draw(sf::RenderWindow* window, sf::View* view);
@@ -54,8 +59,13 @@ public:
     void addOverlay(Overlay*);
     void deleteOverlay(Overlay*);
 
+    const std::set<Actor*>& getActorDeleteQueue();
+    const std::set<Overlay*>& getOverlayDeleteQueue();
+    
     std::list<Actor*>* getActors();
 	std::list<Overlay*>* getOverlays();
+    std::list<std::tuple<std::string, State, bool>>* getStartActors();
+	std::list<std::tuple<std::string, State>>* getStartOverlays();
 
     Actor* getFollowedActor() const;
 	void setFollowedActor(Actor* actor);

@@ -25,8 +25,8 @@ triggers:
         conditionals:
           []
         value: false
-  - type: Timer
-    index: 0
+  - type: Collision
+    target: player
     actions:
       - type: Destroy
         conditionals:
@@ -39,8 +39,8 @@ triggers:
           []
         target: player
         speed: 0.25
-  - type: Collision
-    target: player
+  - type: Timer
+    index: 0
     actions:
       - type: Destroy
         conditionals:

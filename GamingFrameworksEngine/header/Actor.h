@@ -71,6 +71,11 @@ struct State
         return out;
     }
     
+    friend bool operator==(const::State& obj1, const State& obj2)
+    {
+        return obj1.xPosition == obj2.xPosition && obj1.yPosition == obj2.yPosition;
+    }
+    
     const std::string toString() const
     {
         return "xPosition: " + std::to_string(xPosition) + ", yPosition: " + std::to_string(yPosition);

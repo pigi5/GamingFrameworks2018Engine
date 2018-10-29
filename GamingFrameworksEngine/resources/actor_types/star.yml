@@ -16,6 +16,11 @@ triggers:
   - type: Collision
     target: player
     actions:
+      - type: AttributeChange
+        conditionals:
+          []
+        attribute: score
+        offset: 1
       - type: Destroy
         conditionals:
           []

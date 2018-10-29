@@ -13,6 +13,20 @@ depth: 0
 attributes:
   {}
 triggers:
+  - type: Timer
+    index: 0
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 5
+      - type: Create
+        conditionals:
+          []
+        target: fireball
+        xPosition: 40
+        yPosition: 0
   - type: Create
     target: homing_enemy
     actions:
@@ -33,20 +47,6 @@ triggers:
         conditionals:
           []
         value: 0
-  - type: Timer
-    index: 0
-    actions:
-      - type: SetTimer
-        conditionals:
-          []
-        index: 0
-        time: 5
-      - type: Create
-        conditionals:
-          []
-        target: fireball
-        xPosition: 40
-        yPosition: 0
   - type: Step
     target: homing_enemy
     actions:

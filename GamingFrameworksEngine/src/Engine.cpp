@@ -85,7 +85,7 @@ void Engine::run()
 	InputHandler input;
 
     // Defines the current room locally so that the room cannot be changed during loops
-    Room* localCurrentRoom;
+    Room* localCurrentRoom = NULL;
 
     // find default room
     for (auto it = Room::objectMap.begin(); it != Room::objectMap.end(); ++it)
@@ -131,7 +131,11 @@ void Engine::run()
     // Run the game loop
     while (go) 
     {
-        localCurrentRoom = currentRoomIterator->second;
+        if (localCurrentRoom != currentRoomIterator->second)
+        {
+            localCurrentRoom = currentRoomIterator->second;
+            localCurrentRoom->reset();
+        }
 
 		// Reset the timer
 		currentTime = std::chrono::high_resolution_clock::now();
