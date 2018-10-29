@@ -170,6 +170,8 @@ public:
 	wxStaticText* defTxt;
 	wxStaticText* selTxt;
 	wxStaticText* folTxt;
+	wxStaticText* actTxt;
+	wxStaticText* ovTxt;
 
 	void onSetDefault(wxCommandEvent& event);
 	void onSetObject(wxCommandEvent& event);
@@ -1803,7 +1805,7 @@ void Editor::onNew2(wxCommandEvent& event)
 					}
 					else if (aType == "F")
 					{
-						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
+						wxTextEntryDialog *floatChoiceDialog = new wxTextEntryDialog(this, "Enter Value");
 						if (floatChoiceDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = floatChoiceDialog->GetValue();
@@ -2069,27 +2071,47 @@ void Editor::onNew2(wxCommandEvent& event)
 					}
 					else if (aType == "St")
 					{
-						wxArrayString roomChoices;
-						for (const auto& pair : Room::objectMap)
+						if (action == "Set Room")
 						{
-							roomChoices.Add(pair.first);
+							wxArrayString roomChoices;
+							for (const auto& pair : Room::objectMap)
+							{
+								roomChoices.Add(pair.first);
+							}
+							wxSingleChoiceDialog *roomChoiceDialog = new wxSingleChoiceDialog(this, "Choose Room", "Choose one from the list", roomChoices);
+							if (roomChoiceDialog->ShowModal() == wxID_OK)
+							{
+								string str = roomChoiceDialog->GetStringSelection().ToStdString();
+								Action* a;
+								if (action == "Set Room")
+								{
+									a = new action_preset::SetRoom(str);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
+							}
 						}
-						wxSingleChoiceDialog *roomChoiceDialog = new wxSingleChoiceDialog(this, "Choose Room", "Choose one from the list", roomChoices);
-						if (roomChoiceDialog->ShowModal() == wxID_OK)
+						else
 						{
-							string str = roomChoiceDialog->GetStringSelection().ToStdString();
-							Action* a;
-							if (action == "Set Room")
+							wxArrayString sprChoices;
+							for (const auto& pair : Sprite::objectMap)
 							{
-								a = new action_preset::SetRoom(str);
+								sprChoices.Add(pair.first);
 							}
-							else if (action == "Set Sprite")
+							wxSingleChoiceDialog *sprChoiceDialog = new wxSingleChoiceDialog(this, "Choose Sprite", "Choose one from the list", sprChoices);
+							if (sprChoiceDialog->ShowModal() == wxID_OK)
 							{
-								a = new action_preset::SpriteSet(str);
+								string str = sprChoiceDialog->GetStringSelection().ToStdString();
+								Action* a;
+								if (action == "Set Sprite")
+								{
+									a = new action_preset::SetRoom(str);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
 							}
-							aList->emplace_back(a);
-							lb2->Append(a->toString());
-							lb2->SetStringSelection(a->toString());
 						}
 					}
 					else if (aType == "So")
@@ -2600,27 +2622,47 @@ void Editor::onEdit2(wxCommandEvent& event)
 					}
 					else if (aType == "St")
 					{
-						wxArrayString roomChoices;
-						for (const auto& pair : Room::objectMap)
+						if (action == "Set Room")
 						{
-							roomChoices.Add(pair.first);
+							wxArrayString roomChoices;
+							for (const auto& pair : Room::objectMap)
+							{
+								roomChoices.Add(pair.first);
+							}
+							wxSingleChoiceDialog *roomChoiceDialog = new wxSingleChoiceDialog(this, "Choose Room", "Choose one from the list", roomChoices);
+							if (roomChoiceDialog->ShowModal() == wxID_OK)
+							{
+								string str = roomChoiceDialog->GetStringSelection().ToStdString();
+								Action* a;
+								if (action == "Set Room")
+								{
+									a = new action_preset::SetRoom(str);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
+							}
 						}
-						wxSingleChoiceDialog *roomChoiceDialog = new wxSingleChoiceDialog(this, "Choose Room", "Choose one from the list", roomChoices);
-						if (roomChoiceDialog->ShowModal() == wxID_OK)
+						else
 						{
-							string str = roomChoiceDialog->GetStringSelection().ToStdString();
-							Action* a;
-							if (action == "Set Room")
+							wxArrayString sprChoices;
+							for (const auto& pair : Sprite::objectMap)
 							{
-								a = new action_preset::SetRoom(str);
+								sprChoices.Add(pair.first);
 							}
-							else if (action == "Set Sprite")
+							wxSingleChoiceDialog *sprChoiceDialog = new wxSingleChoiceDialog(this, "Choose Sprite", "Choose one from the list", sprChoices);
+							if (sprChoiceDialog->ShowModal() == wxID_OK)
 							{
-								a = new action_preset::SpriteSet(str);
+								string str = sprChoiceDialog->GetStringSelection().ToStdString();
+								Action* a;
+								if (action == "Set Sprite")
+								{
+									a = new action_preset::SpriteSet(str);
+								}
+								aList->emplace_back(a);
+								lb2->Append(a->toString());
+								lb2->SetStringSelection(a->toString());
 							}
-							aList->emplace_back(a);
-							lb2->Append(a->toString());
-							lb2->SetStringSelection(a->toString());
 						}
 					}
 					else if (aType == "So")
@@ -3155,10 +3197,19 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	g2->Add(folTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
 	tPanel->SetSizer(g2);
 	
+	wxGridSizer *g3 = new wxGridSizer(1, 2, 2, 2);
+	wxPanel *t2Panel = new wxPanel(rmEdit, wxID_ANY);
+	actTxt = new wxStaticText(t2Panel, wxID_ANY, "Actors");
+	ovTxt = new wxStaticText(t2Panel, wxID_ANY, "Overlays");
+	g3->Add(actTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g3->Add(ovTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
+	t2Panel->SetSizer(g3);
+
 	wxPanel *rmPanel = new wxPanel(rmEdit, wxID_ANY);
 
 	vbs->Add(tPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 5);
 	vbs->Add(bPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
+	vbs->Add(t2Panel, 0, wxEXPAND | wxTOP | wxBOTTOM, 5);
 	vbs->Add(rmPanel, 1, wxEXPAND | wxALL);
 	rmEdit->SetSizer(vbs);
 
