@@ -3048,13 +3048,71 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 
 void RoomEditor::onSetDefault(wxCommandEvent& event)
 {
-
+	wxArrayString tf;
+	tf.Add("True");
+	tf.Add("False");
+	wxSingleChoiceDialog *defDialog = new wxSingleChoiceDialog(this, "Set Room as Default", "Choose True or False", tf);
+	if (defDialog->ShowModal() == wxID_OK)
+	{
+		string str = defDialog->GetStringSelection().ToStdString();
+		if (str == "False")
+		{
+			rm->is_default = false;
+		}
+		else
+		{
+			for (auto& pair : Room::objectMap)
+			{
+				if (pair.second->is_default == true)
+				{
+					pair.second->is_default = false;
+				}
+			}
+			rm->is_default = true;
+		}
+	}
 }
 void RoomEditor::onSetObject(wxCommandEvent& event)
 {
-
+	wxArrayString actorChoices;
+	for (auto& pair : ActorType::objectMap)
+	{
+		actorChoices.Add(pair.first);
+	}
+	wxSingleChoiceDialog *objDialog = new wxSingleChoiceDialog(this, "Choose Actor for Placement", "Choose one from the list", actorChoices);
+	if (objDialog->ShowModal() == wxID_OK)
+	{
+		string str = objDialog->GetStringSelection().ToStdString();
+		rm->place = ActorType::objectMap[str];
+	}
 }
 void RoomEditor::onSetFollow(wxCommandEvent& event)
 {
-
+	wxArrayString actorChoices;
+	for (auto& i : rm->getActors())
+	{
+		string str = i->getType()->name + " : " + to_string(i->getId());
+		actorChoices.Add(str);
+	}
+	actorChoices.Add("None");
+	wxSingleChoiceDialog *folDialog = new wxSingleChoiceDialog(this, "Set Actor for Camera to Follow", "Choose one from the list", actorChoices);
+	if (folDialog->ShowModal() == wxID_OK)
+	{
+		string str = folDialog->GetStringSelection().ToStdString();
+		if (str == "None")
+		{
+			rm->setFollowedActor(NULL);
+		}
+		else
+		{
+			for (auto& i : rm->getActors())
+			{
+				string find = i->getType()->name + " : " + to_string(i->getId());
+				if (find == str)
+				{
+					rm->setFollowedActor(i);
+				}
+			}
+		}
+	}
 }
