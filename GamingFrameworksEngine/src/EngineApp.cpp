@@ -953,6 +953,7 @@ void Editor::resetTrigger()
             break;
         }
         case ACTOR:
+        case OVERLAY:
         {
             topText->SetLabel(wxString("Now Editing " + actionNames[operation] + " - " + selObject));
 		    st1->SetLabel("Triggers");
@@ -960,7 +961,15 @@ void Editor::resetTrigger()
 		    st3->SetLabel("Conditionals");
 		    st4->SetLabel("Attributes");
 
-		    ActorType* at = ActorType::objectMap.at(selObject);
+		    ActorType* at;
+            if (operation == ACTOR)
+            {
+                at = ActorType::objectMap.at(selObject);
+            } 
+            else
+            {
+                at = OverlayType::objectMap.at(selObject);
+            }
 		    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
 		    for (const auto& pair : actionMap)
 		    {
@@ -985,10 +994,6 @@ void Editor::resetTrigger()
 		    boxFrame->Close(true);
             break;
         }
-        case OVERLAY:
-		{
-			break;
-		}
         case ROOM:
         {
             topText->SetLabel(DEFAULT_TOP_STR);
@@ -1034,7 +1039,15 @@ void Editor::resetAction()
 {
 	lb2->Clear();
 	lb3->Clear();
-	ActorType* at = ActorType::objectMap.at(selObject);
+	ActorType* at;
+    if (operation == ACTOR)
+    {
+        at = ActorType::objectMap.at(selObject);
+    } 
+    else
+    {
+        at = OverlayType::objectMap.at(selObject);
+    }
 	auto actionMap = at->actionMap;
 	bool found = false;
 	for (const auto& pair : actionMap)
@@ -1051,7 +1064,15 @@ void Editor::resetAction()
 void Editor::resetCon()
 {
 	lb3->Clear();
-	ActorType* at = ActorType::objectMap.at(selObject);
+	ActorType* at;
+    if (operation == ACTOR)
+    {
+        at = ActorType::objectMap.at(selObject);
+    } 
+    else
+    {
+        at = OverlayType::objectMap.at(selObject);
+    }
 	auto actionMap = at->actionMap;
 	bool found = false;
 	for (const auto& pair : actionMap)
@@ -1091,7 +1112,7 @@ void Editor::onNew1(wxCommandEvent& event)
 			lb1->Append(fileName.AfterLast('\\'));
 		}
 	}
-	if (operation == ACTOR)
+	else if (operation == ACTOR || operation == OVERLAY)
 	{
 		wxArrayString triggers;
 		triggers.Add("Collision");
@@ -1106,6 +1127,15 @@ void Editor::onNew1(wxCommandEvent& event)
 		wxSingleChoiceDialog *createTriggerDialog = new wxSingleChoiceDialog(this, "Select Trigger to create", "Select Trigger", triggers);
 		if (createTriggerDialog->ShowModal() == wxID_OK)
 		{
+	        ActorType* at;
+            if (operation == ACTOR)
+            {
+                at = ActorType::objectMap.at(selObject);
+            } 
+            else
+            {
+                at = OverlayType::objectMap.at(selObject);
+            }
 			map<string, string> types;
 			types.emplace("Collision", "ActorTypeWrapper");
 			types.emplace("ButtonInput", "ButtonInputType");
@@ -1123,20 +1153,37 @@ void Editor::onNew1(wxCommandEvent& event)
 				if (trig == "Collision")
 				{
 					wxArrayString actorChoices;
-					for (const auto& pair : ActorType::objectMap)
-					{
-						actorChoices.Add(pair.first);
-					}
+                    if (operation == ACTOR)
+                    {
+					    for (const auto& pair : ActorType::objectMap)
+					    {
+						    actorChoices.Add(pair.first);
+					    }
+                    } 
+                    else
+                    {
+					    for (const auto& pair : OverlayType::objectMap)
+					    {
+						    actorChoices.Add(pair.first);
+					    }
+                    }
 					wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 					if (typeWrapperDialog->ShowModal() == wxID_OK)
 					{
-						ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
-						Trigger* t;
+						ActorTypeWrapper* aType;
+                        if (operation == ACTOR)
+                        {
+					        aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+                        } 
+                        else
+                        {
+					        aType = new ActorTypeWrapper(OverlayType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+                        } 
+                        Trigger* t;
 						if (trig == "Collision")
 						{
 							t = new trigger_preset::Collision(aType);
 						}
-						ActorType* at = ActorType::objectMap.at(selObject);
 						list<Action*> aList;
 						at->actionMap[t] = aList;
 						lb1->Append(t->toString());
@@ -1144,7 +1191,15 @@ void Editor::onNew1(wxCommandEvent& event)
 				}
 				else
 				{
-					ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[selObject]);
+					ActorTypeWrapper* aType;
+                    if (operation == ACTOR)
+                    {
+					    aType = new ActorTypeWrapper(ActorType::objectMap[selObject]);
+                    } 
+                    else
+                    {
+					    aType = new ActorTypeWrapper(OverlayType::objectMap[selObject]);
+                    } 
 					Trigger* t;
 					if (trig == "Create")
 					{
@@ -1162,7 +1217,6 @@ void Editor::onNew1(wxCommandEvent& event)
 					{
 						t = new trigger_preset::Destroy(aType);
 					}
-					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
 					lb1->Append(t->toString());
@@ -1217,7 +1271,6 @@ void Editor::onNew1(wxCommandEvent& event)
 							}
 						}
 						Trigger *t = new trigger_preset::ButtonInput(bit);
-						ActorType* at = ActorType::objectMap.at(selObject);
 						list<Action*> aList;
 						at->actionMap[t] = aList;
 						lb1->Append(t->toString());
@@ -1255,7 +1308,6 @@ void Editor::onNew1(wxCommandEvent& event)
 					MouseInputType* mit = new MouseInputType();
 					mit->state = mState;
 					Trigger* t = new trigger_preset::MouseInput(mit);
-					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
 					lb1->Append(t->toString());
@@ -1278,7 +1330,6 @@ void Editor::onNew1(wxCommandEvent& event)
 					{
 						t = new trigger_preset::Custom(i);
 					}
-					ActorType* at = ActorType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
 					lb1->Append(t->toString());
@@ -1320,13 +1371,21 @@ void Editor::onEdit1(wxCommandEvent& event)
 				lb1->Append(fileName.AfterLast('\\'));
 			}
 		}
-		if(operation == ACTOR)
+		else if(operation == ACTOR || operation == OVERLAY)
 		{
-			ActorType* at = ActorType::objectMap.at(selObject);
-			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals>* actionMap = &at->actionMap;
-			bool found = false;
-			for (const auto& pair : *actionMap)
-			{
+	        ActorType* at;
+            if (operation == ACTOR)
+            {
+                at = ActorType::objectMap.at(selObject);
+            } 
+            else
+            {
+                at = OverlayType::objectMap.at(selObject);
+            }
+		    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals>* actionMap = &at->actionMap;
+		    bool found = false;
+		    for (const auto& pair : *actionMap)
+		    {
 				if (pair.first->toString() == str.ToStdString() && !found)
 				{
 					Trigger* t = pair.first;
@@ -1455,15 +1514,33 @@ void Editor::onEdit1(wxCommandEvent& event)
 					}
 					else if(t->getTypeName() == "Collision")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (typeWrapperDialog->ShowModal() == wxID_OK)
 						{
-							ActorTypeWrapper* aType = new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+							ActorTypeWrapper* aType;
+                            if (operation == ACTOR)
+                            {
+                                aType =  new ActorTypeWrapper(ActorType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+                            } 
+                            else
+                            {
+                                aType =  new ActorTypeWrapper(OverlayType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
+                            }
 							Trigger* newTrig;
 							if (t->getTypeName() == "Collision")
 							{
@@ -1516,8 +1593,17 @@ void Editor::onDelete1(wxCommandEvent& event)
                 break;
             }
             case ACTOR:
+            case OVERLAY:
             {
-			    ActorType* at = ActorType::objectMap.at(selObject);
+	            ActorType* at;
+                if (operation == ACTOR)
+                {
+                    at = ActorType::objectMap.at(selObject);
+                } 
+                else
+                {
+                    at = OverlayType::objectMap.at(selObject);
+                }
 			    std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals>* actionMap = &at->actionMap;
 			    bool found = false;
 			    for (const auto& pair : *actionMap)
@@ -1543,7 +1629,15 @@ void Editor::onNew2(wxCommandEvent& event)
 {
 	if (lb1->GetSelection() != -1)
 	{
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto& actionMap = at->actionMap;
 		bool found = false;
 		for (auto& pair : actionMap)
@@ -1708,16 +1802,34 @@ void Editor::onNew2(wxCommandEvent& event)
 					}
 					else if (aType == "At")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actorDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actorDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actorDialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							Action *a = new action_preset::MoveToNearest(act);
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -1726,16 +1838,34 @@ void Editor::onNew2(wxCommandEvent& event)
 					}
 					else if (aType == "AtF")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actor2Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actor2Dialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actor2Dialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							wxTextEntryDialog *float2ChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
 							if (float2ChoiceDialog->ShowModal() == wxID_OK)
 							{
@@ -1750,16 +1880,34 @@ void Editor::onNew2(wxCommandEvent& event)
 					}
 					else if (aType == "AtFF")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actor3Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actor3Dialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actor3Dialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							wxTextEntryDialog *float5ChoiceDialog = new wxTextEntryDialog(this, "Enter X");
 							if (float5ChoiceDialog->ShowModal() == wxID_OK)
 							{
@@ -1935,7 +2083,15 @@ void Editor::onEdit2(wxCommandEvent& event)
 	if (sel != -1)
 	{
 		wxString str = lb2->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto& actionMap = at->actionMap;
 		bool found = false;
 		for (auto& pair : actionMap)
@@ -1959,7 +2115,15 @@ void Editor::onEdit2(wxCommandEvent& event)
 	}
 	if (lb1->GetSelection() != -1)
 	{
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto& actionMap = at->actionMap;
 		bool found = false;
 		for (auto& pair : actionMap)
@@ -2124,16 +2288,34 @@ void Editor::onEdit2(wxCommandEvent& event)
 					}
 					else if (aType == "At")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actorDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actorDialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actorDialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							Action *a = new action_preset::MoveToNearest(act);
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -2142,16 +2324,34 @@ void Editor::onEdit2(wxCommandEvent& event)
 					}
 					else if (aType == "AtF")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actor2Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actor2Dialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actor2Dialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							wxTextEntryDialog *float2ChoiceDialog = new wxTextEntryDialog(this, "Enter Speed");
 							if (float2ChoiceDialog->ShowModal() == wxID_OK)
 							{
@@ -2166,16 +2366,34 @@ void Editor::onEdit2(wxCommandEvent& event)
 					}
 					else if (aType == "AtFF")
 					{
-						wxArrayString actorChoices;
-						for (const auto& pair : ActorType::objectMap)
-						{
-							actorChoices.Add(pair.first);
-						}
+					    wxArrayString actorChoices;
+                        if (operation == ACTOR)
+                        {
+					        for (const auto& pair : ActorType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        } 
+                        else
+                        {
+					        for (const auto& pair : OverlayType::objectMap)
+					        {
+						        actorChoices.Add(pair.first);
+					        }
+                        }
 						wxSingleChoiceDialog *actor3Dialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
 						if (actor3Dialog->ShowModal() == wxID_OK)
 						{
 							wxString str = actor3Dialog->GetStringSelection();
-							ActorType* act = ActorType::objectMap[str.ToStdString()];
+	                        ActorType* act;
+                            if (operation == ACTOR)
+                            {
+                                act = ActorType::objectMap[str.ToStdString()];
+                            } 
+                            else
+                            {
+                                act = OverlayType::objectMap[str.ToStdString()];
+                            }
 							wxTextEntryDialog *float5ChoiceDialog = new wxTextEntryDialog(this, "Enter X");
 							if (float5ChoiceDialog->ShowModal() == wxID_OK)
 							{
@@ -2352,7 +2570,15 @@ void Editor::onDelete2(wxCommandEvent& event)
 	if (sel != -1)
 	{
 		wxString str = lb2->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto& actionMap = at->actionMap;
 		bool found = false;
 		for (auto& pair : actionMap)
@@ -2382,7 +2608,15 @@ void Editor::onNew3(wxCommandEvent& event)
 	int sel = lb2->GetSelection();
 	if (sel != -1)
 	{
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto actionMap = at->actionMap;
 		bool found = false;
 		for (const auto& pair : actionMap)
@@ -2458,7 +2692,15 @@ void Editor::onEdit3(wxCommandEvent& event)
 	if (sel != -1)
 	{
 		wxString str = lb3->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto actionMap = at->actionMap;
 		bool found = false;
 		for (const auto& pair : actionMap)
@@ -2527,7 +2769,15 @@ void Editor::onDelete3(wxCommandEvent& event)
 	if (sel != -1)
 	{
 		wxString str = lb3->GetString(sel);
-		ActorType* at = ActorType::objectMap.at(selObject);
+	    ActorType* at;
+        if (operation == ACTOR)
+        {
+            at = ActorType::objectMap.at(selObject);
+        } 
+        else
+        {
+            at = OverlayType::objectMap.at(selObject);
+        }
 		auto actionMap = at->actionMap;
 		bool found = false;
 		for (const auto& pair : actionMap)
@@ -2571,7 +2821,15 @@ void Editor::onNew4(wxCommandEvent& event)
 		if (getNewAttr->ShowModal() == wxID_OK)
 		{
 			str = getNewAttr->GetValue();
-			ActorType* at = ActorType::objectMap.at(selObject);
+	        ActorType* at;
+            if (operation == ACTOR)
+            {
+                at = ActorType::objectMap.at(selObject);
+            } 
+            else
+            {
+                at = OverlayType::objectMap.at(selObject);
+            }
 			std::unordered_map<std::string, int>* attr = &at->attributes;
 			attr->emplace(str.ToStdString(), 0);
 			string ret = str.ToStdString() + ": {default: 0}";
@@ -2607,6 +2865,7 @@ void Editor::onEdit4(wxCommandEvent& event)
         switch (operation)
         {
             case ACTOR:
+            case OVERLAY:
 				if (lb4->GetString(sel).BeforeFirst(':') != "Sprite")
 				{
 					if (editAttr->ShowModal() == wxID_OK)
@@ -2614,7 +2873,15 @@ void Editor::onEdit4(wxCommandEvent& event)
 						str = editAttr->GetValue();
 						str.ToLong(&toEdit);
 						str = lb4->GetString(sel);
-						ActorType* at = ActorType::objectMap.at(selObject);
+	                    ActorType* at;
+                        if (operation == ACTOR)
+                        {
+                            at = ActorType::objectMap.at(selObject);
+                        } 
+                        else
+                        {
+                            at = OverlayType::objectMap.at(selObject);
+                        }
 						std::unordered_map<std::string, int>* attr = &at->attributes;
 						attr->erase((str.BeforeFirst(':')).ToStdString());
 						attr->emplace((str.BeforeFirst(':')).ToStdString(), (int)toEdit);
@@ -2627,7 +2894,15 @@ void Editor::onEdit4(wxCommandEvent& event)
 					if (editSpr->ShowModal() == wxID_OK)
 					{
 						wxString str = editSpr->GetStringSelection();
-						ActorType* at = ActorType::objectMap.at(selObject);
+	                    ActorType* at;
+                        if (operation == ACTOR)
+                        {
+                            at = ActorType::objectMap.at(selObject);
+                        } 
+                        else
+                        {
+                            at = OverlayType::objectMap.at(selObject);
+                        }
 						if (str == "None")
 						{
 							at->sprite = NULL;
@@ -2665,10 +2940,19 @@ void Editor::onDelete4(wxCommandEvent& event)
         switch (operation)
         {
             case ACTOR:
+            case OVERLAY:
             {
 				if (str.BeforeFirst(':') != "Sprite")
 				{
-					ActorType* at = ActorType::objectMap.at(selObject);
+	                ActorType* at;
+                    if (operation == ACTOR)
+                    {
+                        at = ActorType::objectMap.at(selObject);
+                    } 
+                    else
+                    {
+                        at = OverlayType::objectMap.at(selObject);
+                    }
 					std::unordered_map<std::string, int>* attr = &at->attributes;
 					attr->erase((str.BeforeFirst(':')).ToStdString());
 					lb4->Delete(sel);
@@ -2686,7 +2970,7 @@ void Editor::onDelete4(wxCommandEvent& event)
 void Editor::onBox1Select(wxCommandEvent& event)
 {
 	int sel = lb1->GetSelection();
-	if (sel != -1 && operation == ACTOR)
+	if (sel != -1 && (operation == ACTOR || operation == OVERLAY))
 	{
 		wxString str = lb1->GetString(sel);
 		selTrigger = str.ToStdString();
@@ -2697,7 +2981,7 @@ void Editor::onBox1Select(wxCommandEvent& event)
 void Editor::onBox2Select(wxCommandEvent& event)
 {
 	int sel = lb2->GetSelection();
-	if (sel != -1 && operation == ACTOR)
+	if (sel != -1 && (operation == ACTOR || operation == OVERLAY))
 	{
 		wxString str = lb2->GetString(sel);
 		selAction = str.ToStdString();

@@ -13,5 +13,24 @@ depth: 0
 attributes:
   {}
 triggers:
-  []
+  - type: Create
+    target: hud
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 1
+        time: 1
+  - type: Timer
+    index: 1
+    actions:
+      - type: PlaySound
+        conditionals:
+          []
+        name: test_sound
+      - type: SetTimer
+        conditionals:
+          []
+        index: 1
+        time: 1
 ...
