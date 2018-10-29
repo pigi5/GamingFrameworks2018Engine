@@ -1228,6 +1228,14 @@ namespace action_preset
         {
             return new DepthSet(node);
         }
+        else if (typeName == "XScaleSet")
+        {
+            return new XScaleSet(node);
+        }
+        else if (typeName == "YScaleSet")
+        {
+            return new YScaleSet(node);
+        }
         else if (typeName == "AttributeSet")
         {
             return new AttributeSet(node);
