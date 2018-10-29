@@ -167,6 +167,9 @@ public:
 	RoomEditor();
 
 	wxScrolledWindow* rmEdit;
+	wxStaticText* defTxt;
+	wxStaticText* selTxt;
+	wxStaticText* folTxt;
 
 	void onSetDefault(wxCommandEvent& event);
 	void onSetObject(wxCommandEvent& event);
@@ -3022,7 +3025,8 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	rmEdit->SetScrollbars(20, 20, 5, 5);
 
 	wxBoxSizer *vbs = new wxBoxSizer(wxVERTICAL);
-	wxGridSizer *g = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer *g1 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer *g2 = new wxGridSizer(1, 3, 2, 2);
 
 	wxPanel *bPanel = new wxPanel(rmEdit, wxID_ANY);
 
@@ -3032,13 +3036,38 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	defBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetDefault, this);
 	selBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetObject, this);
 	folBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetFollow, this);
-	g->Add(defBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
-	g->Add(selBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
-	g->Add(folBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
-	bPanel->SetSizer(g);
+	g1->Add(defBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g1->Add(selBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g1->Add(folBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	bPanel->SetSizer(g1);
 
+	wxPanel *tPanel = new wxPanel(rmEdit, wxID_ANY);
+	string defstr = "False";
+	if (rm->is_default)
+	{
+		defstr = "True";
+	}
+	defTxt = new wxStaticText(tPanel, wxID_ANY, "Default Room : " + defstr);
+	string selstr = "None";
+	if (rm->place != NULL)
+	{
+		selstr = rm->place->name;
+	}
+	selTxt = new wxStaticText(tPanel, wxID_ANY, "Selected Object : " + selstr);
+	string folstr = "None";
+	if (rm->getFollowedActor() != NULL)
+	{
+		folstr = rm->getFollowedActor()->getType()->name + " : " + to_string(rm->getFollowedActor()->getId());
+	}
+	folTxt = new wxStaticText(tPanel, wxID_ANY, "Camera Following : " + folstr);
+	g2->Add(defTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g2->Add(selTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g2->Add(folTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
+	tPanel->SetSizer(g2);
+	
 	wxPanel *rmPanel = new wxPanel(rmEdit, wxID_ANY);
 
+	vbs->Add(tPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 5);
 	vbs->Add(bPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
 	vbs->Add(rmPanel, 1, wxEXPAND | wxALL);
 	rmEdit->SetSizer(vbs);
@@ -3071,6 +3100,12 @@ void RoomEditor::onSetDefault(wxCommandEvent& event)
 			rm->is_default = true;
 		}
 	}
+	string defstr = "False";
+	if (rm->is_default)
+	{
+		defstr = "True";
+	}
+	defTxt->SetLabel("Default Room : " + defstr);
 }
 void RoomEditor::onSetObject(wxCommandEvent& event)
 {
@@ -3084,6 +3119,12 @@ void RoomEditor::onSetObject(wxCommandEvent& event)
 	{
 		string str = objDialog->GetStringSelection().ToStdString();
 		rm->place = ActorType::objectMap[str];
+		string selstr = "None";
+		if (rm->place != NULL)
+		{
+			selstr = rm->place->name;
+		}
+		selTxt->SetLabel("Selected Object : " + selstr);
 	}
 }
 void RoomEditor::onSetFollow(wxCommandEvent& event)
@@ -3114,5 +3155,11 @@ void RoomEditor::onSetFollow(wxCommandEvent& event)
 				}
 			}
 		}
+		string folstr = "None";
+		if (rm->getFollowedActor() != NULL)
+		{
+			folstr = rm->getFollowedActor()->getType()->name + " : " + to_string(rm->getFollowedActor()->getId());
+		}
+		folTxt->SetLabel("Camera Following : " + folstr);
 	}
 }
