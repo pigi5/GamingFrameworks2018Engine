@@ -16,14 +16,6 @@ attributes:
   random: 0
   invincible: 0
 triggers:
-  - type: ButtonInput
-    id: 72
-    state: down
-    actions:
-      - type: SetXSpeed
-        conditionals:
-          []
-        speed: 0
   - type: Create
     target: player
     actions:
@@ -44,6 +36,23 @@ triggers:
         conditionals:
           []
         speed: 0
+  - type: ButtonInput
+    id: 72
+    state: down
+    actions:
+      - type: SetXSpeed
+        conditionals:
+          []
+        speed: 0
+  - type: ButtonInput
+    id: 72
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: 0.1
+        yAcceleration: 0
   - type: MouseInput
     state: down
     actions:
@@ -63,15 +72,6 @@ triggers:
         target: bad_wall
         xPosition: 0
         yPosition: 0
-  - type: ButtonInput
-    id: 72
-    state: hold
-    actions:
-      - type: ApplyForce
-        conditionals:
-          []
-        xAcceleration: 0.1
-        yAcceleration: 0
   - type: ButtonInput
     id: 71
     state: hold
@@ -119,14 +119,6 @@ triggers:
           []
         attribute: touchingGround
         value: 1
-  - type: Timer
-    index: 1
-    actions:
-      - type: AttributeSet
-        conditionals:
-          []
-        attribute: invincible
-        value: 0
   - type: ButtonInput
     id: 71
     state: down
@@ -135,6 +127,14 @@ triggers:
         conditionals:
           []
         speed: 0
+  - type: Timer
+    index: 1
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: invincible
+        value: 0
   - type: ButtonInput
     id: 73
     state: down

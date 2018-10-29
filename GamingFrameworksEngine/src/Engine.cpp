@@ -195,7 +195,10 @@ void Engine::run()
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
 						// Location clicking is currently wrong
-						input.handleMousePress(event.mouseButton.x + camera.getCenter().x, event.mouseButton.y + camera.getCenter().y, localCurrentRoom);
+
+						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
+						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, window.getView());
+						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
 					}
 				}
 
@@ -204,7 +207,10 @@ void Engine::run()
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
 						// Location clicking is currently wrong
-						input.handleMouseRelease(event.mouseButton.x + camera.getCenter().x, event.mouseButton.y + camera.getCenter().y, localCurrentRoom);
+
+						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
+						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, window.getView());
+						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
 					}
 				}
 		    }
