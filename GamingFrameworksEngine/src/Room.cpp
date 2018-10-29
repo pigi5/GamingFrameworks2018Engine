@@ -147,7 +147,7 @@ void Room::step()
         overlays.remove(overlay);
         delete overlay;
     }
-    actorDeleteQueue.clear();
+    overlayDeleteQueue.clear();
     
     // sort actors by depth
     actors.sort(Actor::compareDepth);
@@ -205,7 +205,7 @@ void Room::deleteActor(Actor* actor)
     ActorTypeWrapper wrapper(actor->getType());
     trigger_preset::Destroy trigger(&wrapper);
     actor->fireTrigger(&trigger);
-    actorDeleteQueue.push_back(actor);
+    actorDeleteQueue.insert(actor);
 }
 
 void Room::addOverlay(Overlay* newOverlay)
@@ -219,7 +219,7 @@ void Room::deleteOverlay(Overlay* overlay)
     ActorTypeWrapper wrapper(overlay->getType());
     trigger_preset::Destroy trigger(&wrapper);
     overlay->fireTrigger(&trigger);
-    overlayDeleteQueue.push_back(overlay);
+    overlayDeleteQueue.insert(overlay);
 }
 
 std::list<Actor*>* Room::getActors()

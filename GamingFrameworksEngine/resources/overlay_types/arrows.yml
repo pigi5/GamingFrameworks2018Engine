@@ -1,0 +1,37 @@
+---
+name: arrows
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false
+collidable: true
+sprite: spr_arrows
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 0
+attributes:
+  {}
+triggers:
+  - type: Step
+    target: arrows
+    actions:
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: dir
+            value: 0
+        value: 0
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: dir
+            value: -1
+        value: 1
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: dir
+            value: 1
+        value: 2
+...

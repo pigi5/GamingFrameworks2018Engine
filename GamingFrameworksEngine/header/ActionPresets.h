@@ -1235,7 +1235,7 @@ namespace action_preset
 
         SetRoom(const YAML::Node& node) : Action(node)
         {
-            this->name = node["target"].as<int>();
+            this->name = node["target"].as<std::string>();
         }
    
         YAML::Emitter& serialize(YAML::Emitter& out) const

@@ -15,8 +15,8 @@ private:
     std::list<Actor*> actors;
     std::list<Overlay*> overlays;
     
-    std::list<Actor*> actorDeleteQueue;
-    std::list<Overlay*> overlayDeleteQueue;
+    std::set<Actor*> actorDeleteQueue;
+    std::set<Overlay*> overlayDeleteQueue;
 
     Actor* followedActor;
 

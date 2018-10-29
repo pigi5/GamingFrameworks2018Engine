@@ -1,0 +1,55 @@
+---
+name: score
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false
+collidable: true
+sprite: spr_score
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 0
+attributes:
+  {}
+triggers:
+  - type: Step
+    target: score
+    actions:
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 0
+        value: 0
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 1
+        value: 1
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 2
+        value: 2
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 3
+        value: 3
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 4
+        value: 4
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: score
+            value: 5
+        value: 5
+...

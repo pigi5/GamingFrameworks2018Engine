@@ -1,0 +1,7 @@
+---
+name: spr_arrows
+textures:
+  - resources\sprites\arrows.png
+  - resources\sprites\arrows_left.png
+  - resources\sprites\arrows_right.png
+...

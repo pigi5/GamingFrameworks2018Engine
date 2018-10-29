@@ -16,14 +16,6 @@ attributes:
   random: 0
   invincible: 0
 triggers:
-  - type: ButtonInput
-    id: 72
-    state: down
-    actions:
-      - type: SetXSpeed
-        conditionals:
-          []
-        speed: 0
   - type: Create
     target: player
     actions:
@@ -44,25 +36,14 @@ triggers:
         conditionals:
           []
         speed: 0
-  - type: Collision
-    target: wall
+  - type: ButtonInput
+    id: 72
+    state: down
     actions:
-      - type: AttributeSet
+      - type: SetXSpeed
         conditionals:
           []
-        attribute: jumpsLeft
-        value: 1
-      - type: PlaySound
-        conditionals:
-          - comparison: eq
-            attribute: touchingGround
-            value: 0
-        name: test_sound
-      - type: AttributeSet
-        conditionals:
-          []
-        attribute: touchingGround
-        value: 1
+        speed: 0
   - type: Collision
     target: bad_wall
     actions:
@@ -83,11 +64,6 @@ triggers:
             value: 0
         attribute: lives
         offset: -1
-      - type: Destroy
-        conditionals:
-          - comparison: le
-            attribute: lives
-            value: 0
       - type: SetTimer
         conditionals:
           - comparison: eq
@@ -99,6 +75,31 @@ triggers:
         conditionals:
           []
         attribute: invincible
+        value: 1
+      - type: SetRoom
+        conditionals:
+          - comparison: le
+            attribute: lives
+            value: 0
+        target: game_over
+  - type: Collision
+    target: wall
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: jumpsLeft
+        value: 1
+      - type: PlaySound
+        conditionals:
+          - comparison: eq
+            attribute: touchingGround
+            value: 0
+        name: test_sound
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: touchingGround
         value: 1
   - type: Collision
     target: ball
@@ -127,6 +128,34 @@ triggers:
           []
         attribute: invincible
         value: 0
+  - type: Collision
+    target: fireball
+    actions:
+      - type: AttributeChange
+        conditionals:
+          - comparison: eq
+            attribute: invincible
+            value: 0
+        attribute: lives
+        offset: -1
+      - type: SetTimer
+        conditionals:
+          - comparison: eq
+            attribute: invincible
+            value: 0
+        index: 1
+        time: 2
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: invincible
+        value: 1
+      - type: SetRoom
+        conditionals:
+          - comparison: le
+            attribute: lives
+            value: 0
+        target: game_over
   - type: Timer
     index: 0
     actions:
@@ -147,33 +176,6 @@ triggers:
           []
         index: 0
         time: 0.1
-  - type: Collision
-    target: fireball
-    actions:
-      - type: AttributeChange
-        conditionals:
-          - comparison: eq
-            attribute: invincible
-            value: 0
-        attribute: lives
-        offset: -1
-      - type: Destroy
-        conditionals:
-          - comparison: le
-            attribute: lives
-            value: 0
-      - type: SetTimer
-        conditionals:
-          - comparison: eq
-            attribute: invincible
-            value: 0
-        index: 1
-        time: 2
-      - type: AttributeSet
-        conditionals:
-          []
-        attribute: invincible
-        value: 1
   - type: ButtonInput
     id: 3
     state: down
@@ -190,6 +192,15 @@ triggers:
         conditionals:
           []
         xAcceleration: 0.1
+        yAcceleration: 0
+  - type: ButtonInput
+    id: 0
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: -0.1
         yAcceleration: 0
   - type: ButtonInput
     id: 22
@@ -218,40 +229,12 @@ triggers:
         offset: -1
   - type: ButtonInput
     id: 0
-    state: hold
-    actions:
-      - type: ApplyForce
-        conditionals:
-          []
-        xAcceleration: -0.1
-        yAcceleration: 0
-  - type: ButtonInput
-    id: 0
     state: down
     actions:
       - type: SetXSpeed
         conditionals:
           []
         speed: 0
-  - type: MouseInput
-    state: down
-    actions:
-      - type: Create
-        conditionals:
-          - comparison: ge
-            attribute: random
-            value: 9
-        target: bad_wall
-        xPosition: 40
-        yPosition: -100
-      - type: Create
-        conditionals:
-          - comparison: lt
-            attribute: random
-            value: 9
-        target: ball
-        xPosition: 40
-        yPosition: -100
   - type: Collision
     target: greenball
     actions:
@@ -262,11 +245,6 @@ triggers:
             value: 0
         attribute: lives
         offset: -1
-      - type: Destroy
-        conditionals:
-          - comparison: le
-            attribute: lives
-            value: 0
       - type: SetTimer
         conditionals:
           - comparison: eq
@@ -279,4 +257,83 @@ triggers:
           []
         attribute: invincible
         value: 1
+      - type: SetRoom
+        conditionals:
+          - comparison: le
+            attribute: lives
+            value: 0
+        target: game_over
+  - type: ButtonInput
+    id: 4
+    state: down
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: dir
+        value: 1
+  - type: MouseInput
+    state: down
+    actions:
+      - type: Create
+        conditionals:
+          - comparison: lt
+            attribute: random
+            value: 9
+          - comparison: eq
+            attribute: dir
+            value: 1
+        target: ball
+        xPosition: 40
+        yPosition: -100
+      - type: Create
+        conditionals:
+          - comparison: ge
+            attribute: random
+            value: 9
+          - comparison: eq
+            attribute: dir
+            value: 1
+        target: bad_wall
+        xPosition: 40
+        yPosition: -100
+      - type: Create
+        conditionals:
+          - comparison: lt
+            attribute: random
+            value: 9
+          - comparison: eq
+            attribute: dir
+            value: -1
+        target: ball
+        xPosition: -20
+        yPosition: -100
+      - type: Create
+        conditionals:
+          - comparison: ge
+            attribute: random
+            value: 9
+          - comparison: eq
+            attribute: dir
+            value: -1
+        target: bad_wall
+        xPosition: -20
+        yPosition: -100
+  - type: ButtonInput
+    id: 16
+    state: down
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: dir
+        value: -1
+  - type: Collision
+    target: star
+    actions:
+      - type: AttributeChange
+        conditionals:
+          []
+        attribute: score
+        offset: 1
 ...

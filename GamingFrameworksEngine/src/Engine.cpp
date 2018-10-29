@@ -76,7 +76,9 @@ void Engine::run()
 
     engine_util::logger << "Running game " << std::endl;
 
-	sf::VideoMode defaultMode = sf::VideoMode(800, 600);
+    int windowWidth = 800;
+    int windowHeight = 600;
+	sf::VideoMode defaultMode = sf::VideoMode(windowWidth, windowHeight);
 	this->window.create(defaultMode, "Game Window", sf::Style::Titlebar | sf::Style::Close);
     bool go = true;
 	// Initialize input handler
@@ -222,8 +224,15 @@ void Engine::run()
 		//       but it should be unnoticable if our PHYSICS_DELTA_TIME is at least
 		//       twice the frame rate
 		localCurrentRoom->interpolateState(accumulator / engine_constant::PHYSICS_DELTA_TIME);
-        State followedActorState = localCurrentRoom->getFollowedActor()->getCurrentState();
-        camera.setCenter(followedActorState.xPosition, followedActorState.yPosition);
+        if (localCurrentRoom->getFollowedActor() != NULL)
+        {
+            State followedActorState = localCurrentRoom->getFollowedActor()->getCurrentState();
+            camera.setCenter(followedActorState.xPosition, followedActorState.yPosition);
+        }
+        else
+        {
+            camera.setCenter(windowWidth / 2, windowHeight / 2);
+        }
 
         // Clear window
 		window.clear(sf::Color::Black);

@@ -1,0 +1,5 @@
+---
+name: spr_star
+textures:
+  - resources\sprites\star.png
+...

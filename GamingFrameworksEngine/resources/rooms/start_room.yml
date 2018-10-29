@@ -22,8 +22,34 @@ actors:
     startX: 450
     startY: 0
     follow: false
+  - type: star
+    startX: 200
+    startY: 0
+    follow: false
+  - type: star
+    startX: 300
+    startY: -200
+    follow: false
+  - type: star
+    startX: 100
+    startY: -400
+    follow: false
+  - type: star
+    startX: 400
+    startY: -600
+    follow: false
+  - type: star
+    startX: 500
+    startY: -800
+    follow: false
 overlays:
   - type: hud
-    startX: 50
-    startY: 50
+    startX: 60
+    startY: 20
+  - type: arrows
+    startX: 500
+    startY: 20
+  - type: score
+    startX: 20
+    startY: 20
 ...

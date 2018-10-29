@@ -1,0 +1,8 @@
+---
+name: game_over
+default: false
+actors:
+  []
+overlays:
+  []
+...

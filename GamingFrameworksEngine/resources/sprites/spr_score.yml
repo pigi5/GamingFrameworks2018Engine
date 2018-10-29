@@ -1,0 +1,10 @@
+---
+name: spr_score
+textures:
+  - resources\sprites\0.png
+  - resources\sprites\1.png
+  - resources\sprites\2.png
+  - resources\sprites\3.png
+  - resources\sprites\4.png
+  - resources\sprites\5.png
+...
