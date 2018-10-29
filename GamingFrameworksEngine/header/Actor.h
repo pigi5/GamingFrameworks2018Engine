@@ -187,8 +187,8 @@ public:
     friend Logger& operator<<(Logger&, const Actor&);
 
 	// Mouse Functions
-	void checkPressOn(int, int);
-	void checkReleaseOn(int, int);
+	bool checkPressOn(int, int);
+	bool checkReleaseOn(int, int);
 
     // comparators
     static bool compareDepth(const Actor*, const Actor*);

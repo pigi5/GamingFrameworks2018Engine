@@ -259,8 +259,9 @@ void Room::allMousePress(int x, int y, Trigger* trigger)
 {
 	for (Actor* actor : actors)
 	{
-		actor->fireTrigger(trigger);
-		actor->checkPressOn(x, y);
+		if(!actor->checkPressOn(x, y))
+			actor->fireTrigger(trigger);
+
 	}
 }
 
@@ -268,7 +269,7 @@ void Room::allMouseRelease(int x, int y, Trigger* trigger)
 {
 	for (Actor* actor : actors)
 	{
-		actor->fireTrigger(trigger);
-		actor->checkReleaseOn(x, y);
+		if (!actor->checkReleaseOn(x, y))
+			actor->fireTrigger(trigger);
 	}
 }

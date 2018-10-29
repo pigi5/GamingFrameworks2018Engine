@@ -194,8 +194,6 @@ void Engine::run()
 				{
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
-						// Location clicking is currently wrong
-
 						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
 						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, camera);
 						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
@@ -206,11 +204,9 @@ void Engine::run()
 				{
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
-						// Location clicking is currently wrong
-
 						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
 						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, camera);
-						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
+						input.handleMouseRelease(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
 					}
 				}
 		    }
