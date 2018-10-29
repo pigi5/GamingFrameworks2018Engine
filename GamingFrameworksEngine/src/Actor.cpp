@@ -12,11 +12,13 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     id = _id++;
     this->room = room;
     this->type = type;
+    this->xScale = type->xScale;
+    this->yScale = type->yScale;
 
-    if (type->xScale != 0 && type->yScale != 0)
+    if (xScale != 0 && yScale != 0)
     {
-        float width = type->sprite->getRecommendedWidth() * type->xScale;
-        float height = type->sprite->getRecommendedHeight() * type->yScale;
+        float width = type->sprite->getRecommendedWidth() * xScale;
+        float height = type->sprite->getRecommendedHeight() * yScale;
 
         if (type->collidable)
         {
@@ -207,7 +209,7 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
 
     if (type->sprite != NULL)
     {
-	    type->sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, type->xScale, type->yScale, imageAngle);
+	    type->sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, xScale, yScale, imageAngle);
     }
 }
 
@@ -408,8 +410,8 @@ void Actor::setCollidable(bool collidable)
 {
     if (collidable)
     {
-        float width = type->sprite->getRecommendedWidth() * type->xScale;
-        float height = type->sprite->getRecommendedHeight() * type->yScale;
+        float width = type->sprite->getRecommendedWidth() * xScale;
+        float height = type->sprite->getRecommendedHeight() * yScale;
         this->hitbox = new Hitbox(nextState.xPosition + xSpriteOffset, 
             nextState.yPosition + ySpriteOffset, width, height);
     }
@@ -433,6 +435,18 @@ void Actor::setAnimationFrame(float imageFrame)
 void Actor::setDepth(float depth)
 {
     this->depth = depth;
+}
+void Actor::setXScale(float xScale)
+{
+    this->xScale = xScale;
+    // reset hitbox
+    setCollidable(this->hitbox != NULL);
+}
+void Actor::setYScale(float yScale)
+{
+    this->yScale = yScale;
+    // reset hitbox
+    setCollidable(this->hitbox != NULL);
 }
 
 void Actor::setAttribute(std::string key, int value)
@@ -483,7 +497,7 @@ Logger& operator<<(Logger& logger, const Actor& obj)
 
 void Actor::checkPressOn(int clickX, int clickY)
 {
-	if (this->hitbox->isClickedOn(clickX, clickY)) 
+	if (isCollidable() && hitbox->isClickedOn(clickX, clickY)) 
 	{
 		MouseInputType m;
 		m.state = MouseState::PRESS_ON;
@@ -494,7 +508,7 @@ void Actor::checkPressOn(int clickX, int clickY)
 
 void Actor::checkReleaseOn(int clickX, int clickY)
 {
-	if (this->hitbox->isClickedOn(clickX, clickY))
+	if (isCollidable() && hitbox->isClickedOn(clickX, clickY))
 	{
 		MouseInputType m;
 		m.state = MouseState::RELEASE_ON;

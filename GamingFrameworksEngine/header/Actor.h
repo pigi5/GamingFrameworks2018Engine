@@ -107,6 +107,8 @@ protected:
     float ySpriteOffset;
     float imageAngle;
     float depth;
+    float xScale;
+    float yScale;
     
     // Type data
     const ActorType* type;
@@ -162,6 +164,8 @@ public:
 	void setAnimationSpeed(float);
 	void setAnimationFrame(float);
 	void setDepth(float);
+	void setXScale(float);
+	void setYScale(float);
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);

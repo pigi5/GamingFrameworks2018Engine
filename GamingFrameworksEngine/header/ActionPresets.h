@@ -380,11 +380,22 @@ namespace action_preset
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
-                std::stringstream errorMessage;
-                errorMessage << "Actor Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
+                else
+                {
+                    this->actorType = mapItem2->second;
+                }
             }
-            this->actorType = mapItem->second;
+            else
+            {
+                this->actorType = mapItem->second;
+            }
 
             this->startState = State(node);
         }
@@ -392,7 +403,7 @@ namespace action_preset
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
 	        Action::serialize(out);
-	        out << YAML::Key << "target" << YAML::Value << actorType;
+	        out << YAML::Key << "target" << YAML::Value << actorType->name;
 	        out << startState;
 	        return out;
         }
@@ -658,6 +669,88 @@ namespace action_preset
             if (!checkConditionals(actor)) return;
 
             actor->setDepth(value);
+        }
+    };
+    
+    // sets x scale
+    class XScaleSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "XScaleSet";
+        }
+
+        XScaleSet(float value)
+        {
+            this->value = value;
+        }
+
+        XScaleSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setXScale(value);
+        }
+    };
+    
+    // sets y scale
+    class YScaleSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "YScaleSet";
+        }
+
+        YScaleSet(float value)
+        {
+            this->value = value;
+        }
+
+        YScaleSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setYScale(value);
         }
     };
     

@@ -27,4 +27,13 @@ triggers:
           []
         index: 0
         time: 5
+      - type: MoveToNearest
+        conditionals:
+          []
+        target: player
+      - type: Move
+        conditionals:
+          []
+        xOffset: 50
+        yOffset: 0
 ...
