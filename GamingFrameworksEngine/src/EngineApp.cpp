@@ -48,7 +48,10 @@ enum
 	EDIT_ITEM = 12,
 	DELETE_ITEM = 13,
 	CLEAR = 14,
-	PLAY = 15
+	PLAY = 15,
+	DEF = 16,
+	FOL = 17,
+	SELOBJ = 18
 };
 
 unordered_map<int, std::string> actionNames;
@@ -154,6 +157,20 @@ public:
 	wxListBox* lb2;
 	wxListBox* lb3;
 	wxListBox* lb4;
+};
+
+class RoomEditor : public wxFrame
+{
+public:
+	Room* rm;
+
+	RoomEditor();
+
+	wxScrolledWindow* rmEdit;
+
+	void onSetDefault(wxCommandEvent& event);
+	void onSetObject(wxCommandEvent& event);
+	void onSetFollow(wxCommandEvent& event);
 };
 
 // ============================================================================
@@ -1002,7 +1019,7 @@ void Editor::resetTrigger()
 		    st3->SetLabel("Unused");
 		    st4->SetLabel("Unused");
 
-		    wxFrame* rmEditor = new wxFrame(NULL, wxID_ANY, "Room Editor", wxDefaultPosition, wxSize(800, 600));
+		    RoomEditor* rmEditor = new RoomEditor();
 		    rmEditor->Show(true);
 		    boxFrame->Close(true);
             break;
@@ -2987,4 +3004,50 @@ void Editor::onBox2Select(wxCommandEvent& event)
 		selAction = str.ToStdString();
 		resetCon();
 	}
+}
+
+RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition, wxSize(800, 600))
+{
+	rm = Room::objectMap[selObject];
+
+	rmEdit = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+		wxHSCROLL | wxVSCROLL | wxNO_FULL_REPAINT_ON_RESIZE);
+	rmEdit->SetScrollbars(20, 20, 5, 5);
+
+	wxBoxSizer *vbs = new wxBoxSizer(wxVERTICAL);
+	wxGridSizer *g = new wxGridSizer(1, 3, 2, 2);
+
+	wxPanel *bPanel = new wxPanel(rmEdit, wxID_ANY);
+
+	wxButton* defBtn = new wxButton(bPanel, DEF, wxT("Set As Default Room"));
+	wxButton* selBtn = new wxButton(bPanel, SELOBJ, wxT("Set Placed Object"));
+	wxButton* folBtn = new wxButton(bPanel, FOL, wxT("Set Followed Object"));
+	defBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetDefault, this);
+	selBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetObject, this);
+	folBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetFollow, this);
+	g->Add(defBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g->Add(selBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g->Add(folBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	bPanel->SetSizer(g);
+
+	wxPanel *rmPanel = new wxPanel(rmEdit, wxID_ANY);
+
+	vbs->Add(bPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
+	vbs->Add(rmPanel, 1, wxEXPAND | wxALL);
+	rmEdit->SetSizer(vbs);
+
+	Centre();
+}
+
+void RoomEditor::onSetDefault(wxCommandEvent& event)
+{
+
+}
+void RoomEditor::onSetObject(wxCommandEvent& event)
+{
+
+}
+void RoomEditor::onSetFollow(wxCommandEvent& event)
+{
+
 }
