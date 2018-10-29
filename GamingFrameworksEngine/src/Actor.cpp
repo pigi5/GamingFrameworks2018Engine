@@ -12,19 +12,23 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
     id = _id++;
     this->room = room;
     this->type = type;
-    this->xScale = type->xScale;
-    this->yScale = type->yScale;
+    xScale = type->xScale;
+    yScale = type->yScale;
+    sprite = type->sprite;
 
     if (xScale != 0 && yScale != 0)
     {
-        float width = type->sprite->getRecommendedWidth() * xScale;
-        float height = type->sprite->getRecommendedHeight() * yScale;
+        float width = sprite->getRecommendedWidth() * xScale;
+        float height = sprite->getRecommendedHeight() * yScale;
 
         if (type->collidable)
         {
             this->hitbox = new Hitbox(startState.xPosition, startState.yPosition, width, height);
         }
     }
+    friction = type->friction;
+    maxXSpeed = type->maxXSpeed;
+    maxYSpeed = type->maxYSpeed;
 	imageFrame = 0.0f;
     imageSpeed = type->imageSpeed;
     imageAngle = 0.0f;
@@ -100,14 +104,14 @@ void Actor::move(const std::list<Actor*>& actors)
 {
     // Increment speeds
     xSpeed += xAcceleration;
-    if (type->maxXSpeed >= 0 && abs(xSpeed) >= type->maxXSpeed)
+    if (maxXSpeed >= 0 && abs(xSpeed) >= maxXSpeed)
     {
-        xSpeed = engine_util::sign(xSpeed) * type->maxXSpeed;
+        xSpeed = engine_util::sign(xSpeed) * maxXSpeed;
     }
     ySpeed += yAcceleration;
-    if (type->maxYSpeed >= 0 && abs(ySpeed) >= type->maxYSpeed)
+    if (maxYSpeed >= 0 && abs(ySpeed) >= maxYSpeed)
     {
-        ySpeed = engine_util::sign(ySpeed) * type->maxYSpeed;
+        ySpeed = engine_util::sign(ySpeed) * maxYSpeed;
     }
     
     // Collision detection logic (look-ahead style)
@@ -148,7 +152,7 @@ void Actor::move(const std::list<Actor*>& actors)
                 xSpeed = engine_util::sign(xSpeed) * getHitboxDistanceX(*other);
                 // Friction that goes against direction of motion in opposite axis
                 // Don't let speed change signs
-                ySpeed = engine_util::sign(ySpeed) * max(0.0f, abs(ySpeed) - other->type->friction);
+                ySpeed = engine_util::sign(ySpeed) * max(0.0f, abs(ySpeed) - other->friction);
             } 
             else if (collidesY)
             {
@@ -156,7 +160,7 @@ void Actor::move(const std::list<Actor*>& actors)
                 ySpeed = engine_util::sign(ySpeed) * getHitboxDistanceY(*other);
                 // Friction that goes against direction of motion in opposite axis
                 // Don't let speed change signs
-                xSpeed = engine_util::sign(xSpeed) * max(0.0f, abs(xSpeed) - other->type->friction);
+                xSpeed = engine_util::sign(xSpeed) * max(0.0f, abs(xSpeed) - other->friction);
             }
             // Fire collision event
             onCollision(other);
@@ -213,9 +217,9 @@ void Actor::draw(sf::RenderWindow* window, sf::View* view)
     trigger_preset::Draw trigger(&wrapper);
     fireTrigger(&trigger);
 
-    if (type->sprite != NULL)
+    if (sprite != NULL)
     {
-	    type->sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, xScale, yScale, imageAngle);
+	    sprite->draw(window, imageFrame, currentState.xPosition, currentState.yPosition, xScale, yScale, imageAngle);
     }
 }
 
@@ -251,7 +255,7 @@ void Actor::onCollision(Actor* other)
 // returns: if the object has a hitbox
 bool Actor::isCollidable() const
 {
-    return type->sprite != NULL && hitbox != NULL;
+    return sprite != NULL && hitbox != NULL;
 }
 
 // Tests if this actor will collide with the given actor after its new position is
@@ -416,8 +420,8 @@ void Actor::setCollidable(bool collidable)
 {
     if (collidable)
     {
-        float width = type->sprite->getRecommendedWidth() * xScale;
-        float height = type->sprite->getRecommendedHeight() * yScale;
+        float width = sprite->getRecommendedWidth() * xScale;
+        float height = sprite->getRecommendedHeight() * yScale;
         this->hitbox = new Hitbox(nextState.xPosition + xSpriteOffset, 
             nextState.yPosition + ySpriteOffset, width, height);
     }
@@ -451,6 +455,24 @@ void Actor::setXScale(float xScale)
 void Actor::setYScale(float yScale)
 {
     this->yScale = yScale;
+    // reset hitbox
+    setCollidable(this->hitbox != NULL);
+}
+void Actor::setFriction(float friction)
+{
+    this->friction = friction;
+}
+void Actor::setMaxXSpeed(float maxXSpeed)
+{
+    this->maxXSpeed = maxXSpeed;
+}
+void Actor::setMaxYSpeed(float maxYSpeed)
+{
+    this->maxYSpeed = maxYSpeed;
+}
+void Actor::setSprite(Sprite* sprite)
+{
+    this->sprite = sprite;
     // reset hitbox
     setCollidable(this->hitbox != NULL);
 }

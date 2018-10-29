@@ -816,6 +816,186 @@ namespace action_preset
         }
     };
     
+    // sets friction
+    class FrictionSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "FrictionSet";
+        }
+
+        FrictionSet(float value)
+        {
+            this->value = value;
+        }
+
+        FrictionSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setFriction(value);
+        }
+    };
+    
+    // sets max x speed
+    class MaxXSpeedSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "MaxXSpeedSet";
+        }
+
+        MaxXSpeedSet(float value)
+        {
+            this->value = value;
+        }
+
+        MaxXSpeedSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setMaxXSpeed(value);
+        }
+    };
+    
+    // sets max y speed
+    class MaxYSpeedSet : public Action
+    {
+    private:
+        float value;
+    public:
+        std::string getTypeName() const
+        {
+            return "MaxYSpeedSet";
+        }
+
+        MaxYSpeedSet(float value)
+        {
+            this->value = value;
+        }
+
+        MaxYSpeedSet(const YAML::Node& node) : Action(node)
+        {
+            this->value = node["value"].as<float>();
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "value" << YAML::Value << value;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {value: " + std::to_string(value) + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            actor->setMaxYSpeed(value);
+        }
+    };
+    
+    // sets sprite
+    class SpriteSet : public Action
+    {
+    private:
+        std::string spriteName;
+    public:
+        std::string getTypeName() const
+        {
+            return "SpriteSet";
+        }
+
+        SpriteSet(std::string spriteName)
+        {
+            this->spriteName = spriteName;
+        }
+
+        SpriteSet(const YAML::Node& node) : Action(node)
+        {
+            this->spriteName = node["sprite"].as<float>();
+
+            auto mapItem = Sprite::objectMap.find(spriteName);
+            if (mapItem == Sprite::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Sprite " << spriteName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "sprite" << YAML::Value << spriteName;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {sprite: " + spriteName + "}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            auto mapItem = Sprite::objectMap.find(spriteName);
+            if (mapItem == Sprite::objectMap.end())
+            {
+                std::stringstream errorMessage;
+                errorMessage << "Sprite " << spriteName << " does not exist.";
+                throw ConfigurationError(errorMessage.str());
+            }
+
+            actor->setSprite(mapItem->second);
+        }
+    };
+    
     // sets an attribute
     class AttributeSet : public Action
     {
@@ -1289,6 +1469,22 @@ namespace action_preset
         else if (typeName == "YScaleSet")
         {
             return new YScaleSet(node);
+        }
+        else if (typeName == "FrictionSet")
+        {
+            return new FrictionSet(node);
+        }
+        else if (typeName == "MaxXSpeedSet")
+        {
+            return new MaxXSpeedSet(node);
+        }
+        else if (typeName == "MaxYSpeedSet")
+        {
+            return new MaxYSpeedSet(node);
+        }
+        else if (typeName == "SpriteSet")
+        {
+            return new SpriteSet(node);
         }
         else if (typeName == "AttributeSet")
         {

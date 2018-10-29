@@ -91,6 +91,9 @@ protected:
     // physics
     Hitbox* hitbox;
     bool gravitous;
+    float friction;
+    float maxXSpeed;
+    float maxYSpeed;
     float xAcceleration;
     float yAcceleration;
     float xSpeed;
@@ -101,6 +104,7 @@ protected:
     State previousState;
 
     // drawing
+    Sprite* sprite;
     float imageSpeed;
     float imageFrame;
     float xSpriteOffset;
@@ -168,6 +172,10 @@ public:
 	void setDepth(float);
 	void setXScale(float);
 	void setYScale(float);
+	void setFriction(float);
+	void setMaxXSpeed(float);
+	void setMaxYSpeed(float);
+	void setSprite(Sprite*);
 
     void startTimer(int, float);
     
