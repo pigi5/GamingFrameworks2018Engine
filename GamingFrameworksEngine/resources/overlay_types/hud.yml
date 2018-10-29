@@ -13,13 +13,5 @@ depth: 0
 attributes:
   {}
 triggers:
-  - type: ButtonInput
-    id: 3
-    state: hold
-    actions:
-      []
-  - type: Draw
-    target: hud
-    actions:
-      []
+  []
 ...

@@ -987,35 +987,6 @@ void Editor::resetTrigger()
         }
         case OVERLAY:
 		{
-			topText->SetLabel(wxString("Now Editing " + actionNames[operation] + " - " + selObject));
-			st1->SetLabel("Triggers");
-			st2->SetLabel("Actions");
-			st3->SetLabel("Conditionals");
-			st4->SetLabel("Attributes");
-
-			OverlayType* at = OverlayType::objectMap.at(selObject);
-			std::unordered_map<Trigger*, std::list<Action*>, TriggerHash, TriggerEquals> actionMap = at->actionMap;
-			for (const auto& pair : actionMap)
-			{
-				string str = pair.first->toString();
-				lb1->Append(str);
-			}
-			std::unordered_map<std::string, int> attributes = at->attributes;
-			for (const auto& pair : attributes)
-			{
-				string str = pair.first + ": {default: " + to_string(pair.second) + "}";
-				lb4->Append(str);
-			}
-			string str;
-			if (at->sprite != nullptr)
-			{
-				str = "Sprite: {" + at->sprite->name + "}";
-			}
-			else {
-				str = "Sprite: {None}";
-			}
-			lb4->Append(str);
-			boxFrame->Close(true);
 			break;
 		}
         case ROOM:
@@ -1063,90 +1034,39 @@ void Editor::resetAction()
 {
 	lb2->Clear();
 	lb3->Clear();
-	switch (operation)
+	ActorType* at = ActorType::objectMap.at(selObject);
+	auto actionMap = at->actionMap;
+	bool found = false;
+	for (const auto& pair : actionMap)
 	{
-		case ACTOR:
+		if (pair.first->toString() == selTrigger && !found)
 		{
-			ActorType* at = ActorType::objectMap.at(selObject);
-			auto actionMap = at->actionMap;
-			bool found = false;
-			for (const auto& pair : actionMap)
-			{
-				if (pair.first->toString() == selTrigger && !found)
-				{
-					for (auto const& i : pair.second) {
-						lb2->Append(i->toString());
-					}
-					found = true;
-				}
+			for (auto const& i : pair.second) {
+				lb2->Append(i->toString());
 			}
-		}
-		case OVERLAY:
-		{
-			OverlayType* at = OverlayType::objectMap.at(selObject);
-			auto actionMap = at->actionMap;
-			bool found = false;
-			for (const auto& pair : actionMap)
-			{
-				if (pair.first->toString() == selTrigger && !found)
-				{
-					for (auto const& i : pair.second) {
-						lb2->Append(i->toString());
-					}
-					found = true;
-				}
-			}
+			found = true;
 		}
 	}
 }
 void Editor::resetCon()
 {
 	lb3->Clear();
-	switch (operation)
+	ActorType* at = ActorType::objectMap.at(selObject);
+	auto actionMap = at->actionMap;
+	bool found = false;
+	for (const auto& pair : actionMap)
 	{
-		case ACTOR:
+		if (pair.first->toString() == selTrigger && !found)
 		{
-			ActorType* at = ActorType::objectMap.at(selObject);
-			auto actionMap = at->actionMap;
-			bool found = false;
-			for (const auto& pair : actionMap)
+			for (auto const& i : pair.second) 
 			{
-				if (pair.first->toString() == selTrigger && !found)
+				if (i->toString() == selAction && !found)
 				{
-					for (auto const& i : pair.second)
+					for (auto const& j : i->conditionals)
 					{
-						if (i->toString() == selAction && !found)
-						{
-							for (auto const& j : i->conditionals)
-							{
-								lb3->Append(j->toString());
-							}
-							found = true;
-						}
+						lb3->Append(j->toString());
 					}
-				}
-			}
-		}
-		case OVERLAY:
-		{
-			OverlayType* at = OverlayType::objectMap.at(selObject);
-			auto actionMap = at->actionMap;
-			bool found = false;
-			for (const auto& pair : actionMap)
-			{
-				if (pair.first->toString() == selTrigger && !found)
-				{
-					for (auto const& i : pair.second)
-					{
-						if (i->toString() == selAction && !found)
-						{
-							for (auto const& j : i->conditionals)
-							{
-								lb3->Append(j->toString());
-							}
-							found = true;
-						}
-					}
+					found = true;
 				}
 			}
 		}
@@ -1359,201 +1279,6 @@ void Editor::onNew1(wxCommandEvent& event)
 						t = new trigger_preset::Custom(i);
 					}
 					ActorType* at = ActorType::objectMap.at(selObject);
-					list<Action*> aList;
-					at->actionMap[t] = aList;
-					lb1->Append(t->toString());
-				}
-			}
-		}
-	}
-	if (operation == OVERLAY)
-	{
-		wxArrayString triggers;
-		triggers.Add("Collision");
-		triggers.Add("ButtonInput");
-		triggers.Add("MouseInput");
-		triggers.Add("Create");
-		triggers.Add("Step");
-		triggers.Add("Draw");
-		triggers.Add("Destroy");
-		triggers.Add("Timer");
-		triggers.Add("Custom");
-		wxSingleChoiceDialog *createTriggerDialog = new wxSingleChoiceDialog(this, "Select Trigger to create", "Select Trigger", triggers);
-		if (createTriggerDialog->ShowModal() == wxID_OK)
-		{
-			map<string, string> types;
-			types.emplace("Collision", "ActorTypeWrapper");
-			types.emplace("ButtonInput", "ButtonInputType");
-			types.emplace("MouseInput", "MouseInputType");
-			types.emplace("Create", "ActorTypeWrapper");
-			types.emplace("Step", "ActorTypeWrapper");
-			types.emplace("Draw", "ActorTypeWrapper");
-			types.emplace("Destroy", "ActorTypeWrapper");
-			types.emplace("Timer", "Index");
-			types.emplace("Custom", "Index");
-			string trig = createTriggerDialog->GetStringSelection().ToStdString();
-			string type = types[trig];
-			if (type == "ActorTypeWrapper")
-			{
-				if (trig == "Collision")
-				{
-					wxArrayString actorChoices;
-					for (const auto& pair : OverlayType::objectMap)
-					{
-						actorChoices.Add(pair.first);
-					}
-					wxSingleChoiceDialog *typeWrapperDialog = new wxSingleChoiceDialog(this, "Choose Actor Type", "Choose one from the list", actorChoices);
-					if (typeWrapperDialog->ShowModal() == wxID_OK)
-					{
-						ActorTypeWrapper* aType = new ActorTypeWrapper(OverlayType::objectMap[typeWrapperDialog->GetStringSelection().ToStdString()]);
-						Trigger* t;
-						if (trig == "Collision")
-						{
-							t = new trigger_preset::Collision(aType);
-						}
-						OverlayType* at = OverlayType::objectMap.at(selObject);
-						list<Action*> aList;
-						at->actionMap[t] = aList;
-						lb1->Append(t->toString());
-					}
-				}
-				else
-				{
-					ActorTypeWrapper* aType = new ActorTypeWrapper(OverlayType::objectMap[selObject]);
-					Trigger* t;
-					if (trig == "Create")
-					{
-						t = new trigger_preset::Create(aType);
-					}
-					else if (trig == "Step")
-					{
-						t = new trigger_preset::Step(aType);
-					}
-					else if (trig == "Draw")
-					{
-						t = new trigger_preset::Draw(aType);
-					}
-					else if (trig == "Destroy")
-					{
-						t = new trigger_preset::Destroy(aType);
-					}
-					OverlayType* at = OverlayType::objectMap.at(selObject);
-					list<Action*> aList;
-					at->actionMap[t] = aList;
-					lb1->Append(t->toString());
-				}
-			}
-			else if (type == "ButtonInputType")
-			{
-				wxArrayString buttonChoices;
-				for (const auto& pair : keyNames) {
-					if (pair.first >= 0 && pair.first <= 100)
-					{
-						buttonChoices.Add(pair.second);
-					}
-				}
-				wxArrayString buttonStateChoices;
-				buttonStateChoices.Add("Press");
-				buttonStateChoices.Add("Release");
-				buttonStateChoices.Add("Hold");
-				wxSingleChoiceDialog *buttonDialog = new wxSingleChoiceDialog(this, "Choose Button", "Choose one from the list", buttonChoices);
-				wxSingleChoiceDialog *buttonStateDialog = new wxSingleChoiceDialog(this, "Choose Button State", "Choose one from the list", buttonStateChoices);
-				if (buttonDialog->ShowModal() == wxID_OK)
-				{
-					string buttonName = buttonDialog->GetStringSelection().ToStdString();
-					if (buttonStateDialog->ShowModal() == wxID_OK)
-					{
-						string buttonState = buttonStateDialog->GetStringSelection().ToStdString();
-						ButtonState::ButtonState bState;
-						if (buttonState == "Press")
-						{
-							bState = ButtonState::PRESS;
-						}
-						else if (buttonState == "Release")
-						{
-							bState = ButtonState::RELEASE;
-						}
-						else if (buttonState == "Hold")
-						{
-							bState = ButtonState::HOLD;
-						}
-						ButtonInputType* bit = new ButtonInputType();
-						bit->state = bState;
-						bool find = false;
-						for (const auto& pair : keyNames) {
-							if (pair.second == buttonName && !find)
-							{
-								bit->id = pair.first;
-								find = true;
-							}
-							if (find)
-							{
-								break;
-							}
-						}
-						Trigger *t = new trigger_preset::ButtonInput(bit);
-						OverlayType* at = OverlayType::objectMap.at(selObject);
-						list<Action*> aList;
-						at->actionMap[t] = aList;
-						lb1->Append(t->toString());
-					}
-				}
-			}
-			else if (type == "MouseInputType")
-			{
-				wxArrayString mouseChoices;
-				mouseChoices.Add("Press");
-				mouseChoices.Add("Release");
-				mouseChoices.Add("Press On Actor");
-				mouseChoices.Add("Release On Actor");
-				wxSingleChoiceDialog *mouseDialog = new wxSingleChoiceDialog(this, "Choose Mouse State", "Choose one from the list", mouseChoices);
-				if (mouseDialog->ShowModal() == wxID_OK)
-				{
-					string mouseState = mouseDialog->GetStringSelection().ToStdString();
-					MouseState::MouseState mState;
-					if (mouseState == "Press")
-					{
-						mState = MouseState::PRESS;
-					}
-					else if (mouseState == "Release")
-					{
-						mState = MouseState::RELEASE;
-					}
-					else if (mouseState == "Press On Actor")
-					{
-						mState = MouseState::PRESS_ON;
-					}
-					else if (mouseState == "Release On Actor")
-					{
-						mState = MouseState::RELEASE_ON;
-					}
-					MouseInputType* mit = new MouseInputType();
-					mit->state = mState;
-					Trigger* t = new trigger_preset::MouseInput(mit);
-					OverlayType* at = OverlayType::objectMap.at(selObject);
-					list<Action*> aList;
-					at->actionMap[t] = aList;
-					lb1->Append(t->toString());
-				}
-			}
-			else if (type == "Index")
-			{
-				wxTextEntryDialog *indexDialog = new wxTextEntryDialog(this, "Enter Index");
-				if (indexDialog->ShowModal() == wxID_OK)
-				{
-					wxString str = indexDialog->GetValue();
-					int ind = stoi(str.ToStdString());
-					Index* i = new Index(ind);
-					Trigger *t;
-					if (trig == "Timer")
-					{
-						t = new trigger_preset::Timer(i);
-					}
-					else if (trig == "Custom")
-					{
-						t = new trigger_preset::Custom(i);
-					}
-					OverlayType* at = OverlayType::objectMap.at(selObject);
 					list<Action*> aList;
 					at->actionMap[t] = aList;
 					lb1->Append(t->toString());

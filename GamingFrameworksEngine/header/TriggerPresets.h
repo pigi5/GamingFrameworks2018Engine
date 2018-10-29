@@ -21,7 +21,6 @@ public:                                                             \
 
 #include "Trigger.h"
 #include "Actor.h"
-#include "Overlay.h"
 #include "yaml-cpp/yaml.h"
 #include "Configurable.h"
 #include "ButtonStates.h"
@@ -260,22 +259,14 @@ struct ActorTypeWrapper
     ActorTypeWrapper(const YAML::Node& config)
     {
         std::string typeName = config["target"].as<std::string>();
-        auto mapAItem = ActorType::objectMap.find(typeName);
-		auto mapOItem = OverlayType::objectMap.find(typeName);
-        if (mapAItem == ActorType::objectMap.end() && mapOItem == OverlayType::objectMap.end())
+        auto mapItem = ActorType::objectMap.find(typeName);
+        if (mapItem == ActorType::objectMap.end())
         {
-			std::stringstream errorMessage;
-			errorMessage << "Actor/Overlay Type " << typeName << " does not exist.";
-			throw ConfigurationError(errorMessage.str());
+            std::stringstream errorMessage;
+            errorMessage << "Actor Type " << typeName << " does not exist.";
+            throw ConfigurationError(errorMessage.str());
         }
-		else if (mapAItem == ActorType::objectMap.end())
-		{
-			type = mapOItem->second;
-		}
-		else
-		{
-			type = mapAItem->second;
-		}
+        type = mapItem->second;
     }
     
     friend YAML::Emitter& operator<<(YAML::Emitter& out, const ActorTypeWrapper& obj)
