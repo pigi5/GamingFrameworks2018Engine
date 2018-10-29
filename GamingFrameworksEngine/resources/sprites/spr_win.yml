@@ -1,0 +1,5 @@
+---
+name: spr_win
+textures:
+  - resources\sprites\winscreen.png
+...

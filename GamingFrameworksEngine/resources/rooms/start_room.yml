@@ -42,6 +42,10 @@ actors:
     startX: 500
     startY: -800
     follow: false
+  - type: win_line
+    startX: 0
+    startY: -1000
+    follow: false
 overlays:
   - type: hud
     startX: 60

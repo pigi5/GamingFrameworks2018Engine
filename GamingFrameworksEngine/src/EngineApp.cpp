@@ -305,7 +305,7 @@ void MyFrame::loadConfig()
 	}
     catch (const std::exception &e)
     {
-		std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
 		wxMessageDialog* err = new wxMessageDialog(this, e.what(), "ERROR", wxICON_ERROR | wxOK | wxCENTRE);
 		err->ShowModal();
     }

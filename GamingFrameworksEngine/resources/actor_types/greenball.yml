@@ -29,14 +29,14 @@ triggers:
         conditionals:
           []
         speed: -1
-  - type: Collision
-    target: player
+  - type: Timer
+    index: 0
     actions:
       - type: Destroy
         conditionals:
           []
-  - type: Timer
-    index: 0
+  - type: Collision
+    target: player
     actions:
       - type: Destroy
         conditionals:

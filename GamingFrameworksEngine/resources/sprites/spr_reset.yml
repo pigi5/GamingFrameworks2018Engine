@@ -1,0 +1,5 @@
+---
+name: spr_reset
+textures:
+  - resources\sprites\reset.png
+...

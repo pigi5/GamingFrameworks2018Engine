@@ -1,0 +1,27 @@
+---
+name: reset
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false
+collidable: true
+sprite: spr_reset
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 0
+attributes:
+  {}
+triggers:
+  - type: MouseInput
+    state: down on
+    actions:
+      - type: SetRoom
+        conditionals:
+          []
+        target: start_room
+      - type: PlaySound
+        conditionals:
+          []
+        name: test_sound
+...
