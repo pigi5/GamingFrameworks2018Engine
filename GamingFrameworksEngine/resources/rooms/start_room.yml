@@ -10,6 +10,10 @@ actors:
     startX: 200
     startY: 400
     follow: false
+  - type: background
+    startX: 0
+    startY: 0
+    follow: false
 overlays:
   - type: hud
     startX: 50

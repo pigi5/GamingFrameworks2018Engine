@@ -1,0 +1,35 @@
+---
+name: background
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false
+collidable: false
+sprite: spr_background
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 100
+attributes:
+  {}
+triggers:
+  - type: Create
+    target: background
+    actions:
+      - type: CollidableSet
+        conditionals:
+          []
+        value: false
+  - type: Step
+    target: background
+    actions:
+      - type: MoveToNearest
+        conditionals:
+          []
+        target: player
+      - type: Move
+        conditionals:
+          []
+        xOffset: -2000
+        yOffset: -1500
+...

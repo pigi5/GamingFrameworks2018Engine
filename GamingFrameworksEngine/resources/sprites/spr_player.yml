@@ -1,6 +1,8 @@
 ---
 name: spr_player
 textures:
-  - resources\sprites\img_player.png
-  - resources\sprites\img_player2.png
+  - resources\sprites\player1.png
+  - resources\sprites\player2.png
+  - resources\sprites\player3.png
+  - resources\sprites\player2.png
 ...
