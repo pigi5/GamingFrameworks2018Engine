@@ -215,7 +215,10 @@ namespace action_preset
             }
 
             auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
-            actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
+            if (nearest.first != NULL)
+            {
+                actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
+            }
         }
     };
     
@@ -297,20 +300,23 @@ namespace action_preset
 
             auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
             
-            State distanceVector = nearest.first->getNextState() - actor->getNextState();
-            // special case to avoid divide-by-zero
-            if (nearest.second == 0)
+            if (nearest.first != NULL)
             {
-                actor->setXSpeed(0);
-                actor->setYSpeed(0);
-                return;
-            }
-            // calculate speeds
-            float xSpeed = distanceVector.xPosition / nearest.second * speed;
-            float ySpeed = distanceVector.yPosition / nearest.second * speed;
+                State distanceVector = nearest.first->getNextState() - actor->getNextState();
+                // special case to avoid divide-by-zero
+                if (nearest.second == 0)
+                {
+                    actor->setXSpeed(0);
+                    actor->setYSpeed(0);
+                    return;
+                }
+                // calculate speeds
+                float xSpeed = distanceVector.xPosition / nearest.second * speed;
+                float ySpeed = distanceVector.yPosition / nearest.second * speed;
 
-            actor->setXSpeed(xSpeed);
-            actor->setYSpeed(ySpeed);
+                actor->setXSpeed(xSpeed);
+                actor->setYSpeed(ySpeed);
+            }
         }
     };
     

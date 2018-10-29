@@ -13,6 +13,8 @@ depth: 0
 attributes:
   touchingGround: 0
   jumpsLeft: 1
+  random: 0
+  invincible: 0
 triggers:
   - type: ButtonInput
     id: 72
@@ -22,6 +24,14 @@ triggers:
         conditionals:
           []
         speed: 0
+  - type: Create
+    target: player
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 0.1
   - type: MouseInput
     state: down on
     actions:
@@ -39,8 +49,18 @@ triggers:
     actions:
       - type: Create
         conditionals:
-          []
+          - comparison: lt
+            attribute: random
+            value: 9
         target: ball
+        xPosition: 0
+        yPosition: 0
+      - type: Create
+        conditionals:
+          - comparison: ge
+            attribute: random
+            value: 9
+        target: bad_wall
         xPosition: 0
         yPosition: 0
   - type: ButtonInput
@@ -99,6 +119,14 @@ triggers:
           []
         attribute: touchingGround
         value: 1
+  - type: Timer
+    index: 1
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: invincible
+        value: 0
   - type: ButtonInput
     id: 71
     state: down
@@ -132,4 +160,61 @@ triggers:
             value: 0
         attribute: jumpsLeft
         offset: -1
+  - type: Timer
+    index: 0
+    actions:
+      - type: AttributeChange
+        conditionals:
+          []
+        attribute: random
+        offset: 1
+      - type: AttributeSet
+        conditionals:
+          - comparison: ge
+            attribute: random
+            value: 10
+        attribute: random
+        value: 0
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 0.1
+  - type: Collision
+    target: bad_wall
+    actions:
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: jumpsLeft
+        value: 1
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: touchingGround
+        value: 1
+      - type: AttributeChange
+        conditionals:
+          - comparison: eq
+            attribute: invincible
+            value: 0
+        attribute: lives
+        offset: -1
+      - type: Destroy
+        conditionals:
+          - comparison: le
+            attribute: lives
+            value: 0
+      - type: SetTimer
+        conditionals:
+          - comparison: eq
+            attribute: invincible
+            value: 0
+        index: 1
+        time: 2
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: invincible
+        value: 1
 ...
