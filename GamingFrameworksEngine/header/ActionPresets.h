@@ -485,7 +485,9 @@ namespace action_preset
                 actorType = mapItem->second;
             }
 
-            Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
+            State realStateState = startState + actor->getNextState();
+
+            Actor* newActor = new Actor(actor->getRoom(), actorType, realStateState);
             actor->getRoom()->addActor(newActor);
         }
     };

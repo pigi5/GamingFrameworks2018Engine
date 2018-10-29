@@ -1,0 +1,8 @@
+---
+name: spr_straight_enemy
+textures:
+  - resources\sprites\straight_enemy1.png
+  - resources\sprites\straight_enemy2.png
+  - resources\sprites\straight_enemy3.png
+  - resources\sprites\straight_enemy2.png
+...
