@@ -27,6 +27,7 @@ public:
     
     std::string name;
     bool is_default;
+	ActorType* place;
     
     static void createRoom(std::string);
 
@@ -56,6 +57,7 @@ public:
     std::list<Actor*> getActors() const;
 
     Actor* getFollowedActor() const;
+	void setFollowedActor(Actor* actor);
 
     friend std::ostream& operator<<(std::ostream&, const Room&);
     

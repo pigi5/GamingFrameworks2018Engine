@@ -228,6 +228,11 @@ Actor* Room::getFollowedActor() const
     return followedActor;
 }
 
+void Room::setFollowedActor(Actor* actor)
+{
+	this->followedActor = actor;
+}
+
 std::ostream& operator<<(std::ostream& output, const Room& object)
 {
     output << " name: " << object.name;
