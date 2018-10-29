@@ -1,6 +1,6 @@
 ---
 name: ball
-friction: 0
+friction: 0.017
 maxXSpeed: -1
 maxYSpeed: -1
 gravitous: true
@@ -36,4 +36,12 @@ triggers:
           []
         xOffset: 40
         yOffset: -40
+  - type: Step
+    target: ball
+    actions:
+      - type: MoveTowardNearest
+        conditionals:
+          []
+        target: player
+        speed: 0.3
 ...

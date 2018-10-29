@@ -73,11 +73,17 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Actor& obj)
 
 void Actor::step()
 {
-    if (attributes.count("touchingGround") > 0){
-    engine_util::logger << "touchingGround: " << attributes["touchingGround"] << std::endl;
+    // decrement counters
+    for (auto& pair : timers)
+    {
+        pair.second -= engine_constant::PHYSICS_DELTA_TIME;
+        if (pair.second <= 0)
+        {
+            Index wrapper(pair.first);
+            trigger_preset::Timer trigger(&wrapper);
+            fireTrigger(&trigger);
+        }
     }
-
-
 
     imageFrame += imageSpeed;
     // fire step trigger
@@ -447,6 +453,11 @@ void Actor::setYScale(float yScale)
     this->yScale = yScale;
     // reset hitbox
     setCollidable(this->hitbox != NULL);
+}
+
+void Actor::startTimer(int index, float time)
+{
+    timers[index] = time;
 }
 
 void Actor::setAttribute(std::string key, int value)

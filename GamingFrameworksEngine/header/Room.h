@@ -11,16 +11,12 @@ class Engine;
 // Similar to a stage.
 class Room
 {
-public:
-    static const int NUM_TIMERS = 10;
 private:
     std::list<Actor*> actors;
     std::list<Actor*> overlays;
     
     std::list<Actor*> actorDeleteQueue;
     std::list<Actor*> overlayDeleteQueue;
-
-    float timers[NUM_TIMERS];
 
     Actor* followedActor;
 
@@ -56,8 +52,6 @@ public:
     void deleteActor(Actor*);
     void addOverlay(Actor*);
     void deleteOverlay(Actor*);
-
-    void startTimer(int, float);
 
     std::list<Actor*> getActors() const;
 

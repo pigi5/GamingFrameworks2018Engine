@@ -389,6 +389,8 @@ void MyFrame::OnPlay(wxCommandEvent& WXUNUSED(event))
 		try
 		{
 			Engine::getInstance().run();
+            // avoid problems if instance are created at runtime
+            reloadConfig();
 		}
 		catch (const ConfigurationError& e)
 		{
@@ -2648,6 +2650,11 @@ void Editor::onNew3(wxCommandEvent& event)
 						wxArrayString attrChoices;
 						std::unordered_map<std::string, int> attributes = at->attributes;
 						for (const auto& pair : attributes)
+						{
+							string str = pair.first;
+							attrChoices.Add(str);
+						}
+						for (const auto& pair : Engine::defaultAttributes)
 						{
 							string str = pair.first;
 							attrChoices.Add(str);

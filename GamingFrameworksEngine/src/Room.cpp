@@ -129,21 +129,6 @@ void Room::step()
         overlay->step();
     }
 
-    // decrement counters
-    for (int i = 0; i < Room::NUM_TIMERS; i++)
-    {
-        if (timers[i] > 0)
-        {
-            timers[i] -= engine_constant::PHYSICS_DELTA_TIME;
-            if (timers[i] <= 0)
-            {
-                Index wrapper(i);
-                trigger_preset::Timer trigger(&wrapper);
-                fireTrigger(&trigger);
-            }
-        }
-    }
-
     // perform physics
     for (Actor* actor : actors)
     {
@@ -231,11 +216,6 @@ void Room::addOverlay(Actor* newOverlay)
 void Room::deleteOverlay(Actor* overlay)
 {
     overlayDeleteQueue.push_back(overlay);
-}
-
-void Room::startTimer(int index, float time)
-{
-    timers[index] = time;
 }
 
 std::list<Actor*> Room::getActors() const

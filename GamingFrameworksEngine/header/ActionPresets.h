@@ -148,7 +148,7 @@ namespace action_preset
     class MoveToNearest : public Action
     {
     private:
-        ActorType* targetType;
+        std::string typeName;
     public:
         std::string getTypeName() const
         {
@@ -157,40 +157,64 @@ namespace action_preset
 
         MoveToNearest(ActorType* targetType)
         {
-            this->targetType = targetType;
+            this->typeName = targetType->name;
         }
 
         MoveToNearest(const YAML::Node& node) : Action(node)
         {
-            std::string typeName = node["target"].as<std::string>();
+            typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
-                std::stringstream errorMessage;
-                errorMessage << "Actor Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
             }
-
-            this->targetType = mapItem->second;
         }
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
 	        Action::serialize(out);
-	        out << YAML::Key << "target" << YAML::Value << targetType->name;
+	        out << YAML::Key << "target" << YAML::Value << typeName;
 	        return out;
         }
         
         const std::string toString() const
         {
-            return getTypeName() + ": {target: " + targetType->toString() + "}";
+            return getTypeName() + ": {target: " + typeName + "}";
         }
     
         void run(Actor* actor)
         {
             if (!checkConditionals(actor)) return;
 
-            auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
+            ActorType* actorType;
+            
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
+                else
+                {
+                    actorType = mapItem2->second;
+                }
+            }
+            else
+            {
+                actorType = mapItem->second;
+            }
+
+            auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
             actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
         }
     };
@@ -200,7 +224,7 @@ namespace action_preset
     class MoveTowardNearest : public Action
     {
     private:
-        ActorType* targetType;
+        std::string typeName;
         float speed;
     public:
         std::string getTypeName() const
@@ -210,56 +234,80 @@ namespace action_preset
 
         MoveTowardNearest(ActorType* targetType, float speed)
         {
-            this->targetType = targetType;
+            this->typeName = targetType->name;
             this->speed = speed;
         }
 
         MoveTowardNearest(const YAML::Node& node) : Action(node)
         {
-            std::string typeName = node["target"].as<std::string>();
+            typeName = node["target"].as<std::string>();
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
-                std::stringstream errorMessage;
-                errorMessage << "Actor Type " << typeName << " does not exist.";
-                throw ConfigurationError(errorMessage.str());
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
             }
 
-            this->targetType = mapItem->second;
-            this->speed = node["speed"].as<float>();
+            speed = node["speed"].as<float>();
         }
    
         YAML::Emitter& serialize(YAML::Emitter& out) const
         {
 	        Action::serialize(out);
-	        out << YAML::Key << "target" << YAML::Value << targetType->name;
+	        out << YAML::Key << "target" << YAML::Value << typeName;
 	        out << YAML::Key << "speed" << YAML::Value << speed;
 	        return out;
         }
         
         const std::string toString() const
         {
-            return getTypeName() + ": {target: " + targetType->toString() + ", speed: " + std::to_string(speed) + "}";
+            return getTypeName() + ": {target: " + typeName + ", speed: " + std::to_string(speed) + "}";
         }
     
         void run(Actor* actor)
         {
             if (!checkConditionals(actor)) return;
 
-            auto nearest = engine_util::findNearest(actor, actor->getRoom()->getActors());
+            ActorType* actorType;
+            
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
+                else
+                {
+                    actorType = mapItem2->second;
+                }
+            }
+            else
+            {
+                actorType = mapItem->second;
+            }
+
+            auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
             
             State distanceVector = nearest.first->getNextState() - actor->getNextState();
             // special case to avoid divide-by-zero
-            if (distanceVector.xPosition == 0)
+            if (nearest.second == 0)
             {
                 actor->setXSpeed(0);
-                actor->setYSpeed(speed);
+                actor->setYSpeed(0);
                 return;
             }
             // calculate speeds
-            float angle = atan(distanceVector.yPosition / distanceVector.xPosition);
-            float xSpeed = speed * cos(angle) * engine_util::sign(distanceVector.yPosition);
-            float ySpeed = speed * sin(angle) * engine_util::sign(distanceVector.yPosition);
+            float xSpeed = distanceVector.xPosition / nearest.second * speed;
+            float ySpeed = distanceVector.yPosition / nearest.second * speed;
 
             actor->setXSpeed(xSpeed);
             actor->setYSpeed(ySpeed);
@@ -879,14 +927,6 @@ namespace action_preset
         SetTimer(const YAML::Node& node) : Action(node)
         {
             this->index = node["index"].as<int>();
-
-            if (index < 0 || index >= Room::NUM_TIMERS)
-            {
-                std::stringstream errorMessage;
-                errorMessage << "Timer index " << index << " out of bounds.";
-                throw ConfigurationError(errorMessage.str());
-            }
-
             this->time = node["time"].as<float>();
         }
    
@@ -907,7 +947,7 @@ namespace action_preset
         {
             if (!checkConditionals(actor)) return;
 
-            actor->getRoom()->startTimer(index, time);
+            actor->startTimer(index, time);
         }
     };
     

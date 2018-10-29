@@ -13,10 +13,11 @@ float engine_util::distance(Actor* actor1, Actor* actor2)
             distanceVector.yPosition * distanceVector.yPosition);
 }
 
-// finds the nearest actor in the list of actors to the source actor
+// finds the nearest actor of the given type in the list of actors to the source actor
 // uses a simple O(n) search
 // returns a pair: first is the nearest actor pointer, second is the distance
-std::pair<Actor*, float> engine_util::findNearest(Actor* source, const std::list<Actor*>& actors)
+std::pair<Actor*, float> engine_util::findNearest(Actor* source, 
+        ActorType* targetType, const std::list<Actor*>& actors)
 {
     Actor* nearest = NULL;
     float nearestDistance;
@@ -28,11 +29,14 @@ std::pair<Actor*, float> engine_util::findNearest(Actor* source, const std::list
             continue;
         }
 
-        float distance = engine_util::distance(actor, source);
-        if (nearest == NULL || distance < nearestDistance)
+        if (actor->getType() == targetType)
         {
-            nearest = actor;
-            nearestDistance = distance;
+            float distance = engine_util::distance(actor, source);
+            if (nearest == NULL || distance < nearestDistance)
+            {
+                nearest = actor;
+                nearestDistance = distance;
+            }
         }
     }
     return std::make_pair(nearest, nearestDistance);

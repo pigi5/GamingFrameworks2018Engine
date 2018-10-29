@@ -110,6 +110,8 @@ protected:
     float xScale;
     float yScale;
     
+    std::unordered_map<int, float> timers;
+    
     // Type data
     const ActorType* type;
 
@@ -166,6 +168,8 @@ public:
 	void setDepth(float);
 	void setXScale(float);
 	void setYScale(float);
+
+    void startTimer(int, float);
     
     void setAttribute(std::string, int);
     void changeAttribute(std::string, int);

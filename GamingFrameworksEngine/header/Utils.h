@@ -4,6 +4,7 @@
 #include "Logger.h"
 
 class Actor;
+class ActorType;
 
 namespace engine_util
 {
@@ -18,7 +19,7 @@ namespace engine_util
 
     float distance(Actor* actor1, Actor* actor2);
 
-    std::pair<Actor*, float> findNearest(Actor* source, const std::list<Actor*>& actors);
+    std::pair<Actor*, float> findNearest(Actor* source, ActorType* targetType, const std::list<Actor*>& actors);
 
     extern Logger logger;
 }
