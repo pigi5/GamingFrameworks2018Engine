@@ -1962,6 +1962,11 @@ void Editor::onNew2(wxCommandEvent& event)
 							string str = pair.first;
 							attrChoices.Add(str);
 						}
+						for (const auto& pair : Engine::defaultAttributes)
+						{
+							string str = pair.first;
+							attrChoices.Add(str);
+						}
 						wxSingleChoiceDialog *attrChoiceDialog = new wxSingleChoiceDialog(this, "Choose Attribute", "Choose one from the list", attrChoices);
 						if (attrChoiceDialog->ShowModal() == wxID_OK)
 						{
@@ -2444,6 +2449,11 @@ void Editor::onEdit2(wxCommandEvent& event)
 						wxArrayString attrChoices;
 						std::unordered_map<std::string, int> attributes = at->attributes;
 						for (const auto& pair : attributes)
+						{
+							string str = pair.first;
+							attrChoices.Add(str);
+						}
+						for (const auto& pair : Engine::defaultAttributes)
 						{
 							string str = pair.first;
 							attrChoices.Add(str);

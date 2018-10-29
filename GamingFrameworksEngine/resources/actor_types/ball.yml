@@ -13,20 +13,9 @@ depth: 0
 attributes:
   {}
 triggers:
-  - type: Timer
-    index: 0
-    actions:
-      - type: Destroy
-        conditionals:
-          []
   - type: Create
     target: ball
     actions:
-      - type: SetTimer
-        conditionals:
-          []
-        index: 0
-        time: 5
       - type: MoveToNearest
         conditionals:
           []
@@ -36,12 +25,4 @@ triggers:
           []
         xOffset: 40
         yOffset: -40
-  - type: Step
-    target: ball
-    actions:
-      - type: MoveTowardNearest
-        conditionals:
-          []
-        target: player
-        speed: 0.3
 ...
