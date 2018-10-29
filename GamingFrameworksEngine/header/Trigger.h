@@ -64,7 +64,7 @@ public:
 
     Logger& serializeDebug(Logger& logger) const
     {
-        logger << "trigger - " << getTypeName() << " - id - ";
+        logger << getTypeName() << " - id - ";
         if (id == NULL)
         {
             logger << "null";

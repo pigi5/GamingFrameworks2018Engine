@@ -6,6 +6,7 @@
 Logger::Logger(std::string filename)
 {
     this->filename = filename;
+    active = true;
     
     stream.open(filename);
     *this << now() << std::endl;
@@ -25,53 +26,70 @@ std::string Logger::now()
     return str;
 }
 
+void Logger::setActive(bool active)
+{
+    this->active = active;
+}
 
 Logger& operator<<(Logger& logger, const std::string& message)
 {
-    logger.stream << message;
+    if (logger.active)
+    {
+        logger.stream << message;
+    }
     return logger;
 }
 
 Logger& operator<<(Logger& logger, const long val)
 {
-    logger.stream << std::to_string(val);
+    if (logger.active)
+    {
+        logger.stream << std::to_string(val);
+    }
     return logger;
 }
 
 Logger& operator<<(Logger& logger, const int val)
 {
-    logger.stream << std::to_string(val);
+    if (logger.active)
+    {
+        logger.stream << std::to_string(val);
+    }
     return logger;
 }
 
 Logger& operator<<(Logger& logger, const short val)
 {
-    logger.stream << std::to_string(val);
+    if (logger.active)
+    {
+        logger.stream << std::to_string(val);
+    }
     return logger;
 }
 
 Logger& operator<<(Logger& logger, const double val)
 {
-    logger.stream << std::to_string(val);
+    if (logger.active)
+    {
+        logger.stream << std::to_string(val);
+    }
     return logger;
 }
 
 Logger& operator<<(Logger& logger, const float val)
 {
-    logger.stream << std::to_string(val);
+    if (logger.active)
+    {
+        logger.stream << std::to_string(val);
+    }
     return logger;
 }
-
-/*
-Logger& operator<<(Logger& logger, const bool val)
-{
-    logger.stream << (val ? "true" : "false");
-    return logger;
-}
-*/
 
 Logger& operator<<(Logger& logger, ostream_manipulator pf)
 {
-   pf(logger.stream);
-   return logger;
+    if (logger.active)
+    {
+        pf(logger.stream);
+    }
+    return logger;
 }

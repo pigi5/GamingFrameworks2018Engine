@@ -71,6 +71,9 @@ Engine::Engine()
 // Runs the game loop until complete.
 void Engine::run()
 {
+    // COMMENT THIS OUT FOR LOGGING
+    engine_util::logger.setActive(false);
+
     engine_util::logger << "Running game " << std::endl;
 
 	sf::VideoMode defaultMode = sf::VideoMode(800, 600);

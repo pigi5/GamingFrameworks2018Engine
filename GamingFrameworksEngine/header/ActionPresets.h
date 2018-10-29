@@ -360,7 +360,7 @@ namespace action_preset
     class Create : public Action
     {
     private:
-        const ActorType* actorType;
+        std::string typeName;
         State startState;
     public:
         std::string getTypeName() const
@@ -370,13 +370,47 @@ namespace action_preset
 
         Create(const ActorType* actorType, State& startState)
         {
-            this->actorType = actorType;
+            this->typeName = actorType->name;
             this->startState = startState;
         }
 
         Create(const YAML::Node& node) : Action(node)
         {
-            std::string typeName = node["target"].as<std::string>();
+            typeName = node["target"].as<std::string>();
+            auto mapItem = ActorType::objectMap.find(typeName);
+            if (mapItem == ActorType::objectMap.end())
+            {
+                auto mapItem2 = OverlayType::objectMap.find(typeName);
+                if (mapItem2 == OverlayType::objectMap.end())
+                {
+                    std::stringstream errorMessage;
+                    errorMessage << "Actor or Overlay Type " << typeName << " does not exist.";
+                    throw ConfigurationError(errorMessage.str());
+                }
+            }
+
+            startState = State(node);
+        }
+   
+        YAML::Emitter& serialize(YAML::Emitter& out) const
+        {
+	        Action::serialize(out);
+	        out << YAML::Key << "target" << YAML::Value << typeName;
+	        out << startState;
+	        return out;
+        }
+        
+        const std::string toString() const
+        {
+            return getTypeName() + ": {target: " + typeName + ", state: {" + startState.toString() + "}}";
+        }
+    
+        void run(Actor* actor)
+        {
+            if (!checkConditionals(actor)) return;
+
+            ActorType* actorType;
+            
             auto mapItem = ActorType::objectMap.find(typeName);
             if (mapItem == ActorType::objectMap.end())
             {
@@ -389,33 +423,13 @@ namespace action_preset
                 }
                 else
                 {
-                    this->actorType = mapItem2->second;
+                    actorType = mapItem2->second;
                 }
             }
             else
             {
-                this->actorType = mapItem->second;
+                actorType = mapItem->second;
             }
-
-            this->startState = State(node);
-        }
-   
-        YAML::Emitter& serialize(YAML::Emitter& out) const
-        {
-	        Action::serialize(out);
-	        out << YAML::Key << "target" << YAML::Value << actorType->name;
-	        out << startState;
-	        return out;
-        }
-        
-        const std::string toString() const
-        {
-            return getTypeName() + ": {target: " + actorType->toString() + ", state: {" + startState.toString() + "}}";
-        }
-    
-        void run(Actor* actor)
-        {
-            if (!checkConditionals(actor)) return;
 
             Actor* newActor = new Actor(actor->getRoom(), actorType, startState);
             actor->getRoom()->addActor(newActor);

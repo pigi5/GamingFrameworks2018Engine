@@ -163,6 +163,7 @@ ActorType::~ActorType()
             delete action;
         }
     }
+    actionMap.clear();
 }
 
 bool ActorType::operator<(const ActorType& other) const

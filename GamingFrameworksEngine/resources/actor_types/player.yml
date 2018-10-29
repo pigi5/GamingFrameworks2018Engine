@@ -52,6 +52,15 @@ triggers:
         target: ball
         xPosition: 0
         yPosition: 0
+  - type: ButtonInput
+    id: 71
+    state: hold
+    actions:
+      - type: ApplyForce
+        conditionals:
+          []
+        xAcceleration: -0.1
+        yAcceleration: 0
   - type: Collision
     target: wall
     actions:
@@ -71,15 +80,25 @@ triggers:
           []
         attribute: touchingGround
         value: 1
-  - type: ButtonInput
-    id: 71
-    state: hold
+  - type: Collision
+    target: ball
     actions:
-      - type: ApplyForce
+      - type: AttributeSet
         conditionals:
           []
-        xAcceleration: -0.1
-        yAcceleration: 0
+        attribute: jumpsLeft
+        value: 1
+      - type: PlaySound
+        conditionals:
+          - comparison: eq
+            attribute: touchingGround
+            value: 0
+        name: test_sound
+      - type: AttributeSet
+        conditionals:
+          []
+        attribute: touchingGround
+        value: 1
   - type: ButtonInput
     id: 71
     state: down

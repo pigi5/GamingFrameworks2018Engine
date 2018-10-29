@@ -11,6 +11,7 @@ private:
     std::ofstream stream;
     std::string filename;
 
+    bool active;
 public:
     Logger(){};
     Logger(std::string filename);
@@ -18,7 +19,9 @@ public:
     ~Logger();
     
     std::string now();
-    
+
+    void setActive(bool);
+
     friend Logger& operator<<(Logger&, const std::string&);
     friend Logger& operator<<(Logger&, const long);
     friend Logger& operator<<(Logger&, const int);

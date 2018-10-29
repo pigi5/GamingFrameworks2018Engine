@@ -34,6 +34,6 @@ triggers:
       - type: Move
         conditionals:
           []
-        xOffset: 50
-        yOffset: 0
+        xOffset: 40
+        yOffset: -40
 ...
