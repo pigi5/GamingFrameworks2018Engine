@@ -1692,6 +1692,12 @@ void Editor::onNew2(wxCommandEvent& event)
 				actionChoices.Add("Set Animation Speed");
 				actionChoices.Add("Set Animation Frame");
 				actionChoices.Add("Set Depth");
+				actionChoices.Add("Set X Scale");
+				actionChoices.Add("Set Y Scale");
+				actionChoices.Add("Set Friction");
+				actionChoices.Add("Set Max X Speed");
+				actionChoices.Add("Set Max Y Speed");
+				actionChoices.Add("Set Sprite");
 				wxSingleChoiceDialog *actionChoiceDialog = new wxSingleChoiceDialog(this, "Choose Action", "Choose one from the list", actionChoices);
 				if (actionChoiceDialog->ShowModal() == wxID_OK)
 				{
@@ -1719,6 +1725,12 @@ void Editor::onNew2(wxCommandEvent& event)
 					types.emplace("Set Animation Speed", "F");
 					types.emplace("Set Animation Frame", "F");
 					types.emplace("Set Depth", "F");
+					types.emplace("Set X Scale", "F");
+					types.emplace("Set Y Scale", "F");
+					types.emplace("Set Friction", "F");
+					types.emplace("Set Max X Speed", "F");
+					types.emplace("Set Max Y Speed", "F");
+					types.emplace("Set Sprite", "St");
 					string action = actionChoiceDialog->GetStringSelection().ToStdString();
 					string aType = types[action];
 					if (aType == "FF")
@@ -1816,6 +1828,26 @@ void Editor::onNew2(wxCommandEvent& event)
 							else if (action == "Set Depth")
 							{
 								a = new action_preset::DepthSet(spd);
+							}
+							else if (action == "Set X Scale")
+							{
+								a = new action_preset::XScaleSet(spd);
+							}
+							else if (action == "Set Y Scale")
+							{
+								a = new action_preset::YScaleSet(spd);
+							}
+							else if (action == "Set Friction")
+							{
+								a = new action_preset::FrictionSet(spd);
+							}
+							else if (action == "Set Max X Speed")
+							{
+								a = new action_preset::MaxXSpeedSet(spd);
+							}
+							else if (action == "Set Max Y Speed")
+							{
+								a = new action_preset::MaxYSpeedSet(spd);
 							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -2041,7 +2073,15 @@ void Editor::onNew2(wxCommandEvent& event)
 						if (roomChoiceDialog->ShowModal() == wxID_OK)
 						{
 							string str = roomChoiceDialog->GetStringSelection().ToStdString();
-							Action* a = new action_preset::SetRoom(str);
+							Action* a;
+							if (action == "Set Room")
+							{
+								a = new action_preset::SetRoom(str);
+							}
+							else if (action == "Set Sprite")
+							{
+								a = new action_preset::SpriteSet(str);
+							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
 							lb2->SetStringSelection(a->toString());
@@ -2178,6 +2218,12 @@ void Editor::onEdit2(wxCommandEvent& event)
 				actionChoices.Add("Set Animation Speed");
 				actionChoices.Add("Set Animation Frame");
 				actionChoices.Add("Set Depth");
+				actionChoices.Add("Set X Scale");
+				actionChoices.Add("Set Y Scale");
+				actionChoices.Add("Set Friction");
+				actionChoices.Add("Set Max X Speed");
+				actionChoices.Add("Set Max Y Speed");
+				actionChoices.Add("Set Sprite");
 				wxSingleChoiceDialog *actionChoiceDialog = new wxSingleChoiceDialog(this, "Choose Action", "Choose one from the list", actionChoices);
 				if (actionChoiceDialog->ShowModal() == wxID_OK)
 				{
@@ -2205,6 +2251,12 @@ void Editor::onEdit2(wxCommandEvent& event)
 					types.emplace("Set Animation Speed", "F");
 					types.emplace("Set Animation Frame", "F");
 					types.emplace("Set Depth", "F");
+					types.emplace("Set X Scale", "F");
+					types.emplace("Set Y Scale", "F");
+					types.emplace("Set Friction", "F");
+					types.emplace("Set Max X Speed", "F");
+					types.emplace("Set Max Y Speed", "F");
+					types.emplace("Set Sprite", "St");
 					string action = actionChoiceDialog->GetStringSelection().ToStdString();
 					string aType = types[action];
 					if (aType == "FF")
@@ -2302,6 +2354,26 @@ void Editor::onEdit2(wxCommandEvent& event)
 							else if (action == "Set Depth")
 							{
 								a = new action_preset::DepthSet(spd);
+							}
+							else if (action == "Set X Scale")
+							{
+								a = new action_preset::XScaleSet(spd);
+							}
+							else if (action == "Set Y Scale")
+							{
+								a = new action_preset::YScaleSet(spd);
+							}
+							else if (action == "Set Friction")
+							{
+								a = new action_preset::FrictionSet(spd);
+							}
+							else if (action == "Set Max X Speed")
+							{
+								a = new action_preset::MaxXSpeedSet(spd);
+							}
+							else if (action == "Set Max Y Speed")
+							{
+								a = new action_preset::MaxYSpeedSet(spd);
 							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
@@ -2527,7 +2599,15 @@ void Editor::onEdit2(wxCommandEvent& event)
 						if (roomChoiceDialog->ShowModal() == wxID_OK)
 						{
 							string str = roomChoiceDialog->GetStringSelection().ToStdString();
-							Action* a = new action_preset::SetRoom(str);
+							Action* a;
+							if (action == "Set Room")
+							{
+								a = new action_preset::SetRoom(str);
+							}
+							else if (action == "Set Sprite")
+							{
+								a = new action_preset::SpriteSet(str);
+							}
 							aList->emplace_back(a);
 							lb2->Append(a->toString());
 							lb2->SetStringSelection(a->toString());
