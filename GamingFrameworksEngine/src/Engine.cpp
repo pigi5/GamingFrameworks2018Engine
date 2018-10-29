@@ -197,7 +197,7 @@ void Engine::run()
 						// Location clicking is currently wrong
 
 						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
-						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, window.getView());
+						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, camera);
 						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
 					}
 				}
@@ -209,7 +209,7 @@ void Engine::run()
 						// Location clicking is currently wrong
 
 						sf::Vector2i mouseCoords(event.mouseButton.x, event.mouseButton.y);
-						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, window.getView());
+						sf::Vector2f mouseToWorld = window.mapPixelToCoords(mouseCoords, camera);
 						input.handleMousePress(mouseToWorld.x, mouseToWorld.y, localCurrentRoom);
 					}
 				}
