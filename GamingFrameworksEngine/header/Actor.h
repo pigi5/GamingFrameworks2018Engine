@@ -154,12 +154,14 @@ public:
 	const ActorType* getType() const;
 	int getId() const;
     State getNextState() const;
+	State getStartState() const;
     State getCurrentState() const;
     Hitbox* getHitbox() const;
     Room* getRoom() const;
     int getAttribute(std::string) const;
     
 	// Setters
+	void setStartState(State start);
     void setPosition(float, float);
 	void setXSpeed(float);
 	void setYSpeed(float);

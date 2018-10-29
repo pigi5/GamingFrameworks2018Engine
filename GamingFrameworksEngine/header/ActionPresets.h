@@ -214,11 +214,8 @@ namespace action_preset
                 actorType = mapItem->second;
             }
 
-            auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
-            if (nearest.first != NULL)
-            {
-                actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
-            }
+            auto nearest = engine_util::findNearest(actor, actorType, *actor->getRoom()->getActors());
+            actor->setPosition(nearest.first->getNextState().xPosition, nearest.first->getNextState().yPosition);
         }
     };
     
@@ -298,25 +295,22 @@ namespace action_preset
                 actorType = mapItem->second;
             }
 
-            auto nearest = engine_util::findNearest(actor, actorType, actor->getRoom()->getActors());
+            auto nearest = engine_util::findNearest(actor, actorType, *actor->getRoom()->getActors());
             
-            if (nearest.first != NULL)
+            State distanceVector = nearest.first->getNextState() - actor->getNextState();
+            // special case to avoid divide-by-zero
+            if (nearest.second == 0)
             {
-                State distanceVector = nearest.first->getNextState() - actor->getNextState();
-                // special case to avoid divide-by-zero
-                if (nearest.second == 0)
-                {
-                    actor->setXSpeed(0);
-                    actor->setYSpeed(0);
-                    return;
-                }
-                // calculate speeds
-                float xSpeed = distanceVector.xPosition / nearest.second * speed;
-                float ySpeed = distanceVector.yPosition / nearest.second * speed;
-
-                actor->setXSpeed(xSpeed);
-                actor->setYSpeed(ySpeed);
+                actor->setXSpeed(0);
+                actor->setYSpeed(0);
+                return;
             }
+            // calculate speeds
+            float xSpeed = distanceVector.xPosition / nearest.second * speed;
+            float ySpeed = distanceVector.yPosition / nearest.second * speed;
+
+            actor->setXSpeed(xSpeed);
+            actor->setYSpeed(ySpeed);
         }
     };
     

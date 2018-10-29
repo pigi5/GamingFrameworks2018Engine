@@ -344,6 +344,11 @@ State Actor::getNextState() const
     return nextState;
 }
 
+State Actor::getStartState() const
+{
+	return startState;
+}
+
 State Actor::getCurrentState() const
 {
     return currentState;
@@ -376,6 +381,11 @@ int Actor::getAttribute(std::string key) const
         }
     }
     return val->second;
+}
+
+void Actor::setStartState(State start)
+{
+	this->startState = start;
 }
 
 void Actor::setPosition(float xPosition, float yPosition)

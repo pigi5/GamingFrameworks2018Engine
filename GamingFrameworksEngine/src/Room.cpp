@@ -89,7 +89,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Room& obj)
     out << YAML::EndSeq;
     
     out << YAML::Key << "overlays" << YAML::Value << YAML::BeginSeq;
-    for (Actor* overlay : obj.overlays)
+    for (Overlay* overlay : obj.overlays)
     {
         out << YAML::BeginMap;
         out << *overlay;
@@ -111,7 +111,7 @@ Room::~Room()
     {
         delete actor;
     }
-    for (Actor* overlay : overlays)
+    for (Overlay* overlay : overlays)
     {
         delete overlay;
     }
@@ -124,7 +124,7 @@ void Room::step()
     {
         actor->step();
     }
-    for (Actor* overlay : overlays)
+    for (Overlay* overlay : overlays)
     {
         overlay->step();
     }
@@ -134,10 +134,6 @@ void Room::step()
     {
         actor->move(actors);
     }
-    for (Actor* overlay : overlays)
-    {
-        overlay->move(overlays);
-    }
 
     // delete actors queued for deletion
     for (Actor* actor : actorDeleteQueue)
@@ -146,7 +142,7 @@ void Room::step()
         delete actor;
     }
     actorDeleteQueue.clear();
-    for (Actor* overlay : overlayDeleteQueue)
+    for (Overlay* overlay : overlayDeleteQueue)
     {
         overlays.remove(overlay);
         delete overlay;
@@ -164,7 +160,7 @@ void Room::interpolateState(float progress)
 	{
 		actor->interpolateState(progress);
 	}
-    for (Actor* overlay : overlays)
+    for (Overlay* overlay : overlays)
     {
         overlay->interpolateState(progress);
     }
@@ -180,7 +176,7 @@ void Room::draw(sf::RenderWindow* window, sf::View* view)
 
 void Room::drawHUD(sf::RenderWindow* window, sf::View* view)
 {
-    for (Actor* overlay : overlays)
+    for (Overlay* overlay : overlays)
     {
         overlay->draw(window, view);
     }
@@ -192,7 +188,7 @@ void Room::fireTrigger(Trigger* trigger)
     {
         actor->fireTrigger(trigger);
     }
-    for (Actor* overlay : overlays)
+    for (Overlay* overlay : overlays)
     {
         overlay->fireTrigger(trigger);
     }
@@ -212,12 +208,12 @@ void Room::deleteActor(Actor* actor)
     actorDeleteQueue.push_back(actor);
 }
 
-void Room::addOverlay(Actor* newOverlay)
+void Room::addOverlay(Overlay* newOverlay)
 {
     overlays.push_back(newOverlay);
 }
 
-void Room::deleteOverlay(Actor* overlay)
+void Room::deleteOverlay(Overlay* overlay)
 {
     // fire destroy trigger
     ActorTypeWrapper wrapper(overlay->getType());
@@ -226,9 +222,14 @@ void Room::deleteOverlay(Actor* overlay)
     overlayDeleteQueue.push_back(overlay);
 }
 
-std::list<Actor*> Room::getActors() const
+std::list<Actor*>* Room::getActors()
 {
-    return actors;
+    return &actors;
+}
+
+std::list<Overlay*>* Room::getOverlays()
+{
+	return &overlays;
 }
 
 Actor* Room::getFollowedActor() const

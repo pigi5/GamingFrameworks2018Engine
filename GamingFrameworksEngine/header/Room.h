@@ -13,10 +13,10 @@ class Room
 {
 private:
     std::list<Actor*> actors;
-    std::list<Actor*> overlays;
+    std::list<Overlay*> overlays;
     
     std::list<Actor*> actorDeleteQueue;
-    std::list<Actor*> overlayDeleteQueue;
+    std::list<Overlay*> overlayDeleteQueue;
 
     Actor* followedActor;
 
@@ -51,10 +51,11 @@ public:
     
     void addActor(Actor*);
     void deleteActor(Actor*);
-    void addOverlay(Actor*);
-    void deleteOverlay(Actor*);
+    void addOverlay(Overlay*);
+    void deleteOverlay(Overlay*);
 
-    std::list<Actor*> getActors() const;
+    std::list<Actor*>* getActors();
+	std::list<Overlay*>* getOverlays();
 
     Actor* getFollowedActor() const;
 	void setFollowedActor(Actor* actor);
