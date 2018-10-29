@@ -1,0 +1,5 @@
+---
+name: spr_greenball
+textures:
+  - resources\sprites\greenball.png
+...

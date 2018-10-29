@@ -13,16 +13,5 @@ depth: 0
 attributes:
   {}
 triggers:
-  - type: Create
-    target: ball
-    actions:
-      - type: MoveToNearest
-        conditionals:
-          []
-        target: player
-      - type: Move
-        conditionals:
-          []
-        xOffset: 40
-        yOffset: -40
+  []
 ...

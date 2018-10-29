@@ -56,11 +56,6 @@ Actor::Actor(Room* room, const ActorType* type, State& startState)
 
 Actor::~Actor()
 {
-    // fire destroy trigger
-    ActorTypeWrapper wrapper(type);
-    trigger_preset::Destroy trigger(&wrapper);
-    fireTrigger(&trigger);
-
     if (hitbox != NULL) 
     {
         delete hitbox;
@@ -428,6 +423,10 @@ void Actor::setYSpeed(float ySpeed)
 
 void Actor::setCollidable(bool collidable)
 {
+    if (this->hitbox != NULL)
+    {
+        delete hitbox;
+    }
     if (collidable)
     {
         float width = sprite->getRecommendedWidth() * xScale;

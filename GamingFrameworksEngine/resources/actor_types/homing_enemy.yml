@@ -1,0 +1,58 @@
+---
+name: homing_enemy
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: true
+collidable: true
+sprite: spr_homing_enemy
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 0
+attributes:
+  {}
+triggers:
+  - type: Create
+    target: homing_enemy
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 5
+      - type: GravitousSet
+        conditionals:
+          []
+        value: false
+      - type: AnimationSpeedSet
+        conditionals:
+          []
+        value: 0.1
+      - type: MaxXSpeedSet
+        conditionals:
+          []
+        value: 0
+  - type: Timer
+    index: 0
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 5
+      - type: Create
+        conditionals:
+          []
+        target: fireball
+        xPosition: 40
+        yPosition: 0
+  - type: Step
+    target: homing_enemy
+    actions:
+      - type: MoveTowardNearest
+        conditionals:
+          []
+        target: player
+        speed: 1
+...

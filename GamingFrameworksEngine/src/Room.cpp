@@ -201,6 +201,10 @@ void Room::addActor(Actor* newActor)
 
 void Room::deleteActor(Actor* actor)
 {
+    // fire destroy trigger
+    ActorTypeWrapper wrapper(actor->getType());
+    trigger_preset::Destroy trigger(&wrapper);
+    actor->fireTrigger(&trigger);
     actorDeleteQueue.push_back(actor);
 }
 
@@ -211,6 +215,10 @@ void Room::addOverlay(Overlay* newOverlay)
 
 void Room::deleteOverlay(Overlay* overlay)
 {
+    // fire destroy trigger
+    ActorTypeWrapper wrapper(overlay->getType());
+    trigger_preset::Destroy trigger(&wrapper);
+    overlay->fireTrigger(&trigger);
     overlayDeleteQueue.push_back(overlay);
 }
 
