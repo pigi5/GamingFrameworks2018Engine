@@ -168,14 +168,23 @@ public:
 
 	wxScrolledWindow* rmEdit;
 	wxStaticText* defTxt;
-	wxStaticText* selTxt;
 	wxStaticText* folTxt;
 	wxStaticText* actTxt;
 	wxStaticText* ovTxt;
 
+	wxListBox* actBox;
+	wxListBox* ovBox;
+
 	void onSetDefault(wxCommandEvent& event);
-	void onSetObject(wxCommandEvent& event);
 	void onSetFollow(wxCommandEvent& event);
+
+	void onActNew(wxCommandEvent& event);
+	void onActEdit(wxCommandEvent& event);
+	void onActDelete(wxCommandEvent& event);
+
+	void onOvNew(wxCommandEvent& event);
+	void onOvEdit(wxCommandEvent& event);
+	void onOvDelete(wxCommandEvent& event);
 };
 
 // ============================================================================
@@ -800,15 +809,19 @@ void Sidebar::onDelete(wxCommandEvent& event)
         {
             case SPRITE:
 			    Sprite::objectMap.erase(str.ToStdString());
+				wxRemoveFile(currentPath + "\\sprites\\" + str + ".yml");
                 break;
             case ACTOR:
 			    ActorType::objectMap.erase(str.ToStdString());
+				wxRemoveFile(currentPath + "\\actor_types\\" + str + ".yml");
                 break;
             case OVERLAY:
 			    OverlayType::objectMap.erase(str.ToStdString());
+				wxRemoveFile(currentPath + "\\overlay_types\\" + str + ".yml");
                 break;
             case ROOM:
 			    Room::objectMap.erase(str.ToStdString());
+				wxRemoveFile(currentPath + "\\rooms\\" + str + ".yml");
                 break;
             case SOUND:
 			    Sound::objectMap.erase(str.ToStdString());
@@ -3157,19 +3170,16 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	rmEdit->SetScrollbars(20, 20, 5, 5);
 
 	wxBoxSizer *vbs = new wxBoxSizer(wxVERTICAL);
-	wxGridSizer *g1 = new wxGridSizer(1, 3, 2, 2);
-	wxGridSizer *g2 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer *g1 = new wxGridSizer(1, 2, 2, 2);
+	wxGridSizer *g2 = new wxGridSizer(1, 2, 2, 2);
 
 	wxPanel *bPanel = new wxPanel(rmEdit, wxID_ANY);
 
 	wxButton* defBtn = new wxButton(bPanel, DEF, wxT("Set As Default Room"));
-	wxButton* selBtn = new wxButton(bPanel, SELOBJ, wxT("Set Placed Object"));
 	wxButton* folBtn = new wxButton(bPanel, FOL, wxT("Set Followed Object"));
 	defBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetDefault, this);
-	selBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetObject, this);
 	folBtn->Bind(wxEVT_BUTTON, &RoomEditor::onSetFollow, this);
 	g1->Add(defBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
-	g1->Add(selBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
 	g1->Add(folBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
 	bPanel->SetSizer(g1);
 
@@ -3180,12 +3190,6 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 		defstr = "True";
 	}
 	defTxt = new wxStaticText(tPanel, wxID_ANY, "Default Room : " + defstr);
-	string selstr = "None";
-	if (rm->place != NULL)
-	{
-		selstr = rm->place->name;
-	}
-	selTxt = new wxStaticText(tPanel, wxID_ANY, "Selected Object : " + selstr);
 	string folstr = "None";
 	if (rm->getFollowedActor() != NULL)
 	{
@@ -3193,10 +3197,9 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	}
 	folTxt = new wxStaticText(tPanel, wxID_ANY, "Camera Following : " + folstr);
 	g2->Add(defTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
-	g2->Add(selTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
 	g2->Add(folTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
 	tPanel->SetSizer(g2);
-	
+
 	wxGridSizer *g3 = new wxGridSizer(1, 2, 2, 2);
 	wxPanel *t2Panel = new wxPanel(rmEdit, wxID_ANY);
 	actTxt = new wxStaticText(t2Panel, wxID_ANY, "Actors");
@@ -3205,11 +3208,63 @@ RoomEditor::RoomEditor() : wxFrame(NULL, wxID_ANY, selObject, wxDefaultPosition,
 	g3->Add(ovTxt, 0, wxALIGN_CENTER | wxCENTER, 2);
 	t2Panel->SetSizer(g3);
 
+	wxGridSizer *g4 = new wxGridSizer(1, 2, 2, 2);
+	wxGridSizer *g5 = new wxGridSizer(1, 3, 2, 2);
+	wxGridSizer *g6 = new wxGridSizer(1, 3, 2, 2);
+	wxPanel *btnsPanel = new wxPanel(rmEdit, wxID_ANY);
+	wxPanel *actBtnPanel = new wxPanel(btnsPanel, wxID_ANY);
+	wxPanel *ovBtnPanel = new wxPanel(btnsPanel, wxID_ANY);
+
+	wxButton* actNewBtn = new wxButton(actBtnPanel, NEW_ITEM, wxT("New"));
+	wxButton* actEditBtn = new wxButton(actBtnPanel, EDIT_ITEM, wxT("Edit"));
+	wxButton* actDelBtn = new wxButton(actBtnPanel, DELETE_ITEM, wxT("Delete"));
+	actNewBtn->Bind(wxEVT_BUTTON, &RoomEditor::onActNew, this);
+	actEditBtn->Bind(wxEVT_BUTTON, &RoomEditor::onActEdit, this);
+	actDelBtn->Bind(wxEVT_BUTTON, &RoomEditor::onActDelete, this);
+
+	g5->Add(actNewBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g5->Add(actEditBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g5->Add(actDelBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	actBtnPanel->SetSizer(g5);
+
+	wxButton* ovNewBtn = new wxButton(ovBtnPanel, NEW_ITEM, wxT("New"));
+	wxButton* ovEditBtn = new wxButton(ovBtnPanel, EDIT_ITEM, wxT("Edit"));
+	wxButton* ovDelBtn = new wxButton(ovBtnPanel, DELETE_ITEM, wxT("Delete"));
+	ovNewBtn->Bind(wxEVT_BUTTON, &RoomEditor::onOvNew, this);
+	ovEditBtn->Bind(wxEVT_BUTTON, &RoomEditor::onOvEdit, this);
+	ovDelBtn->Bind(wxEVT_BUTTON, &RoomEditor::onOvDelete, this);
+
+	g6->Add(ovNewBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g6->Add(ovEditBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	g6->Add(ovDelBtn, 0, wxALIGN_CENTER | wxCENTER, 2);
+	ovBtnPanel->SetSizer(g6);
+
+	g4->Add(actBtnPanel, 0, wxEXPAND | wxLEFT, 2);
+	g4->Add(ovBtnPanel, 0, wxEXPAND | wxRIGHT, 2);
+	btnsPanel->SetSizer(g4);
+
+	wxGridSizer *g7 = new wxGridSizer(1, 2, 2, 2);
 	wxPanel *rmPanel = new wxPanel(rmEdit, wxID_ANY);
+	actBox = new wxListBox(rmPanel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	for (auto& i : *rm->getActors())
+	{
+		string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+		actBox->Append(ap);
+	}
+	ovBox = new wxListBox(rmPanel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	for (auto& i : *rm->getOverlays())
+	{
+		string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+		ovBox->Append(ap);
+	}
+	g7->Add(actBox, 1, wxEXPAND | wxALL, 2);
+	g7->Add(ovBox, 1, wxEXPAND | wxALL, 2);
+	rmPanel->SetSizer(g7);
 
 	vbs->Add(tPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 5);
 	vbs->Add(bPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
 	vbs->Add(t2Panel, 0, wxEXPAND | wxTOP | wxBOTTOM, 5);
+	vbs->Add(btnsPanel, 0, wxEXPAND | wxTOP | wxBOTTOM, 10);
 	vbs->Add(rmPanel, 1, wxEXPAND | wxALL);
 	rmEdit->SetSizer(vbs);
 
@@ -3248,30 +3303,10 @@ void RoomEditor::onSetDefault(wxCommandEvent& event)
 	}
 	defTxt->SetLabel("Default Room : " + defstr);
 }
-void RoomEditor::onSetObject(wxCommandEvent& event)
-{
-	wxArrayString actorChoices;
-	for (auto& pair : ActorType::objectMap)
-	{
-		actorChoices.Add(pair.first);
-	}
-	wxSingleChoiceDialog *objDialog = new wxSingleChoiceDialog(this, "Choose Actor for Placement", "Choose one from the list", actorChoices);
-	if (objDialog->ShowModal() == wxID_OK)
-	{
-		string str = objDialog->GetStringSelection().ToStdString();
-		rm->place = ActorType::objectMap[str];
-		string selstr = "None";
-		if (rm->place != NULL)
-		{
-			selstr = rm->place->name;
-		}
-		selTxt->SetLabel("Selected Object : " + selstr);
-	}
-}
 void RoomEditor::onSetFollow(wxCommandEvent& event)
 {
 	wxArrayString actorChoices;
-	for (auto& i : rm->getActors())
+	for (auto& i : *rm->getActors())
 	{
 		string str = i->getType()->name + " : " + to_string(i->getId());
 		actorChoices.Add(str);
@@ -3287,7 +3322,7 @@ void RoomEditor::onSetFollow(wxCommandEvent& event)
 		}
 		else
 		{
-			for (auto& i : rm->getActors())
+			for (auto& i : *rm->getActors())
 			{
 				string find = i->getType()->name + " : " + to_string(i->getId());
 				if (find == str)
@@ -3302,5 +3337,195 @@ void RoomEditor::onSetFollow(wxCommandEvent& event)
 			folstr = rm->getFollowedActor()->getType()->name + " : " + to_string(rm->getFollowedActor()->getId());
 		}
 		folTxt->SetLabel("Camera Following : " + folstr);
+	}
+}
+
+void RoomEditor::onActNew(wxCommandEvent& event)
+{
+	Actor* a;
+	wxArrayString typeChoices;
+	for (auto& pair : ActorType::objectMap)
+	{
+		typeChoices.Add(pair.first);
+	}
+	wxSingleChoiceDialog *actTypeChoice = new wxSingleChoiceDialog(this, "Choose Actor Type to Add", "Choose One and Press OK", typeChoices);
+	if (actTypeChoice->ShowModal() == wxID_OK)
+	{
+		string str = actTypeChoice->GetStringSelection().ToStdString();
+		ActorType* at = ActorType::objectMap[str];
+		wxTextEntryDialog *actF1ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
+		if (actF1ChoiceDialog->ShowModal() == wxID_OK)
+		{
+			wxString str = actF1ChoiceDialog->GetValue();
+			float spd1 = stof(str.ToStdString());
+			wxTextEntryDialog *actF2ChoiceDialog = new wxTextEntryDialog(this, "Enter Y Position");
+			if (actF2ChoiceDialog->ShowModal() == wxID_OK)
+			{
+				wxString str = actF2ChoiceDialog->GetValue();
+				float spd2 = stof(str.ToStdString());
+				State st = State(spd1, spd2);
+				a = new Actor(rm, at, st);
+				rm->addActor(a);
+				string ap = a->getType()->name + " : " + to_string(a->getId()) + " : X : " + to_string(a->getStartState().xPosition) + " : Y : " + to_string(a->getStartState().yPosition);
+				actBox->Append(ap);
+			}
+		}
+	}
+}
+void RoomEditor::onActEdit(wxCommandEvent& event)
+{
+	int sel = actBox->GetSelection();
+	if (sel != -1)
+	{
+		string str = actBox->GetStringSelection().ToStdString();
+		bool found = false;
+		for (auto& i : *rm->getActors())
+		{
+			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			if (ap == str)
+			{
+				wxTextEntryDialog *actF3ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
+				if (actF3ChoiceDialog->ShowModal() == wxID_OK)
+				{
+					wxString str = actF3ChoiceDialog->GetValue();
+					float spd1 = stof(str.ToStdString());
+					wxTextEntryDialog *actF4ChoiceDialog = new wxTextEntryDialog(this, "Enter Y Position");
+					if (actF4ChoiceDialog->ShowModal() == wxID_OK)
+					{
+						wxString str = actF4ChoiceDialog->GetValue();
+						float spd2 = stof(str.ToStdString());
+						State st = State(spd1, spd2);
+						i->setStartState(st);
+						ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+						actBox->SetString(sel, ap);
+					}
+				}
+				found = true;
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+
+	}
+}
+void RoomEditor::onActDelete(wxCommandEvent& event)
+{
+	int sel = actBox->GetSelection();
+	if (sel != -1)
+	{
+		string str = actBox->GetStringSelection().ToStdString();
+		bool found = false;
+		for (auto& i : *rm->getActors())
+		{
+			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			if (ap == str)
+			{
+				rm->getActors()->remove(i);
+				actBox->Delete(sel);
+				found = true;
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+
+	}
+}
+
+void RoomEditor::onOvNew(wxCommandEvent& event)
+{
+	Overlay* o;
+	wxArrayString typeChoices;
+	for (auto& pair : OverlayType::objectMap)
+	{
+		typeChoices.Add(pair.first);
+	}
+	wxSingleChoiceDialog *ovTypeChoice = new wxSingleChoiceDialog(this, "Choose Overlay Type to Add", "Choose One and Press OK", typeChoices);
+	if (ovTypeChoice->ShowModal() == wxID_OK)
+	{
+		string str = ovTypeChoice->GetStringSelection().ToStdString();
+		OverlayType* ot = OverlayType::objectMap[str];
+		wxTextEntryDialog *actF1ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
+		if (actF1ChoiceDialog->ShowModal() == wxID_OK)
+		{
+			wxString str = actF1ChoiceDialog->GetValue();
+			float spd1 = stof(str.ToStdString());
+			wxTextEntryDialog *actF2ChoiceDialog = new wxTextEntryDialog(this, "Enter Y Position");
+			if (actF2ChoiceDialog->ShowModal() == wxID_OK)
+			{
+				wxString str = actF2ChoiceDialog->GetValue();
+				float spd2 = stof(str.ToStdString());
+				State st = State(spd1, spd2);
+				o = new Overlay(rm, ot, st);
+				rm->addOverlay(o);
+				string ap = o->getType()->name + " : " + to_string(o->getId()) + " : X : " + to_string(o->getStartState().xPosition) + " : Y : " + to_string(o->getStartState().yPosition);
+				ovBox->Append(ap);
+			}
+		}
+	}
+}
+void RoomEditor::onOvEdit(wxCommandEvent& event)
+{
+	int sel = ovBox->GetSelection();
+	if (sel != -1)
+	{
+		string str = ovBox->GetStringSelection().ToStdString();
+		bool found = false;
+		for (auto& i : *rm->getOverlays())
+		{
+			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			if (ap == str)
+			{
+				wxTextEntryDialog *ovF3ChoiceDialog = new wxTextEntryDialog(this, "Enter X Position");
+				if (ovF3ChoiceDialog->ShowModal() == wxID_OK)
+				{
+					wxString str = ovF3ChoiceDialog->GetValue();
+					float spd1 = stof(str.ToStdString());
+					wxTextEntryDialog *ovF4ChoiceDialog = new wxTextEntryDialog(this, "Enter Y Position");
+					if (ovF4ChoiceDialog->ShowModal() == wxID_OK)
+					{
+						wxString str = ovF4ChoiceDialog->GetValue();
+						float spd2 = stof(str.ToStdString());
+						State st = State(spd1, spd2);
+						i->setStartState(st);
+						ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+						ovBox->SetString(sel, ap);
+					}
+				}
+				found = true;
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+
+	}
+}
+void RoomEditor::onOvDelete(wxCommandEvent& event)
+{
+	int sel = ovBox->GetSelection();
+	if (sel != -1)
+	{
+		string str = ovBox->GetStringSelection().ToStdString();
+		bool found = false;
+		for (auto& i : *rm->getOverlays())
+		{
+			string ap = i->getType()->name + " : " + to_string(i->getId()) + " : X : " + to_string(i->getStartState().xPosition) + " : Y : " + to_string(i->getStartState().yPosition);
+			if (ap == str)
+			{
+				rm->getOverlays()->remove(i);
+				ovBox->Delete(sel);
+				found = true;
+			}
+			if (found)
+			{
+				break;
+			}
+		}
+
 	}
 }
