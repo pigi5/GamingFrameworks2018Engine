@@ -235,7 +235,7 @@ void Actor::fireTrigger(Trigger* trigger)
             engine_util::logger << *this << ": action - " << *action << std::endl;
             action->run(this);
             // can't continue if deleted
-            if (dynamic_cast<action_preset::Destroy*>(action))
+            if (dynamic_cast<action_preset::Destroy*>(action) && action->checkConditionals(this))
             {
                 return;
             }

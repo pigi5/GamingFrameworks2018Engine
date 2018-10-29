@@ -5,13 +5,46 @@ maxXSpeed: -1
 maxYSpeed: -1
 gravitous: false
 collidable: false
-sprite: ~
-xScale: 0
-yScale: 0
+sprite: spr_lives
+xScale: 1
+yScale: 1
 animationSpeed: 0
 depth: 0
 attributes:
   {}
 triggers:
-  []
+  - type: Create
+    target: hud
+    actions:
+      - type: AnimationSpeedSet
+        conditionals:
+          []
+        value: 0
+  - type: Step
+    target: hud
+    actions:
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: le
+            attribute: lives
+            value: 0
+        value: 0
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: lives
+            value: 1
+        value: 1
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: lives
+            value: 2
+        value: 2
+      - type: AnimationFrameSet
+        conditionals:
+          - comparison: eq
+            attribute: lives
+            value: 3
+        value: 3
 ...

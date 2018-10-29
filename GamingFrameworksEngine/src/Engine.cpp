@@ -72,7 +72,7 @@ Engine::Engine()
 void Engine::run()
 {
     // COMMENT THIS OUT FOR LOGGING
-    engine_util::logger.setActive(false);
+    //engine_util::logger.setActive(false);
 
     engine_util::logger << "Running game " << std::endl;
 
