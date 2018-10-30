@@ -740,16 +740,26 @@ void Sidebar::onNew(wxCommandEvent& WXUNUSED(event))
 	if (str.Len() > 0)
 	{
 		listbox->Append(str);
+		MySplitterWindow* p1;
         switch (operation)
         {
             case SPRITE:
 			    Sprite::createSprite(str.ToStdString());
+				selObject = str.ToStdString();
+				p1 = (MySplitterWindow*)this->GetParent();
+				p1->OnChange();
                 break;
             case ACTOR:
 			    ActorType::createActorType(str.ToStdString());
+				selObject = str.ToStdString();
+				p1 = (MySplitterWindow*)this->GetParent();
+				p1->OnChange();
                 break;
             case OVERLAY:
 			    OverlayType::createOverlayType(str.ToStdString());
+				selObject = str.ToStdString();
+				p1 = (MySplitterWindow*)this->GetParent();
+				p1->OnChange();
                 break;
             case ROOM:
 			    Room::createRoom(str.ToStdString());
