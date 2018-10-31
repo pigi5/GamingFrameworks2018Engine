@@ -363,15 +363,6 @@ void MyFrame::OnNew(wxCommandEvent& event)
 		this->SetLabel("RAGE - " + f);
 		wxMkdir(f);
 		currentPath = p + "//" + f;
-		if (wxSetWorkingDirectory(currentPath))
-		{
-			wxMkdir("actor_types");
-			wxMkdir("overlay_types");
-			wxMkdir("rooms");
-			wxMkdir("audio");
-			wxMkdir("sprites");
-			wxSetWorkingDirectory(p);
-		}
 	}
 	else
 	{

@@ -85,6 +85,13 @@ static void saveAll(std::string projectDir)
 {
     std::stringstream directoryPath;
     directoryPath << projectDir << "/" << T::DIR_NAME;
+
+    DIR* dir = opendir(directoryPath.str().c_str());
+    // if that directory does not exist, create it
+    if (dir == NULL && errno == ENOENT)
+    {
+        CreateDirectoryA(directoryPath.str().c_str(), NULL);
+    } 
  
     // iterate all objects of type T in memory
     for (const auto& pair : T::objectMap)
