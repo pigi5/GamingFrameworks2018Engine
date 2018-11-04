@@ -1,0 +1,5 @@
+---
+name: spr_line
+textures:
+  - resources\sprites\winline.png
+...

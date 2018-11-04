@@ -1,0 +1,15 @@
+---
+name: game_over
+default: false
+actors:
+  - type: gameover
+    startX: 0
+    startY: 0
+    follow: false
+  - type: reset
+    startX: 300
+    startY: 400
+    follow: false
+overlays:
+  []
+...

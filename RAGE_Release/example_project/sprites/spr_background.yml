@@ -1,0 +1,5 @@
+---
+name: spr_background
+textures:
+  - resources\sprites\background.png
+...

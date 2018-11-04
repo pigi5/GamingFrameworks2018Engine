@@ -1,0 +1,8 @@
+---
+name: spr_lives
+textures:
+  - resources\sprites\lives0.png
+  - resources\sprites\lives1.png
+  - resources\sprites\lives2.png
+  - resources\sprites\lives3.png
+...

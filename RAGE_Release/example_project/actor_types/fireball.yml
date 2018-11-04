@@ -1,0 +1,48 @@
+---
+name: fireball
+friction: 0
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: true
+collidable: true
+sprite: spr_fireball
+xScale: 1
+yScale: 1
+animationSpeed: 0
+depth: 0
+attributes:
+  {}
+triggers:
+  - type: Create
+    target: fireball
+    actions:
+      - type: SetTimer
+        conditionals:
+          []
+        index: 0
+        time: 7.5
+      - type: GravitousSet
+        conditionals:
+          []
+        value: false
+  - type: Collision
+    target: player
+    actions:
+      - type: Destroy
+        conditionals:
+          []
+  - type: Step
+    target: fireball
+    actions:
+      - type: MoveTowardNearest
+        conditionals:
+          []
+        target: player
+        speed: 0.25
+  - type: Timer
+    index: 0
+    actions:
+      - type: Destroy
+        conditionals:
+          []
+...

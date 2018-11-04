@@ -1,0 +1,13 @@
+---
+name: win_room
+default: false
+actors:
+  - type: win
+    startX: 0
+    startY: 0
+    follow: false
+overlays:
+  - type: score
+    startX: 430
+    startY: 400
+...

@@ -1,0 +1,17 @@
+---
+name: wall
+friction: 0.017
+maxXSpeed: -1
+maxYSpeed: -1
+gravitous: false
+collidable: true
+sprite: spr_brick
+xScale: 10
+yScale: 5
+animationSpeed: 0
+depth: -1
+attributes:
+  {}
+triggers:
+  []
+...
