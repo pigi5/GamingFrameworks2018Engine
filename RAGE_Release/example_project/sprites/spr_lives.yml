@@ -1,8 +1,8 @@
 ---
 name: spr_lives
 textures:
-  - resources\sprites\lives0.png
-  - resources\sprites\lives1.png
-  - resources\sprites\lives2.png
-  - resources\sprites\lives3.png
+  - example_project\sprites\lives0.png
+  - example_project\sprites\lives1.png
+  - example_project\sprites\lives2.png
+  - example_project\sprites\lives3.png
 ...

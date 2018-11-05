@@ -1,5 +1,5 @@
 ---
 name: spr_star
 textures:
-  - resources\sprites\star.png
+  - example_project\sprites\star.png
 ...

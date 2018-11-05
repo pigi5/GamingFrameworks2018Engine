@@ -1,5 +1,5 @@
 ---
 name: spr_gameover
 textures:
-  - resources\sprites\game_over.png
+  - example_project\sprites\game_over.png
 ...

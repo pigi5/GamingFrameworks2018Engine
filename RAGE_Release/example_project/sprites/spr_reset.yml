@@ -1,5 +1,5 @@
 ---
 name: spr_reset
 textures:
-  - resources\sprites\reset.png
+  - example_project\sprites\reset.png
 ...

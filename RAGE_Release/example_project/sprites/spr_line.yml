@@ -1,5 +1,5 @@
 ---
 name: spr_line
 textures:
-  - resources\sprites\winline.png
+  - example_project\sprites\winline.png
 ...

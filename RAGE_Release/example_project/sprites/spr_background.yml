@@ -1,5 +1,5 @@
 ---
 name: spr_background
 textures:
-  - resources\sprites\background.png
+  - example_project\sprites\background.png
 ...

@@ -1,5 +1,5 @@
 ---
 name: spr_bad_brick
 textures:
-  - resources\sprites\img_brick_bad.png
+  - example_project\sprites\img_brick_bad.png
 ...

@@ -1,4 +1,4 @@
 ---
 name: test_sound
-file_name: resources\sounds\demoSound.wav
+file_name: example_project\sounds\demoSound.wav
 ...

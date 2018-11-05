@@ -1,8 +1,8 @@
 ---
 name: spr_homing_enemy
 textures:
-  - resources\sprites\homing_enemy1.png
-  - resources\sprites\homing_enemy2.png
-  - resources\sprites\homing_enemy3.png
-  - resources\sprites\homing_enemy2.png
+  - example_project\sprites\homing_enemy1.png
+  - example_project\sprites\homing_enemy2.png
+  - example_project\sprites\homing_enemy3.png
+  - example_project\sprites\homing_enemy2.png
 ...

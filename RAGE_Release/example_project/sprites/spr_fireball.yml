@@ -1,5 +1,5 @@
 ---
 name: spr_fireball
 textures:
-  - resources\sprites\fireball.png
+  - example_project\sprites\fireball.png
 ...
